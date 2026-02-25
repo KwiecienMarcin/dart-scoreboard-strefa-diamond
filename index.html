@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Strefa Diamond Dart Scoreboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="orientation-warning">
+      <p>Ta aplikacja działa najlepiej w poziomie. Obróć urządzenie.</p>
+    </div>
+
+    <main id="app">
+      <header class="topbar">
+        <button id="home-link" class="ghost-btn">🏠 Strona główna</button>
+      </header>
+
+      <section id="home-screen" class="screen active">
+        <div class="hero-card">
+          <div class="logo-wrap">
+            <img src="assets/logo-placeholder.svg" alt="Strefa Diamond logo" class="hero-logo" />
+          </div>
+          <h1>Strefa Diamond</h1>
+          <p>najlepszy wymiar darta</p>
+          <div class="home-actions">
+            <button id="go-scoreboard" class="primary-btn">Dart Scoreboard</button>
+            <a class="secondary-btn" href="https://nakka.com/n01/online/" target="_blank" rel="noreferrer">Nakka</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="setup-screen" class="screen">
+        <div class="panel">
+          <h2>Ustawienia meczu</h2>
+
+          <div class="field-row">
+            <label for="player-count">Liczba zawodników</label>
+            <select id="player-count">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+
+          <div id="players-inputs" class="players-grid"></div>
+
+          <div class="field-row">
+            <span>Zakończenie lega</span>
+            <div class="toggle-wrap">
+              <label><input type="radio" name="out-mode" value="double" checked /> Double out</label>
+              <label><input type="radio" name="out-mode" value="single" /> Single out</label>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <label for="start-score">Start punktów</label>
+            <select id="start-score">
+              <option value="301">301</option>
+              <option value="501" selected>501</option>
+              <option value="701">701</option>
+            </select>
+          </div>
+
+          <button id="start-game" class="primary-btn">Dalej</button>
+        </div>
+      </section>
+
+      <section id="game-screen" class="screen">
+        <div class="game-header">
+          <h2 id="match-title">Mecz</h2>
+          <div class="game-controls">
+            <button id="back-to-setup" class="ghost-btn">← Edytuj zawodników</button>
+            <button id="new-game" class="ghost-btn">Nowa gra</button>
+          </div>
+        </div>
+
+        <div class="game-layout">
+          <div class="score-side">
+            <article id="current-player-card" class="current-player-card"></article>
+            <ul id="players-list" class="players-list"></ul>
+          </div>
+
+          <div class="input-side">
+            <div class="score-input-box">
+              <input id="score-input" type="text" inputmode="numeric" placeholder="Wpisz wynik tury" readonly />
+              <button id="submit-score" class="primary-btn">Zatwierdź</button>
+            </div>
+
+            <div class="keypad" id="keypad"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

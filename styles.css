@@ -1,0 +1,315 @@
+:root {
+  --bg: #061716;
+  --panel: #0b2420;
+  --panel-2: #122f29;
+  --accent: #ff9f1a;
+  --accent-2: #ff583a;
+  --text: #f6f7f8;
+  --muted: #b7c6c3;
+  --good: #2dd48f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at 30% 20%, #15352f, var(--bg));
+  min-height: 100vh;
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 20px 20px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+.hero-card,
+.panel,
+.current-player-card,
+.players-list,
+.score-input-box,
+.keypad {
+  background: linear-gradient(120deg, rgba(10, 33, 30, 0.97), rgba(19, 45, 39, 0.95));
+  border-radius: 22px;
+  border: 1px solid rgba(172, 196, 188, 0.2);
+}
+
+.hero-card {
+  min-height: calc(100vh - 90px);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 20px;
+}
+
+.logo-wrap {
+  width: 140px;
+  height: 140px;
+}
+
+.hero-logo {
+  width: 100%;
+  height: 100%;
+}
+
+h1,
+h2,
+.match-font {
+  margin: 0;
+  font-family: "Bebas Neue", sans-serif;
+  letter-spacing: 1px;
+}
+
+.hero-card h1 {
+  font-size: clamp(2.8rem, 7vw, 5rem);
+}
+
+.hero-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+}
+
+.home-actions {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+}
+
+button,
+.secondary-btn,
+select,
+input {
+  font: inherit;
+}
+
+.primary-btn,
+.secondary-btn,
+.ghost-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 18px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-btn {
+  background: linear-gradient(120deg, var(--accent-2), var(--accent));
+}
+
+.secondary-btn,
+.ghost-btn {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.panel {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.panel h2 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 14px;
+}
+
+.field-row {
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+select,
+.player-name {
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  border: 1px solid rgba(184, 211, 201, 0.25);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.toggle-wrap {
+  display: flex;
+  gap: 14px;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.game-header h2 {
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+}
+
+.game-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.game-layout {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 14px;
+}
+
+.score-side {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+}
+
+.current-player-card {
+  padding: 16px;
+  background: linear-gradient(130deg, #ff583a, #ff9f1a);
+  color: #fff;
+}
+
+.current-player-card h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.current-player-score {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.current-player-score .big {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(4rem, 8vw, 6rem);
+  line-height: 1;
+}
+
+.checkout {
+  margin-top: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  width: fit-content;
+  background: rgba(0, 0, 0, 0.4);
+  font-weight: 800;
+}
+
+.players-list {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.players-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(193, 213, 204, 0.22);
+  padding-bottom: 8px;
+}
+
+.players-list li:last-child {
+  border-bottom: none;
+}
+
+.score-input-box {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+#score-input {
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #091917;
+  border-radius: 12px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.keypad {
+  margin-top: 10px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.keypad button {
+  border: none;
+  border-radius: 12px;
+  min-height: 62px;
+  font-size: 2rem;
+  font-family: "Bebas Neue", sans-serif;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+}
+
+.keypad button.action {
+  background: rgba(45, 212, 143, 0.2);
+}
+
+#orientation-warning {
+  display: none;
+}
+
+@media (orientation: portrait) {
+  #app {
+    display: none;
+  }
+
+  #orientation-warning {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 960px) {
+  .game-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .players-grid {
+    grid-template-columns: 1fr;
+  }
+}

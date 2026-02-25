@@ -1,0 +1,12 @@
+<svg width="220" height="220" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Strefa Diamond logo placeholder">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff5a36"/>
+      <stop offset="1" stop-color="#ffa320"/>
+    </linearGradient>
+  </defs>
+  <rect width="220" height="220" rx="44" fill="#0d221f"/>
+  <polygon points="110,25 185,110 110,195 35,110" fill="url(#g)"/>
+  <circle cx="110" cy="110" r="30" fill="#0d221f"/>
+  <text x="110" y="120" fill="#d2f1ee" text-anchor="middle" font-size="34" font-family="Arial" font-weight="700">SD</text>
+</svg>
