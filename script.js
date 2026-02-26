@@ -12,6 +12,7 @@ const startGameBtn = document.getElementById('start-game');
 const startScoreSelect = document.getElementById('start-score');
 const backToSetupBtn = document.getElementById('back-to-setup');
 const newGameBtn = document.getElementById('new-game');
+const undoTurnBtn = document.getElementById('undo-turn');
 const currentPlayerCard = document.getElementById('current-player-card');
 const playersList = document.getElementById('players-list');
 const scoreInput = document.getElementById('score-input');
@@ -22,6 +23,7 @@ const scoreInputEl = document.getElementById('score-input');
 const submitScoreLabel = document.getElementById('submit-score');
 const backToSetupLabel = document.getElementById('back-to-setup-label');
 const newGameLabel = document.getElementById('new-game-label');
+const undoTurnLabel = document.getElementById('undo-turn-label');
 const langPlBtn = document.getElementById('lang-pl');
 const langEnBtn = document.getElementById('lang-en');
 
@@ -32,12 +34,50 @@ const state = {
   startScore: 501,
   turnInput: '',
   lang: 'pl',
+  turnHistory: [],
 };
 
 const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'C'];
 
 
 
+
+
+function loadImageFromCandidates(img, candidates) {
+  const uniqueCandidates = [...new Set(candidates.filter(Boolean))];
+
+  function tryNext(index) {
+    if (index >= uniqueCandidates.length) return;
+
+    const candidate = uniqueCandidates[index];
+    img.src = candidate;
+    img.onerror = () => tryNext(index + 1);
+    img.onload = () => {
+      img.onerror = null;
+    };
+  }
+
+  tryNext(0);
+}
+
+function initBrandLogos() {
+  const logos = document.querySelectorAll('.brand-logo');
+
+  logos.forEach((img) => {
+    const original = img.getAttribute('src') || '';
+    const normalized = original.startsWith('/') ? original.slice(1) : original;
+    const candidates = [
+      normalized,
+      `/${normalized}`,
+      normalized.toLowerCase(),
+      `/${normalized.toLowerCase()}`,
+      normalized.replace('.png', '.PNG'),
+      `/${normalized.replace('.png', '.PNG')}`,
+    ];
+
+    loadImageFromCandidates(img, candidates);
+  });
+}
 
 const t = {
   pl: {
@@ -50,6 +90,7 @@ const t = {
     outSingle: 'Single out',
     backToSetup: 'Edytuj zawodników',
     newGame: 'Nowa gra',
+    undoTurn: 'Cofnij turę',
     enterScore: 'Wpisz wynik tury',
     submit: 'Zatwierdź',
     nowThrowing: 'Rzuca teraz',
@@ -60,6 +101,8 @@ const t = {
     legWin: (name) => `${name} wygrywa lega! Startujemy nowego lega.`,
     modeDouble: 'Double out',
     modeSingle: 'Single out',
+    gameTitle: 'Mecz',
+    noUndo: 'Brak tury do cofnięcia.',
   },
   en: {
     setupTitle: 'Match settings',
@@ -71,6 +114,7 @@ const t = {
     outSingle: 'Single out',
     backToSetup: 'Edit players',
     newGame: 'New game',
+    undoTurn: 'Undo turn',
     enterScore: 'Enter turn score',
     submit: 'Submit',
     nowThrowing: 'Now throwing',
@@ -81,6 +125,8 @@ const t = {
     legWin: (name) => `${name} wins the leg! Starting a new leg.`,
     modeDouble: 'Double out',
     modeSingle: 'Single out',
+    gameTitle: 'Game',
+    noUndo: 'There is no turn to undo.',
   },
 };
 
@@ -106,6 +152,7 @@ function applyTranslations() {
 
   if (backToSetupLabel) backToSetupLabel.textContent = tr('backToSetup');
   if (newGameLabel) newGameLabel.textContent = tr('newGame');
+  if (undoTurnLabel) undoTurnLabel.textContent = tr('undoTurn');
   if (scoreInputEl) scoreInputEl.placeholder = tr('enterScore');
   if (submitScoreLabel) submitScoreLabel.textContent = tr('submit');
   if (startGameBtn) startGameBtn.textContent = tr('next');
@@ -158,6 +205,7 @@ function collectPlayers() {
   state.startScore = start;
   state.outMode = document.querySelector('input[name="out-mode"]:checked').value;
   state.turnInput = '';
+  state.turnHistory = [];
   applyTranslations();
 }
 
@@ -222,7 +270,7 @@ function renderGame() {
   const current = state.players[state.currentPlayer];
   const checkout = findCheckout(current.score, state.outMode);
 
-  matchTitle.textContent = `${state.outMode === 'double' ? tr('modeDouble') : tr('modeSingle')} • ${state.startScore}`;
+  matchTitle.textContent = tr('gameTitle');
 
   currentPlayerCard.innerHTML = `
     <h3>${tr('nowThrowing')}: ${current.name}</h3>
@@ -251,6 +299,28 @@ function rotatePlayer() {
   state.currentPlayer = (state.currentPlayer + 1) % state.players.length;
 }
 
+
+function saveTurnSnapshot() {
+  state.turnHistory.push({
+    players: state.players.map((player) => ({ ...player })),
+    currentPlayer: state.currentPlayer,
+  });
+}
+
+function undoTurn() {
+  const snapshot = state.turnHistory.pop();
+
+  if (!snapshot) {
+    alert(tr('noUndo'));
+    return;
+  }
+
+  state.players = snapshot.players.map((player) => ({ ...player }));
+  state.currentPlayer = snapshot.currentPlayer;
+  state.turnInput = '';
+  renderGame();
+}
+
 function submitTurn() {
   const current = state.players[state.currentPlayer];
   const entered = Number(state.turnInput);
@@ -259,6 +329,8 @@ function submitTurn() {
     alert(tr('invalidTurn'));
     return;
   }
+
+  saveTurnSnapshot();
 
   const remaining = current.score - entered;
   const validCheckout = remaining === 0;
@@ -302,6 +374,7 @@ function submitTurn() {
 
 function handleHomeReset() {
   state.players = [];
+  state.turnHistory = [];
   state.turnInput = '';
   playerCountSelect.value = '2';
   renderPlayerInputs();
@@ -375,11 +448,13 @@ backToSetupBtn.addEventListener('click', () => {
   showScreen('setup');
 });
 
+undoTurnBtn?.addEventListener('click', undoTurn);
 newGameBtn.addEventListener('click', handleHomeReset);
 homeLink.addEventListener('click', handleHomeReset);
 
 submitScoreBtn.addEventListener('click', submitTurn);
 
+initBrandLogos();
 buildKeypad();
 renderPlayerInputs();
 applyTranslations();
