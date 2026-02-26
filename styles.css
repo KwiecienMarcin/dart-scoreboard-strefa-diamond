@@ -1,0 +1,494 @@
+:root {
+  --bg: #06080f;
+  --panel: #101420;
+  --panel-2: #1a2131;
+  --accent: #f2ba2a;
+  --accent-2: #ffd449;
+  --text: #ffffff;
+  --muted: #f2f2f2;
+  --good: #f2ba2a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Bebas Neue", Inter, sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at 30% 20%, #191f31, var(--bg));
+  min-height: 100vh;
+}
+
+#app {
+  width: min(100vw, 1280px);
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 20px 20px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.topbar-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+.topbar-logo {
+  height: 44px;
+  width: auto;
+  filter: drop-shadow(0 0 10px rgba(242, 186, 42, 0.2));
+}
+
+.brand-logo {
+  display: block;
+}
+
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+.hero-card,
+.panel,
+.current-player-card,
+.players-list,
+.score-input-box,
+.keypad {
+  background: linear-gradient(120deg, rgba(15, 19, 30, 0.97), rgba(24, 29, 44, 0.95));
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: calc(100vh - 90px);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 30px 24px;
+}
+
+.hero-card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 24px;
+  background: conic-gradient(from 180deg at 50% 50%, rgba(242, 186, 42, 0.65), rgba(255, 255, 255, 0.15), rgba(242, 186, 42, 0.6));
+  animation: spin-border 8s linear infinite;
+  z-index: -2;
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 20px;
+  background: linear-gradient(120deg, rgba(11, 14, 22, 0.98), rgba(22, 26, 39, 0.96));
+  z-index: -1;
+}
+
+.logo-wrap {
+  z-index: 2;
+  width: min(88vw, 980px);
+  min-height: 120px;
+}
+
+.hero-logo {
+  width: 100%;
+  height: auto;
+  z-index: 2;
+  filter: drop-shadow(0 0 24px rgba(242, 186, 42, 0.35));
+}
+
+.hero-glow {
+  display: none;
+}
+
+.slogan {
+  z-index: 2;
+  margin: 0;
+  font-family: "Bebas Neue", sans-serif;
+  letter-spacing: 2px;
+  color: #ffffff;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+}
+
+
+.brand-title {
+  z-index: 2;
+  margin: 0;
+  font-size: clamp(2.8rem, 7vw, 5.2rem);
+  letter-spacing: 2px;
+  color: #ffffff;
+  text-shadow: 0 0 22px rgba(242, 186, 42, 0.2);
+}
+
+.home-cta {
+  width: 100%;
+  min-height: 94px;
+  font-size: clamp(1.45rem, 2.2vw, 1.9rem);
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  letter-spacing: 1.4px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-cta span {
+  display: inline-block;
+  transform: translateY(1px);
+  font-size: inherit;
+  line-height: 1;
+  font-weight: 700;
+  min-width: 14ch;
+  text-align: center;
+}
+
+.home-cta:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 16px 34px rgba(242, 186, 42, 0.22);
+}
+
+.home-badges {
+  z-index: 2;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.home-badges span {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.hero-credit {
+  position: absolute;
+  right: 18px;
+  bottom: 14px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  letter-spacing: 1px;
+}
+
+h1,
+h2,
+.match-font {
+  margin: 0;
+  font-family: "Bebas Neue", sans-serif;
+  letter-spacing: 1px;
+}
+
+.hero-card h1 {
+  font-size: clamp(2.8rem, 7vw, 5rem);
+}
+
+.hero-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+}
+
+
+.home-language {
+  z-index: 2;
+  display: inline-flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.lang-btn {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  min-width: 70px;
+  min-height: 44px;
+  border-radius: 12px;
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+.lang-btn.active {
+  background: linear-gradient(120deg, var(--accent-2), var(--accent));
+  color: #161616;
+  border-color: rgba(242, 186, 42, 0.7);
+}
+
+.home-actions {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, 340px);
+  gap: 14px;
+  justify-content: center;
+}
+
+button,
+.secondary-btn,
+select,
+input {
+  font: inherit;
+  letter-spacing: 1px;
+}
+
+.primary-btn,
+.secondary-btn,
+.ghost-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 18px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-btn {
+  background: linear-gradient(120deg, var(--accent-2), var(--accent));
+  color: #151515;
+}
+
+.secondary-btn,
+.ghost-btn {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.secondary-btn.home-cta {
+  border: 1px solid rgba(242, 186, 42, 0.45);
+  background: linear-gradient(120deg, rgba(255,255,255,0.08), rgba(242,186,42,0.12));
+}
+
+
+.panel {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.panel h2 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 14px;
+}
+
+.field-row {
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+select,
+.player-name {
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.toggle-wrap {
+  display: flex;
+  gap: 14px;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.game-header h2 {
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+}
+
+.game-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.game-layout {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 14px;
+}
+
+.score-side {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+}
+
+.current-player-card {
+  padding: 16px;
+  background: linear-gradient(130deg, #f2ba2a, #ffd449);
+  color: #101010;
+}
+
+.current-player-card h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.current-player-score {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.current-player-score .big {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(4rem, 8vw, 6rem);
+  line-height: 1;
+}
+
+.checkout {
+  margin-top: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  width: fit-content;
+  background: rgba(8, 8, 8, 0.72);
+  color: #ffe27c;
+  font-weight: 800;
+}
+
+.players-list {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.players-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  padding-bottom: 8px;
+}
+
+.players-list li:last-child {
+  border-bottom: none;
+}
+
+.score-input-box {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+#score-input {
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #171717;
+  border-radius: 12px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.keypad {
+  margin-top: 10px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.keypad button {
+  border: none;
+  border-radius: 12px;
+  min-height: 62px;
+  font-size: 2rem;
+  font-family: "Bebas Neue", sans-serif;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+}
+
+.keypad button.action {
+  background: rgba(242, 186, 42, 0.28);
+}
+
+#orientation-warning {
+  display: none;
+}
+
+@media (orientation: portrait) {
+  #app {
+    display: none;
+  }
+
+  #orientation-warning {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 960px), (max-height: 560px) {
+  #app {
+    padding: 8px 10px 12px;
+  }
+
+  .home-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .home-cta {
+    min-height: 82px;
+    width: 100%;
+  }
+
+  .hero-credit {
+    position: static;
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  .game-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .players-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@keyframes spin-border {
+  to {
+    transform: rotate(1turn);
+  }
+}
