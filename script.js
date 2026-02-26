@@ -114,6 +114,16 @@ function applyTranslations() {
   langEnBtn?.classList.toggle('active', state.lang === 'en');
 }
 
+
+function ensureLogoAssets() {
+  document.querySelectorAll('img[data-fallback]').forEach((img) => {
+    img.addEventListener('error', () => {
+      const fb = img.getAttribute('data-fallback');
+      if (fb && img.src.indexOf(fb) === -1) img.src = fb;
+    });
+  });
+}
+
 function showScreen(name) {
   Object.entries(screens).forEach(([screenName, element]) => {
     element.classList.toggle('active', screenName === name);
@@ -380,6 +390,7 @@ homeLink.addEventListener('click', handleHomeReset);
 submitScoreBtn.addEventListener('click', submitTurn);
 
 buildKeypad();
+ensureLogoAssets();
 renderPlayerInputs();
 applyTranslations();
 showScreen('home');

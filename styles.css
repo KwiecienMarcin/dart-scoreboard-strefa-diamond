@@ -273,6 +273,11 @@ input {
   background: linear-gradient(120deg, rgba(255,255,255,0.08), rgba(242,186,42,0.12));
 }
 
+.nakka-cta span {
+  font-size: 1.18em;
+  letter-spacing: 1.6px;
+}
+
 .panel {
   max-width: 920px;
   margin: 0 auto;
