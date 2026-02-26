@@ -9,6 +9,7 @@ Prosta webowa apka do liczenia darta w klimacie Strefa Diamond.
 - Link do strony głównej na każdym ekranie.
 - Podpowiedzi checkoutów dla wartości <= 180.
 - Widok zaprojektowany pod orientację poziomą.
+- Branding Strefa Diamond z głównym logo `assets/logo_full.svg`.
 
 ## Uruchomienie lokalne
 ```bash

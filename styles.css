@@ -1,11 +1,11 @@
 :root {
-  --bg: #061716;
-  --panel: #0b2420;
-  --panel-2: #122f29;
-  --accent: #ff9f1a;
-  --accent-2: #ff583a;
-  --text: #f6f7f8;
-  --muted: #b7c6c3;
+  --bg: #06080f;
+  --panel: #101420;
+  --panel-2: #1a2131;
+  --accent: #f2ba2a;
+  --accent-2: #ffd449;
+  --text: #fff6d5;
+  --muted: #d9cfae;
   --good: #2dd48f;
 }
 
@@ -17,7 +17,7 @@ body {
   margin: 0;
   font-family: Inter, sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at 30% 20%, #15352f, var(--bg));
+  background: radial-gradient(circle at 30% 20%, #191f31, var(--bg));
   min-height: 100vh;
 }
 
@@ -29,8 +29,14 @@ body {
 
 .topbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
+}
+
+.topbar-logo {
+  height: 44px;
+  width: auto;
 }
 
 .screen {
@@ -62,13 +68,13 @@ body {
 }
 
 .logo-wrap {
-  width: 140px;
-  height: 140px;
+  width: min(80vw, 760px);
+  min-height: 120px;
 }
 
 .hero-logo {
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 
 h1,
@@ -118,6 +124,7 @@ input {
 
 .primary-btn {
   background: linear-gradient(120deg, var(--accent-2), var(--accent));
+  color: #151515;
 }
 
 .secondary-btn,
@@ -195,8 +202,8 @@ select,
 
 .current-player-card {
   padding: 16px;
-  background: linear-gradient(130deg, #ff583a, #ff9f1a);
-  color: #fff;
+  background: linear-gradient(130deg, #f2ba2a, #ffd449);
+  color: #101010;
 }
 
 .current-player-card h3 {
@@ -222,7 +229,8 @@ select,
   padding: 8px 10px;
   border-radius: 10px;
   width: fit-content;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(8, 8, 8, 0.72);
+  color: #ffe27c;
   font-weight: 800;
 }
 
@@ -256,7 +264,7 @@ select,
 #score-input {
   border: none;
   background: rgba(255, 255, 255, 0.9);
-  color: #091917;
+  color: #171717;
   border-radius: 12px;
   font-size: 1.4rem;
   font-weight: 700;
