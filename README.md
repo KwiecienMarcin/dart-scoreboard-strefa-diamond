@@ -9,11 +9,11 @@ Prosta webowa apka do liczenia darta w klimacie Strefa Diamond.
 - Link do strony głównej na każdym ekranie.
 - Podpowiedzi checkoutów dla wartości <= 180.
 - Widok zaprojektowany pod orientację poziomą.
-- Branding Strefa Diamond z głównym logo `assets/logo_full.svg`.
+- Branding Strefa Diamond z logo PNG (`assets/logo_full.png`, `assets/logo_strefa_diamond_pion.png`).
 
 
 ## Logo / branding (ważne)
-Aplikacja teraz najpierw próbuje wczytać PNG, a jeśli nie ma pliku, używa SVG fallback.
+Aplikacja używa wyłącznie plików PNG z folderu `assets/`.
 
 Oczekiwane pliki (wrzuć do `assets/`):
 - `logo_full.png`
@@ -27,7 +27,6 @@ git add assets/logo_full.png assets/logo_strefa_diamond_pion.png
 git commit -m "Add Strefa Diamond PNG logos"
 ```
 
-Jeśli ich nie ma, strona nadal działa na `logo_full.svg`.
 
 ## Uruchomienie lokalne
 ```bash
