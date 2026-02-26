@@ -154,6 +154,9 @@ body {
   transform: translateY(1px);
   font-size: inherit;
   line-height: 1;
+  font-weight: 700;
+  min-width: 14ch;
+  text-align: center;
 }
 
 .home-cta:hover {
@@ -273,10 +276,6 @@ input {
   background: linear-gradient(120deg, rgba(255,255,255,0.08), rgba(242,186,42,0.12));
 }
 
-.nakka-cta span {
-  font-size: 1.18em;
-  letter-spacing: 1.6px;
-}
 
 .panel {
   max-width: 920px;
