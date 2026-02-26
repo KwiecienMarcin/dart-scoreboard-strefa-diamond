@@ -39,43 +39,6 @@ const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '
 
 
 
-
-function loadImageFromCandidates(img, candidates) {
-  const uniqueCandidates = [...new Set(candidates.filter(Boolean))];
-
-  function tryNext(index) {
-    if (index >= uniqueCandidates.length) return;
-
-    const candidate = uniqueCandidates[index];
-    img.src = candidate;
-    img.onerror = () => tryNext(index + 1);
-    img.onload = () => {
-      img.onerror = null;
-    };
-  }
-
-  tryNext(0);
-}
-
-function initBrandLogos() {
-  const logos = document.querySelectorAll('.brand-logo');
-
-  logos.forEach((img) => {
-    const original = img.getAttribute('src') || '';
-    const normalized = original.startsWith('/') ? original.slice(1) : original;
-    const candidates = [
-      normalized,
-      `/${normalized}`,
-      normalized.toLowerCase(),
-      `/${normalized.toLowerCase()}`,
-      normalized.replace('.png', '.PNG'),
-      `/${normalized.replace('.png', '.PNG')}`,
-    ];
-
-    loadImageFromCandidates(img, candidates);
-  });
-}
-
 const t = {
   pl: {
     setupTitle: 'Ustawienia meczu',
@@ -417,7 +380,6 @@ homeLink.addEventListener('click', handleHomeReset);
 
 submitScoreBtn.addEventListener('click', submitTurn);
 
-initBrandLogos();
 buildKeypad();
 renderPlayerInputs();
 applyTranslations();
