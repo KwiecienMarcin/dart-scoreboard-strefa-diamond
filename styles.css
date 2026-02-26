@@ -4,9 +4,9 @@
   --panel-2: #1a2131;
   --accent: #f2ba2a;
   --accent-2: #ffd449;
-  --text: #fff6d5;
-  --muted: #d9cfae;
-  --good: #2dd48f;
+  --text: #ffffff;
+  --muted: #f2f2f2;
+  --good: #f2ba2a;
 }
 
 * {
@@ -53,9 +53,9 @@ body {
 .players-list,
 .score-input-box,
 .keypad {
-  background: linear-gradient(120deg, rgba(10, 33, 30, 0.97), rgba(19, 45, 39, 0.95));
+  background: linear-gradient(120deg, rgba(15, 19, 30, 0.97), rgba(24, 29, 44, 0.95));
   border-radius: 22px;
-  border: 1px solid rgba(172, 196, 188, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .hero-card {
@@ -155,7 +155,7 @@ select,
 .player-name {
   background: rgba(0, 0, 0, 0.25);
   color: var(--text);
-  border: 1px solid rgba(184, 211, 201, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 10px 12px;
   border-radius: 10px;
 }
@@ -246,7 +246,7 @@ select,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(193, 213, 204, 0.22);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
   padding-bottom: 8px;
 }
 
@@ -290,7 +290,7 @@ select,
 }
 
 .keypad button.action {
-  background: rgba(45, 212, 143, 0.2);
+  background: rgba(242, 186, 42, 0.28);
 }
 
 #orientation-warning {
