@@ -22,6 +22,7 @@ body {
 }
 
 #app {
+  width: min(100vw, 1280px);
   max-width: 1280px;
   margin: 0 auto;
   padding: 12px 20px 20px;
@@ -113,11 +114,7 @@ body {
 }
 
 .hero-glow {
-  position: absolute;
-  inset: auto -20% -40% -20%;
-  height: 72%;
-  background: radial-gradient(circle, rgba(242, 186, 42, 0.22) 0%, rgba(242, 186, 42, 0.02) 60%, transparent 75%);
-  pointer-events: none;
+  display: none;
 }
 
 .slogan {
@@ -179,18 +176,13 @@ body {
   background: rgba(255, 255, 255, 0.06);
 }
 
-.hero-side-logo {
+.hero-credit {
   position: absolute;
-  right: 16px;
-  bottom: 16px;
-  width: clamp(100px, 14vw, 180px);
-  opacity: 0.3;
-}
-
-.hero-logo-vertical {
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 0 14px rgba(242, 186, 42, 0.25));
+  right: 18px;
+  bottom: 14px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  letter-spacing: 1px;
 }
 
 h1,
@@ -214,7 +206,7 @@ h2,
 .home-actions {
   margin-top: 18px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(270px, 360px));
+  grid-template-columns: repeat(2, minmax(300px, 360px));
   gap: 14px;
   justify-content: center;
 }
@@ -434,7 +426,7 @@ select,
   }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 960px), (max-height: 560px) {
   .home-actions {
     grid-template-columns: 1fr;
   }
@@ -443,8 +435,10 @@ select,
     min-height: 82px;
   }
 
-  .hero-side-logo {
-    display: none;
+  .hero-credit {
+    position: static;
+    margin-top: 4px;
+    text-align: center;
   }
 
   .game-layout {

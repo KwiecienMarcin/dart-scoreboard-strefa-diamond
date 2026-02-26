@@ -18,6 +18,11 @@ const scoreInput = document.getElementById('score-input');
 const submitScoreBtn = document.getElementById('submit-score');
 const keypad = document.getElementById('keypad');
 const matchTitle = document.getElementById('match-title');
+const languageSelect = document.getElementById('language-select');
+const scoreInputEl = document.getElementById('score-input');
+const submitScoreLabel = document.getElementById('submit-score');
+const backToSetupLabel = document.getElementById('back-to-setup-label');
+const newGameLabel = document.getElementById('new-game-label');
 
 const state = {
   players: [],
@@ -25,20 +30,66 @@ const state = {
   outMode: 'double',
   startScore: 501,
   turnInput: '',
+  lang: 'pl',
 };
 
 const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'C'];
 
 
-function enableLogoFallbacks() {
-  document.querySelectorAll('img[data-fallback]').forEach((img) => {
-    img.addEventListener('error', () => {
-      const fallback = img.getAttribute('data-fallback');
-      if (fallback && img.getAttribute('src') !== fallback) {
-        img.setAttribute('src', fallback);
-      }
-    });
-  });
+
+
+const t = {
+  pl: {
+    setupTitle: 'Ustawienia meczu',
+    outDouble: 'Double out',
+    outSingle: 'Single out',
+    backToSetup: 'Edytuj zawodników',
+    newGame: 'Nowa gra',
+    enterScore: 'Wpisz wynik tury',
+    submit: 'Zatwierdź',
+    nowThrowing: 'Rzuca teraz',
+    remaining: 'Pozostało',
+    average: 'Średnia 3-dart',
+    checkout: 'Checkout',
+    invalidTurn: 'Podaj poprawny wynik tury (0-180).',
+    legWin: (name) => `${name} wygrywa lega! Startujemy nowego lega.`,
+    modeDouble: 'Double out',
+    modeSingle: 'Single out',
+  },
+  en: {
+    setupTitle: 'Match settings',
+    outDouble: 'Double out',
+    outSingle: 'Single out',
+    backToSetup: 'Edit players',
+    newGame: 'New game',
+    enterScore: 'Enter turn score',
+    submit: 'Submit',
+    nowThrowing: 'Now throwing',
+    remaining: 'Remaining',
+    average: '3-dart avg',
+    checkout: 'Checkout',
+    invalidTurn: 'Enter a valid turn score (0-180).',
+    legWin: (name) => `${name} wins the leg! Starting a new leg.`,
+    modeDouble: 'Double out',
+    modeSingle: 'Single out',
+  },
+};
+
+function tr(key) {
+  return t[state.lang]?.[key] ?? t.pl[key] ?? key;
+}
+
+function applyTranslations() {
+  const setupTitle = document.getElementById('setup-title');
+  if (setupTitle) setupTitle.textContent = tr('setupTitle');
+  const outDouble = document.querySelector('input[name="out-mode"][value="double"]')?.parentElement;
+  const outSingle = document.querySelector('input[name="out-mode"][value="single"]')?.parentElement;
+  if (outDouble) outDouble.childNodes[outDouble.childNodes.length - 1].textContent = ` ${tr('outDouble')}`;
+  if (outSingle) outSingle.childNodes[outSingle.childNodes.length - 1].textContent = ` ${tr('outSingle')}`;
+  if (backToSetupLabel) backToSetupLabel.textContent = tr('backToSetup');
+  if (newGameLabel) newGameLabel.textContent = tr('newGame');
+  if (scoreInputEl) scoreInputEl.placeholder = tr('enterScore');
+  if (submitScoreLabel) submitScoreLabel.textContent = tr('submit');
 }
 
 function showScreen(name) {
@@ -84,6 +135,8 @@ function collectPlayers() {
   state.startScore = start;
   state.outMode = document.querySelector('input[name="out-mode"]:checked').value;
   state.turnInput = '';
+  state.lang = languageSelect?.value || 'pl';
+  applyTranslations();
 }
 
 function getAverage(player) {
@@ -147,16 +200,16 @@ function renderGame() {
   const current = state.players[state.currentPlayer];
   const checkout = findCheckout(current.score, state.outMode);
 
-  matchTitle.textContent = `${state.outMode === 'double' ? 'Double out' : 'Single out'} • ${state.startScore}`;
+  matchTitle.textContent = `${state.outMode === 'double' ? tr('modeDouble') : tr('modeSingle')} • ${state.startScore}`;
 
   currentPlayerCard.innerHTML = `
-    <h3>Rzuca teraz: ${current.name}</h3>
+    <h3>${tr('nowThrowing')}: ${current.name}</h3>
     <div class="current-player-score">
       <span class="big">${current.score}</span>
-      <span>Pozostało</span>
+      <span>${tr('remaining')}</span>
     </div>
-    <div>Średnia 3-dart: ${getAverage(current)}</div>
-    ${checkout ? `<div class="checkout">Checkout: ${checkout}</div>` : ''}
+    <div>${tr('average')}: ${getAverage(current)}</div>
+    ${checkout ? `<div class="checkout">${tr('checkout')}: ${checkout}</div>` : ''}
   `;
 
   playersList.innerHTML = '';
@@ -181,7 +234,7 @@ function submitTurn() {
   const entered = Number(state.turnInput);
 
   if (!Number.isInteger(entered) || entered < 0 || entered > 180) {
-    alert('Podaj poprawny wynik tury (0-180).');
+    alert(tr('invalidTurn'));
     return;
   }
 
@@ -211,7 +264,7 @@ function submitTurn() {
     current.scoredPoints += entered;
 
     if (current.score === 0) {
-      alert(`${current.name} wygrywa lega! Startujemy nowego lega.`);
+      alert(tr('legWin')(current.name));
       state.players.forEach((p) => {
         p.score = state.startScore;
       });
@@ -260,6 +313,13 @@ function buildKeypad() {
 }
 
 playerCountSelect.addEventListener('change', renderPlayerInputs);
+languageSelect?.addEventListener('change', () => {
+  state.lang = languageSelect.value;
+  applyTranslations();
+  if (screens.game.classList.contains('active') && state.players.length) {
+    renderGame();
+  }
+});
 
 goScoreboardBtn.addEventListener('click', () => {
   showScreen('setup');
@@ -295,6 +355,6 @@ homeLink.addEventListener('click', handleHomeReset);
 submitScoreBtn.addEventListener('click', submitTurn);
 
 buildKeypad();
-enableLogoFallbacks();
 renderPlayerInputs();
+applyTranslations();
 showScreen('home');
