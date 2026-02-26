@@ -1,0 +1,626 @@
+:root {
+  --bg: #04050a;
+  --bg-2: #0a0d17;
+  --panel: #0f1423;
+  --panel-2: #1b2338;
+  --panel-3: #242f49;
+  --accent: #ffca2f;
+  --accent-2: #ffe27a;
+  --text: #ffffff;
+  --muted: #dbe2ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Bebas Neue", Inter, sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at 18% 10%, #1a2240 0%, #0a0d17 44%, var(--bg) 100%);
+  min-height: 100vh;
+}
+
+#app {
+  width: min(100vw, 1280px);
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 18px 16px;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+  background: linear-gradient(140deg, rgba(12, 16, 29, 0.96), rgba(28, 35, 53, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+  padding: 8px 12px;
+}
+
+.topbar-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+.topbar-logo {
+  height: clamp(38px, 5.8vh, 54px);
+  width: auto;
+  filter: drop-shadow(0 0 10px rgba(242, 186, 42, 0.2));
+}
+
+.brand-logo {
+  display: block;
+}
+
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+.hero-card,
+.panel,
+.current-player-card,
+.players-list,
+.score-input-box,
+.keypad {
+  background: linear-gradient(130deg, rgba(15, 20, 36, 0.98), rgba(32, 40, 64, 0.95));
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 30px 24px;
+}
+
+.hero-card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 24px;
+  background: conic-gradient(from 180deg at 50% 50%, rgba(255, 202, 47, 0.9), rgba(255, 255, 255, 0.16), rgba(255, 202, 47, 0.92), rgba(255, 255, 255, 0.2));
+  animation: spin-border 8s linear infinite;
+  z-index: -2;
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 20px;
+  background: linear-gradient(130deg, rgba(7, 10, 18, 0.98), rgba(22, 28, 45, 0.97));
+  z-index: -1;
+}
+
+.logo-wrap {
+  z-index: 2;
+  width: min(80vw, 820px);
+  min-height: 100px;
+}
+
+.hero-logo {
+  width: 100%;
+  height: auto;
+  z-index: 2;
+  filter: drop-shadow(0 0 28px rgba(255, 202, 47, 0.48));
+}
+
+.hero-glow {
+  display: none;
+}
+
+
+.brand-stack {
+  width: min(74vw, 660px);
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+}
+
+.slogan {
+  z-index: 2;
+  margin: 0;
+  font-family: "Bebas Neue", sans-serif;
+  letter-spacing: 2px;
+  color: #ffffff;
+  font-size: clamp(1.4rem, 2.45vw, 2.15rem);
+  width: 100%;
+  text-align: center;
+  letter-spacing: 1.5px;
+  border-top: 1px solid rgba(255, 202, 47, 0.35);
+  padding-top: 5px;
+}
+
+
+.brand-title {
+  z-index: 2;
+  margin: 0;
+  width: 100%;
+  font-size: clamp(2.9rem, 6.5vw, 5.3rem);
+  letter-spacing: 2px;
+  color: #ffffff;
+  text-shadow: 0 0 22px rgba(242, 186, 42, 0.2);
+}
+
+.home-cta {
+  width: 100%;
+  min-height: 96px;
+  font-size: clamp(1.6rem, 2.35vw, 2.05rem);
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  letter-spacing: 1.4px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-cta span {
+  display: inline-block;
+  transform: translateY(1px);
+  font-size: inherit;
+  line-height: 1;
+  font-weight: 700;
+  min-width: 16ch;
+  text-align: center;
+}
+
+.home-cta:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 16px 34px rgba(242, 186, 42, 0.22);
+}
+
+.home-badges {
+  z-index: 2;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.home-badges span {
+  border: 1px solid rgba(255, 202, 47, 0.35);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: rgba(255, 202, 47, 0.12);
+}
+
+.hero-credit {
+  position: absolute;
+  right: 18px;
+  bottom: 14px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  letter-spacing: 1px;
+}
+
+h1,
+h2,
+.match-font {
+  margin: 0;
+  font-family: "Bebas Neue", sans-serif;
+  letter-spacing: 1px;
+}
+
+.hero-card h1 {
+  font-size: clamp(2.8rem, 7vw, 5rem);
+}
+
+.hero-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+}
+
+
+.home-language {
+  z-index: 2;
+  display: inline-flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.lang-btn {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  min-width: 70px;
+  min-height: 44px;
+  border-radius: 12px;
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+.lang-btn.active {
+  background: linear-gradient(120deg, var(--accent-2), var(--accent));
+  color: #161616;
+  border-color: rgba(242, 186, 42, 0.7);
+}
+
+.home-actions {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, 340px);
+  gap: 12px;
+  justify-content: center;
+}
+
+button,
+.secondary-btn,
+select,
+input {
+  font: inherit;
+  letter-spacing: 1px;
+}
+
+.primary-btn,
+.secondary-btn,
+.ghost-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 18px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-btn {
+  background: linear-gradient(130deg, var(--accent-2), var(--accent));
+  color: #151515;
+  box-shadow: 0 10px 24px rgba(255, 202, 47, 0.28);
+}
+
+.secondary-btn,
+.ghost-btn {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.secondary-btn.home-cta {
+  border: 1px solid rgba(242, 186, 42, 0.45);
+  background: linear-gradient(120deg, rgba(255,255,255,0.08), rgba(242,186,42,0.12));
+}
+
+
+.panel {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 18px;
+  position: relative;
+}
+
+.panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 202, 47, 0.25);
+  pointer-events: none;
+}
+
+.panel h2 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 14px;
+}
+
+.field-row {
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+select,
+.player-name {
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.toggle-wrap {
+  display: flex;
+  gap: 12px;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.game-header h2 {
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+}
+
+.game-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.game-layout {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 12px;
+}
+
+.score-side {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+}
+
+.current-player-card {
+  padding: 16px;
+  background: linear-gradient(130deg, #ffcf45, #ffe48b);
+  color: #0f1220;
+  box-shadow: 0 16px 30px rgba(255, 202, 47, 0.3);
+}
+
+.current-player-card h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.current-player-score {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.current-player-score .big {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(4rem, 8vw, 6rem);
+  line-height: 1;
+}
+
+.checkout {
+  margin-top: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  width: fit-content;
+  background: rgba(8, 8, 8, 0.72);
+  color: #ffe27c;
+  font-weight: 800;
+}
+
+.players-list {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.players-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  padding-bottom: 8px;
+}
+
+.players-list li:last-child {
+  border-bottom: none;
+}
+
+.score-input-box {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+#score-input {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.95);
+  color: #11152a;
+  border-radius: 12px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.keypad {
+  margin-top: 10px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.keypad button {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  min-height: 62px;
+  font-size: 2rem;
+  font-family: "Bebas Neue", sans-serif;
+  background: linear-gradient(150deg, rgba(32, 41, 62, 0.95), rgba(23, 29, 46, 0.95));
+  color: var(--text);
+}
+
+.keypad button.action {
+  background: linear-gradient(130deg, rgba(255, 226, 122, 0.9), rgba(255, 202, 47, 0.92));
+  color: #11152a;
+}
+
+
+#orientation-warning {
+  display: none;
+}
+
+@media (orientation: portrait) {
+  #app {
+    display: none;
+  }
+
+  #orientation-warning {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2rem;
+    background: radial-gradient(circle at 50% 20%, #1d2540, #070a12);
+  }
+}
+
+@media (max-width: 1180px) and (orientation: landscape) {
+  #app {
+    width: 100vw;
+    max-width: 100vw;
+    padding: 8px 10px 10px;
+  }
+
+  .topbar {
+    padding: 7px 10px;
+  }
+
+  .hero-card {
+    padding: 16px 14px;
+    gap: 9px;
+  }
+
+  .logo-wrap {
+    width: min(66vw, 640px);
+    min-height: 80px;
+  }
+
+  .brand-stack {
+    width: min(86vw, 620px);
+  }
+
+  .brand-title {
+    font-size: clamp(2.2rem, 5.2vw, 4rem);
+  }
+
+  .slogan {
+    font-size: clamp(1.05rem, 2.2vw, 1.8rem);
+  }
+
+  .home-actions {
+    margin-top: 10px;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    width: min(92vw, 740px);
+  }
+
+  .home-cta {
+    min-height: 74px;
+    font-size: clamp(1.25rem, 2.1vw, 1.65rem);
+  }
+
+  .home-badges span {
+    padding: 6px 10px;
+  }
+
+  .game-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .current-player-score .big {
+    font-size: clamp(3.4rem, 6.2vw, 5.2rem);
+  }
+
+  .keypad button {
+    min-height: 52px;
+  }
+}
+
+@media (max-width: 960px) and (orientation: landscape), (max-height: 560px) and (orientation: landscape) {
+  #app {
+    padding: 8px 10px 12px;
+  }
+
+  .home-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(95vw, 700px);
+  }
+
+  .home-cta {
+    min-height: 82px;
+    width: 100%;
+  }
+
+  .hero-credit {
+    position: static;
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  .game-layout {
+    grid-template-columns: 1.05fr 1fr;
+  }
+
+  .players-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@keyframes spin-border {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .topbar-logo {
+    height: 34px;
+  }
+
+  .ghost-btn {
+    padding: 8px 10px;
+  }
+
+  .field-row {
+    margin: 8px 0;
+  }
+
+  .game-header h2 {
+    font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+  }
+
+  .current-player-card,
+  .players-list,
+  .score-input-box,
+  .keypad {
+    border-radius: 14px;
+  }
+
+  .keypad button {
+    min-height: 46px;
+    font-size: 1.6rem;
+  }
+}
