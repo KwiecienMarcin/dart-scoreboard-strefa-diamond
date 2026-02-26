@@ -11,6 +11,16 @@ Prosta webowa apka do liczenia darta w klimacie Strefa Diamond.
 - Widok zaprojektowany pod orientację poziomą.
 - Branding Strefa Diamond z głównym logo `assets/logo_full.svg`.
 
+
+## Logo / branding (ważne)
+Aplikacja teraz najpierw próbuje wczytać PNG, a jeśli nie ma pliku, używa SVG fallback.
+
+Oczekiwane pliki (wrzuć do `assets/`):
+- `logo_full.png`
+- `logo_strefa_diamond_pion.png`
+
+Jeśli ich nie ma, strona nadal działa na `logo_full.svg`.
+
 ## Uruchomienie lokalne
 ```bash
 python3 -m http.server 4173
