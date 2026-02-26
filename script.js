@@ -18,11 +18,12 @@ const scoreInput = document.getElementById('score-input');
 const submitScoreBtn = document.getElementById('submit-score');
 const keypad = document.getElementById('keypad');
 const matchTitle = document.getElementById('match-title');
-const languageSelect = document.getElementById('language-select');
 const scoreInputEl = document.getElementById('score-input');
 const submitScoreLabel = document.getElementById('submit-score');
 const backToSetupLabel = document.getElementById('back-to-setup-label');
 const newGameLabel = document.getElementById('new-game-label');
+const langPlBtn = document.getElementById('lang-pl');
+const langEnBtn = document.getElementById('lang-en');
 
 const state = {
   players: [],
@@ -41,6 +42,10 @@ const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '
 const t = {
   pl: {
     setupTitle: 'Ustawienia meczu',
+    playerCount: 'Liczba zawodników',
+    outMode: 'Zakończenie lega',
+    startScore: 'Start punktów',
+    next: 'Dalej',
     outDouble: 'Double out',
     outSingle: 'Single out',
     backToSetup: 'Edytuj zawodników',
@@ -58,6 +63,10 @@ const t = {
   },
   en: {
     setupTitle: 'Match settings',
+    playerCount: 'Players count',
+    outMode: 'Leg finish mode',
+    startScore: 'Starting score',
+    next: 'Next',
     outDouble: 'Double out',
     outSingle: 'Single out',
     backToSetup: 'Edit players',
@@ -81,15 +90,28 @@ function tr(key) {
 
 function applyTranslations() {
   const setupTitle = document.getElementById('setup-title');
+  const labelPlayerCount = document.getElementById('label-player-count');
+  const labelOutMode = document.getElementById('label-out-mode');
+  const labelStartScore = document.getElementById('label-start-score');
+
   if (setupTitle) setupTitle.textContent = tr('setupTitle');
+  if (labelPlayerCount) labelPlayerCount.textContent = tr('playerCount');
+  if (labelOutMode) labelOutMode.textContent = tr('outMode');
+  if (labelStartScore) labelStartScore.textContent = tr('startScore');
+
   const outDouble = document.querySelector('input[name="out-mode"][value="double"]')?.parentElement;
   const outSingle = document.querySelector('input[name="out-mode"][value="single"]')?.parentElement;
   if (outDouble) outDouble.childNodes[outDouble.childNodes.length - 1].textContent = ` ${tr('outDouble')}`;
   if (outSingle) outSingle.childNodes[outSingle.childNodes.length - 1].textContent = ` ${tr('outSingle')}`;
+
   if (backToSetupLabel) backToSetupLabel.textContent = tr('backToSetup');
   if (newGameLabel) newGameLabel.textContent = tr('newGame');
   if (scoreInputEl) scoreInputEl.placeholder = tr('enterScore');
   if (submitScoreLabel) submitScoreLabel.textContent = tr('submit');
+  if (startGameBtn) startGameBtn.textContent = tr('next');
+
+  langPlBtn?.classList.toggle('active', state.lang === 'pl');
+  langEnBtn?.classList.toggle('active', state.lang === 'en');
 }
 
 function showScreen(name) {
@@ -135,7 +157,6 @@ function collectPlayers() {
   state.startScore = start;
   state.outMode = document.querySelector('input[name="out-mode"]:checked').value;
   state.turnInput = '';
-  state.lang = languageSelect?.value || 'pl';
   applyTranslations();
 }
 
@@ -313,12 +334,16 @@ function buildKeypad() {
 }
 
 playerCountSelect.addEventListener('change', renderPlayerInputs);
-languageSelect?.addEventListener('change', () => {
-  state.lang = languageSelect.value;
+langPlBtn?.addEventListener('click', () => {
+  state.lang = 'pl';
   applyTranslations();
-  if (screens.game.classList.contains('active') && state.players.length) {
-    renderGame();
-  }
+  if (state.players.length && screens.game.classList.contains('active')) renderGame();
+});
+
+langEnBtn?.addEventListener('click', () => {
+  state.lang = 'en';
+  applyTranslations();
+  if (state.players.length && screens.game.classList.contains('active')) renderGame();
 });
 
 goScoreboardBtn.addEventListener('click', () => {

@@ -32,6 +32,11 @@
           <h1 class="brand-title">STREFA DIAMOND</h1>
           <p class="slogan">NAJLEPSZY WYMIAR DARTA</p>
 
+          <div class="home-language" role="group" aria-label="Language selector">
+            <button id="lang-pl" class="lang-btn active" type="button">PL</button>
+            <button id="lang-en" class="lang-btn" type="button">EN</button>
+          </div>
+
           <div class="home-actions">
             <button id="go-scoreboard" class="primary-btn home-cta"><span>🎯 DART SCOREBOARD</span></button>
             <a class="secondary-btn home-cta" href="https://nakka.com/n01/online/" target="_blank" rel="noreferrer"><span>📈 NAKKA</span></a>
@@ -52,15 +57,7 @@
           <h2 id="setup-title">Ustawienia meczu</h2>
 
           <div class="field-row">
-            <label for="language-select">Język / Language</label>
-            <select id="language-select">
-              <option value="pl">🇵🇱 PL</option>
-              <option value="en">🇬🇧 EN</option>
-            </select>
-          </div>
-
-          <div class="field-row">
-            <label for="player-count">Liczba zawodników</label>
+            <label id="label-player-count" for="player-count">Liczba zawodników</label>
             <select id="player-count">
               <option value="1">1</option>
               <option value="2" selected>2</option>
@@ -72,7 +69,7 @@
           <div id="players-inputs" class="players-grid"></div>
 
           <div class="field-row">
-            <span>Zakończenie lega</span>
+            <span id="label-out-mode">Zakończenie lega</span>
             <div class="toggle-wrap">
               <label><input type="radio" name="out-mode" value="double" checked /> Double out</label>
               <label><input type="radio" name="out-mode" value="single" /> Single out</label>
@@ -80,7 +77,7 @@
           </div>
 
           <div class="field-row">
-            <label for="start-score">Start punktów</label>
+            <label id="label-start-score" for="start-score">Start punktów</label>
             <select id="start-score">
               <option value="301">301</option>
               <option value="501" selected>501</option>
