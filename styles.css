@@ -15,7 +15,7 @@
 
 body {
   margin: 0;
-  font-family: Inter, sans-serif;
+  font-family: "Bebas Neue", Inter, sans-serif;
   color: var(--text);
   background: radial-gradient(circle at 30% 20%, #191f31, var(--bg));
   min-height: 100vh;
@@ -104,6 +104,16 @@ body {
   font-size: clamp(1.6rem, 3vw, 2.6rem);
 }
 
+
+.brand-title {
+  z-index: 2;
+  margin: 0;
+  font-size: clamp(2.8rem, 7vw, 5.2rem);
+  letter-spacing: 2px;
+  color: #ffffff;
+  text-shadow: 0 0 22px rgba(242, 186, 42, 0.2);
+}
+
 .home-cta {
   min-width: min(44vw, 360px);
   min-height: 86px;
@@ -176,6 +186,7 @@ button,
 select,
 input {
   font: inherit;
+  letter-spacing: 1px;
 }
 
 .primary-btn,
