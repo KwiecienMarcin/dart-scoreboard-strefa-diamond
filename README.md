@@ -17,9 +17,23 @@ python3 -m http.server 4173
 Potem otwórz `http://localhost:4173`.
 
 ## Deployment
-### Netlify
-- Build command: *(puste)*
-- Publish directory: `.`
+### Netlify (zalecane)
+Repo zawiera już konfigurację:
+- `netlify.toml` z `publish = "."`
+- fallback SPA (`/* -> /index.html 200`)
+- plik `_redirects` jako dodatkowe zabezpieczenie
+
+#### Kroki
+1. Netlify → **Add new site** → **Import an existing project**.
+2. Wybierz repo.
+3. Build command: *(puste)*.
+4. Publish directory: `.`.
+5. Deploy.
+
+#### Gdy widzisz "Page not found"
+- sprawdź, czy deploy bierze **branch z tym commitem** (z `netlify.toml` i `_redirects`)
+- sprawdź, czy Publish directory to **`.`**
+- zrób **Clear cache and deploy site**
 
 ### Railway
 - Service typu Static Site albo Nixpacks
