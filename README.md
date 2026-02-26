@@ -19,6 +19,14 @@ Oczekiwane pliki (wrzuć do `assets/`):
 - `logo_full.png`
 - `logo_strefa_diamond_pion.png`
 
+Szybkie dodanie z terminala:
+```bash
+cp /sciezka/do/logo_full.png assets/logo_full.png
+cp /sciezka/do/logo_strefa_diamond_pion.png assets/logo_strefa_diamond_pion.png
+git add assets/logo_full.png assets/logo_strefa_diamond_pion.png
+git commit -m "Add Strefa Diamond PNG logos"
+```
+
 Jeśli ich nie ma, strona nadal działa na `logo_full.svg`.
 
 ## Uruchomienie lokalne

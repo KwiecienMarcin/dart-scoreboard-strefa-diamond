@@ -29,6 +29,18 @@ const state = {
 
 const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'C'];
 
+
+function enableLogoFallbacks() {
+  document.querySelectorAll('img[data-fallback]').forEach((img) => {
+    img.addEventListener('error', () => {
+      const fallback = img.getAttribute('data-fallback');
+      if (fallback && img.getAttribute('src') !== fallback) {
+        img.setAttribute('src', fallback);
+      }
+    });
+  });
+}
+
 function showScreen(name) {
   Object.entries(screens).forEach(([screenName, element]) => {
     element.classList.toggle('active', screenName === name);
@@ -283,5 +295,6 @@ homeLink.addEventListener('click', handleHomeReset);
 submitScoreBtn.addEventListener('click', submitTurn);
 
 buildKeypad();
+enableLogoFallbacks();
 renderPlayerInputs();
 showScreen('home');
