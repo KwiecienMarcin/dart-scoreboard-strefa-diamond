@@ -53,15 +53,18 @@ function initLogoFallbacks() {
       .map((item) => item.trim())
       .filter(Boolean);
 
-    let index = 0;
-    img.src = candidates[index] || img.src;
+    if (!candidates.length) return;
 
-    img.addEventListener('error', () => {
+    let index = Math.max(candidates.indexOf(img.getAttribute('src') || ''), 0);
+
+    const tryNext = () => {
       index += 1;
       if (index < candidates.length) {
         img.src = candidates[index];
       }
-    });
+    };
+
+    img.addEventListener('error', tryNext);
   });
 }
 
