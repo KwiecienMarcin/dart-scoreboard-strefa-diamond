@@ -4,8 +4,8 @@
   --panel: #0f1423;
   --panel-2: #1b2338;
   --panel-3: #242f49;
-  --accent: #ffca2f;
-  --accent-2: #ffe27a;
+  --accent: #d4a017;
+  --accent-2: #f6d36b;
   --text: #ffffff;
   --muted: #dbe2ff;
 }
@@ -412,7 +412,7 @@ select,
 
 .current-player-card {
   padding: 22px;
-  background: linear-gradient(130deg, #ffcf45, #ffe48b);
+  background: linear-gradient(135deg, #c9961a, #f0cf6a);
   color: #0f1220;
   box-shadow: 0 16px 30px rgba(255, 202, 47, 0.3);
 }
@@ -428,7 +428,7 @@ select,
   padding: 2px 10px;
   border-radius: 999px;
   background: #111a2f;
-  color: #ffe27a;
+  color: #f6d36b;
   text-shadow: 0 0 14px rgba(255, 202, 47, 0.75);
   box-shadow: 0 0 0 1px rgba(255, 202, 47, 0.5), 0 0 18px rgba(255, 202, 47, 0.35);
 }
@@ -442,8 +442,17 @@ select,
 
 .current-player-score .big {
   font-family: "Bebas Neue", sans-serif;
-  font-size: clamp(4.8rem, 9vw, 7rem);
+  font-size: clamp(5.2rem, 9.8vw, 7.6rem);
   line-height: 1;
+  color: #fff7dc;
+  text-shadow: 0 0 22px rgba(120, 76, 8, 0.5), 0 0 38px rgba(212, 160, 23, 0.45);
+}
+
+.remaining-label {
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  letter-spacing: 1px;
+  font-weight: 700;
+  color: #fff2be;
 }
 
 .checkout {
@@ -452,7 +461,7 @@ select,
   border-radius: 10px;
   width: fit-content;
   background: rgba(8, 8, 8, 0.72);
-  color: #ffe27c;
+  color: #f6d36b;
   font-weight: 800;
 }
 

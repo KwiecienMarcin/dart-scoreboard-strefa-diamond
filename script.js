@@ -265,7 +265,7 @@ function renderGame() {
     <h3>${tr('nowThrowing')}: <span class="active-thrower-name">${current.name}</span></h3>
     <div class="current-player-score">
       <span class="big">${current.score}</span>
-      <span>${tr('remaining')}</span>
+      <span class="remaining-label">${tr('remaining')}</span>
     </div>
     <div>${tr('average')}: ${getAverage(current)}</div>
     ${checkout ? `<div class="checkout">${tr('checkout')}: ${checkout}</div>` : ''}
