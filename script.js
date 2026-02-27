@@ -44,28 +44,59 @@ const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '
 
 
 
-function initLogoFallbacks() {
+function probeImage(src, timeoutMs = 2000) {
+  return new Promise((resolve) => {
+    const probe = new Image();
+    let done = false;
+
+    const finish = (ok) => {
+      if (done) return;
+      done = true;
+      resolve(ok);
+    };
+
+    const timer = setTimeout(() => finish(false), timeoutMs);
+
+    probe.onload = () => {
+      clearTimeout(timer);
+      finish(true);
+    };
+
+    probe.onerror = () => {
+      clearTimeout(timer);
+      finish(false);
+    };
+
+    probe.src = src;
+  });
+}
+
+async function initLogoFallbacks() {
   const logos = document.querySelectorAll('.brand-logo');
 
-  logos.forEach((img) => {
-    const candidates = (img.dataset.logoCandidates || img.getAttribute('src') || '')
+  for (const img of logos) {
+    const rawCandidates = (img.dataset.logoCandidates || img.getAttribute('src') || '')
       .split(',')
       .map((item) => item.trim())
       .filter(Boolean);
 
-    if (!candidates.length) return;
+    const candidates = [...new Set(rawCandidates)];
+    let applied = false;
 
-    let index = Math.max(candidates.indexOf(img.getAttribute('src') || ''), 0);
-
-    const tryNext = () => {
-      index += 1;
-      if (index < candidates.length) {
-        img.src = candidates[index];
+    for (const src of candidates) {
+      // eslint-disable-next-line no-await-in-loop
+      const ok = await probeImage(src);
+      if (ok) {
+        img.src = src;
+        applied = true;
+        break;
       }
-    };
+    }
 
-    img.addEventListener('error', tryNext);
-  });
+    if (!applied && candidates[0]) {
+      img.src = candidates[0];
+    }
+  }
 }
 
 const t = {
