@@ -276,7 +276,7 @@ function renderGame() {
     const li = document.createElement('li');
     li.classList.toggle('current-turn', idx === state.currentPlayer);
     li.innerHTML = `
-      <span class="player-row-name">${idx === state.currentPlayer ? '🎯 ' : ''}${player.name}</span>
+      <span class="player-row-name">${player.name}</span>
       <strong>${player.score}</strong>
     `;
     playersList.appendChild(li);

@@ -542,6 +542,22 @@ select,
 }
 
 
+.keypad-brand {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0 2px;
+}
+
+.keypad-logo {
+  width: min(92%, 520px);
+  max-height: 78px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(212, 160, 23, 0.35));
+}
+
+
 #orientation-warning {
   display: none;
 }
@@ -634,6 +650,10 @@ select,
   .keypad button {
     min-height: 52px;
   }
+
+  .keypad-logo {
+    max-height: 58px;
+  }
 }
 
 @media (max-width: 960px) and (orientation: landscape), (max-height: 560px) and (orientation: landscape) {
@@ -725,5 +745,9 @@ select,
   .keypad button {
     min-height: 52px;
     font-size: 1.8rem;
+  }
+
+  .keypad-logo {
+    max-height: 46px;
   }
 }
