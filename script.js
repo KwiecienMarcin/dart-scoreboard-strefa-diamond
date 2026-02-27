@@ -43,39 +43,28 @@ const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '
 
 
 
-function loadImageFromCandidates(img, candidates) {
-  const uniqueCandidates = [...new Set(candidates.filter(Boolean))];
 
-  function tryNext(index) {
-    if (index >= uniqueCandidates.length) return;
-
-    const candidate = uniqueCandidates[index];
-    img.src = candidate;
-    img.onerror = () => tryNext(index + 1);
-    img.onload = () => {
-      img.onerror = null;
-    };
-  }
-
-  tryNext(0);
-}
-
-function initBrandLogos() {
+function initLogoFallbacks() {
   const logos = document.querySelectorAll('.brand-logo');
 
   logos.forEach((img) => {
-    const original = img.getAttribute('src') || '';
-    const normalized = original.startsWith('/') ? original.slice(1) : original;
-    const candidates = [
-      normalized,
-      `/${normalized}`,
-      normalized.toLowerCase(),
-      `/${normalized.toLowerCase()}`,
-      normalized.replace('.png', '.PNG'),
-      `/${normalized.replace('.png', '.PNG')}`,
-    ];
+    const candidates = (img.dataset.logoCandidates || img.getAttribute('src') || '')
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
 
-    loadImageFromCandidates(img, candidates);
+    if (!candidates.length) return;
+
+    let index = Math.max(candidates.indexOf(img.getAttribute('src') || ''), 0);
+
+    const tryNext = () => {
+      index += 1;
+      if (index < candidates.length) {
+        img.src = candidates[index];
+      }
+    };
+
+    img.addEventListener('error', tryNext);
   });
 }
 
@@ -273,7 +262,7 @@ function renderGame() {
   matchTitle.textContent = tr('gameTitle');
 
   currentPlayerCard.innerHTML = `
-    <h3>${tr('nowThrowing')}: ${current.name}</h3>
+    <h3>${tr('nowThrowing')}: <span class="active-thrower-name">${current.name}</span></h3>
     <div class="current-player-score">
       <span class="big">${current.score}</span>
       <span>${tr('remaining')}</span>
@@ -285,8 +274,9 @@ function renderGame() {
   playersList.innerHTML = '';
   state.players.forEach((player, idx) => {
     const li = document.createElement('li');
+    li.classList.toggle('current-turn', idx === state.currentPlayer);
     li.innerHTML = `
-      <span>${idx === state.currentPlayer ? '🎯 ' : ''}${player.name}</span>
+      <span class="player-row-name">${idx === state.currentPlayer ? '🎯 ' : ''}${player.name}</span>
       <strong>${player.score}</strong>
     `;
     playersList.appendChild(li);
@@ -454,7 +444,7 @@ homeLink.addEventListener('click', handleHomeReset);
 
 submitScoreBtn.addEventListener('click', submitTurn);
 
-initBrandLogos();
+initLogoFallbacks();
 buildKeypad();
 renderPlayerInputs();
 applyTranslations();
