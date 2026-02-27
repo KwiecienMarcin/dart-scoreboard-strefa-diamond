@@ -64,15 +64,14 @@ function initBrandLogos() {
   const logos = document.querySelectorAll('.brand-logo');
 
   logos.forEach((img) => {
-    const original = img.getAttribute('src') || '';
-    const normalized = original.startsWith('/') ? original.slice(1) : original;
+    const src = img.getAttribute('src') || '/assets/logo_full.png';
+    const normalized = src.startsWith('/') ? src : `/${src}`;
+
     const candidates = [
       normalized,
-      `/${normalized}`,
-      normalized.toLowerCase(),
-      `/${normalized.toLowerCase()}`,
+      normalized.slice(1),
       normalized.replace('.png', '.PNG'),
-      `/${normalized.replace('.png', '.PNG')}`,
+      normalized.slice(1).replace('.png', '.PNG'),
     ];
 
     loadImageFromCandidates(img, candidates);
