@@ -233,30 +233,34 @@ body {
 }
 
 .nakka-link {
-  border: none;
-  background: none;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.03);
   cursor: pointer;
-  padding: 8px 16px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-  transition: background 0.2s ease, transform 0.15s ease;
+  padding: 14px 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
 .nakka-link:hover {
   background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(242, 186, 42, 0.35);
 }
 
 .nakka-link:active {
-  transform: scale(0.95);
+  transform: scale(0.97);
 }
 
 .nakka-name {
   font-family: "Bebas Neue", "Rajdhani", sans-serif;
   color: var(--accent-2);
-  letter-spacing: 1.5px;
-  font-size: 1.15rem;
+  letter-spacing: 2px;
+  font-size: 1.3rem;
 }
 
 .nakka-link-sub {
@@ -264,6 +268,7 @@ body {
   font-weight: 500;
   font-size: 0.82rem;
   color: rgba(255, 255, 255, 0.5);
+  text-align: center;
 }
 
 .home-badges {
@@ -619,9 +624,9 @@ select,
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   text-align: center;
-  padding: 16px 10px;
+  padding: 10px 6px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -629,10 +634,10 @@ select,
 }
 
 .players-list li span {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.75);
-  letter-spacing: 0.5px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.3px;
 }
 
 .players-list strong {
