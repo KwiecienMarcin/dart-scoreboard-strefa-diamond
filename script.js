@@ -34,6 +34,12 @@ const inputModeHeadingEl = document.getElementById('input-mode-heading');
 const sumCaptionEl = document.getElementById('sum-caption');
 const dartsCaptionEl = document.getElementById('darts-caption');
 const toastEl = document.getElementById('toast');
+const menuLink = document.getElementById('menu-link');
+const menuModal = document.getElementById('menu-modal');
+const menuClose = document.getElementById('menu-close');
+const menuTabs = document.querySelectorAll('.menu-tab');
+const menuPanels = document.querySelectorAll('.menu-panel');
+const menuSubtabs = document.querySelectorAll('.menu-subtab');
 const rulesModal = document.getElementById('rules-modal');
 const rulesClose = document.getElementById('rules-close');
 const rulesTitleEl = document.getElementById('rules-title');
@@ -119,16 +125,59 @@ const bustJokes = {
 
 const lowScoreJokes = {
   pl: [
-    (c) => `${c.player}, ${c.amount} punktów w trzech rzutach? Wydaje mi się, że da się rzucić więcej.`,
-    (c) => `${c.player} chyba dziś trenuje rzucanie do podłogi. ${c.amount} punktów.`,
-    (c) => `${c.amount} punktów, ${c.player}? Tarcza jest tuż przed tobą, przysięgam.`,
+    { min: 0, max: 10, text: (c) => `${c.player}, ${c.amount} punktów w trzech rzutach? Wydaje mi się, że da się rzucić więcej.` },
+    { min: 0, max: 10, text: (c) => `${c.player} chyba dziś trenuje rzucanie do podłogi. ${c.amount} punktów.` },
+    { min: 0, max: 10, text: (c) => `${c.amount} punktów, ${c.player}? Tarcza jest tuż przed tobą, przysięgam.` },
+    { min: 0, max: 10, text: (c) => `${c.player}, po takim rzucie numer do trenera dostaniesz przy barze.` },
   ],
   en: [
-    (c) => `${c.player}, ${c.amount} points in three darts? I feel like you can do better than that.`,
-    (c) => `${c.player} might be practicing throwing at the floor today. ${c.amount} points.`,
-    (c) => `${c.amount} points, ${c.player}? The board is right in front of you, I promise.`,
+    { min: 0, max: 10, text: (c) => `${c.player}, ${c.amount} points in three darts? I feel like you can do better than that.` },
+    { min: 0, max: 10, text: (c) => `${c.player} might be practicing throwing at the floor today. ${c.amount} points.` },
+    { min: 0, max: 10, text: (c) => `${c.amount} points, ${c.player}? The board is right in front of you, I promise.` },
+    { min: 0, max: 10, text: (c) => `${c.player}, after that throw, the bar has a coach's number ready for you.` },
   ],
 };
+
+const tableNumberJokes = {
+  pl: [
+    (c) => `${c.player}, ${c.amount} punktów? To akurat numer jednego z naszych stołów bilardowych.`,
+    (c) => `${c.amount}, ${c.player}? Zgaduję, że to numer stolika bilardowego, bo na wynik w darta trochę słabo.`,
+    (c) => `${c.player}, ${c.amount} punktów w darta, ale za to mamy stolik bilardowy z takim numerem.`,
+    (c) => `${c.player}, stolik bilardowy numer ${c.amount} możesz mieć zarezerwowany już za godzinę.`,
+    (c) => `${c.player}, może czas zamienić lotki na kij? Stolik numer ${c.amount} będzie wolny za godzinę.`,
+  ],
+  en: [
+    (c) => `${c.player}, ${c.amount} points? That's actually one of our pool table numbers.`,
+    (c) => `${c.amount}, ${c.player}? I'm guessing that's a pool table number, a bit weak for a darts score.`,
+    (c) => `${c.player}, ${c.amount} points in darts, but we've got a pool table with that exact number.`,
+    (c) => `${c.player}, you could have pool table number ${c.amount} booked in an hour.`,
+    (c) => `${c.player}, maybe it's time to trade the darts for a cue? Table number ${c.amount} opens up in an hour.`,
+  ],
+};
+
+const sportJokes = {
+  pl: [
+    { min: 1, max: 3, text: (c) => `${c.player}, to nie koszykówka, żeby rzucać za ${c.amount}.` },
+    { min: 4, max: 8, text: (c) => `${c.player}, ${c.amount} punktów? Tyle goli Polska strzela San Marino, a nie punktów zdobywa się w darta.` },
+    { min: 15, max: 15, text: (c) => `${c.player}, ${c.amount}? Tak liczy się w tenisie, nie w darta.` },
+    { min: 30, max: 30, text: (c) => `${c.amount} punktów, ${c.player}? Ktoś tu chyba myśli, że gra w tenisa.` },
+    { min: 40, max: 40, text: (c) => `${c.player}, ${c.amount}, czyli tenisowy wynik. Ale to nie kort, to tarcza.` },
+  ],
+  en: [
+    { min: 1, max: 3, text: (c) => `${c.player}, this isn't basketball, you don't throw for ${c.amount}.` },
+    { min: 4, max: 8, text: (c) => `${c.player}, ${c.amount} points? That's how many goals a solid team scores against San Marino, not how many darts points you should have.` },
+    { min: 15, max: 15, text: (c) => `${c.player}, ${c.amount}? That's how tennis keeps score, not darts.` },
+    { min: 30, max: 30, text: (c) => `${c.amount} points, ${c.player}? Someone thinks they're playing tennis.` },
+    { min: 40, max: 40, text: (c) => `${c.player}, ${c.amount}, that's a tennis score. But this isn't a court, it's a dartboard.` },
+  ],
+};
+
+function getSportJoke(amount) {
+  const pool = sportJokes[state.lang] ?? sportJokes.pl;
+  const eligible = pool.filter((j) => amount >= j.min && amount <= j.max);
+  if (!eligible.length) return null;
+  return eligible[Math.floor(Math.random() * eligible.length)];
+}
 
 const liveBannerJokes = {
   pl: [
@@ -145,6 +194,10 @@ const liveBannerJokes = {
 
 const highScoreJokes = {
   pl: {
+    tourney: [
+      (c) => `${c.player}, we wtorki mamy turniej. Nadajesz się. A dla ${c.weakest} mamy za to poniedziałkowe turnieje bilarda.`,
+      (c) => `${c.player}, taki wynik kwalifikuje na wtorkowy turniej. ${c.weakest}, dla ciebie zostają poniedziałki przy bilardzie.`,
+    ],
     great: [
       (c) => `${c.player}, ${c.amount} punktów? Ale wynik! Tak trzymać.`,
       (c) => `${c.amount} punktów od ${c.player}. Ktoś tu dziś w formie.`,
@@ -157,6 +210,10 @@ const highScoreJokes = {
     ],
   },
   en: {
+    tourney: [
+      (c) => `${c.player}, we run a tournament on Tuesdays. You qualify. As for ${c.weakest}, we've got Monday pool tournaments for you.`,
+      (c) => `${c.player}, that score gets you into the Tuesday tournament. ${c.weakest}, Mondays at the pool table are more your speed.`,
+    ],
     great: [
       (c) => `${c.player}, ${c.amount} points? Now that's a score. Keep it up.`,
       (c) => `${c.amount} points from ${c.player}. Someone's on fire tonight.`,
@@ -408,30 +465,50 @@ function maybeRoastBust(playerName) {
 
 function maybeRoastLowScore(playerName, amount) {
   const pool = lowScoreJokes[state.lang] ?? lowScoreJokes.pl;
-  const template = pool[Math.floor(Math.random() * pool.length)];
-  showLiveBanner(template({ player: playerName, amount }));
+  const eligible = pool.filter((j) => amount >= j.min && amount <= j.max);
+  const chosen = eligible[Math.floor(Math.random() * eligible.length)];
+  showLiveBanner(chosen.text({ player: playerName, amount }));
 }
 
-function maybeCelebrateHighScore(playerName, amount) {
+function maybeCelebrateHighScore(current, amount) {
   const tiers = highScoreJokes[state.lang] ?? highScoreJokes.pl;
-  const pool = amount > 170 ? tiers.pro : tiers.great;
+  const tier = amount > 170 ? 'pro' : amount > 120 ? 'great' : 'tourney';
+  const pool = tiers[tier];
   const template = pool[Math.floor(Math.random() * pool.length)];
-  showLiveBanner(template({ player: playerName, amount }));
+
+  let weakest = current.name;
+  const others = state.players.filter((p) => p.id !== current.id);
+  if (others.length) {
+    weakest = [...others].sort((a, b) => b.score - a.score)[0].name;
+  }
+
+  showLiveBanner(template({ player: current.name, amount, weakest }));
 }
 
-function reactToTurnResult(playerName, amount, bust) {
+function reactToTurnResult(current, amount, bust) {
   if (!state.jokesEnabled) return;
 
   if (bust) {
-    maybeRoastBust(playerName);
+    maybeRoastBust(current.name);
     return;
   }
 
   if (!Number.isInteger(amount)) return;
+
+  const sport = getSportJoke(amount);
+  if (sport) {
+    showLiveBanner(sport.text({ player: current.name, amount }));
+    return;
+  }
+
   if (amount <= 10) {
-    maybeRoastLowScore(playerName, amount);
-  } else if (amount > 120) {
-    maybeCelebrateHighScore(playerName, amount);
+    maybeRoastLowScore(current.name, amount);
+  } else if (amount <= 54) {
+    const pool = tableNumberJokes[state.lang] ?? tableNumberJokes.pl;
+    const template = pool[Math.floor(Math.random() * pool.length)];
+    showLiveBanner(template({ player: current.name, amount }));
+  } else if (amount > 90) {
+    maybeCelebrateHighScore(current, amount);
   }
 }
 
@@ -787,7 +864,7 @@ function submitTurn() {
   if (legWon) {
     showLegWinModal(current.name, legStandings);
   } else {
-    reactToTurnResult(current.name, entered, bust);
+    reactToTurnResult(current, entered, bust);
   }
 }
 
@@ -853,10 +930,19 @@ function handleDartKey(key) {
   if (base === 0) multiplier = 1;
   if (base === 25 && multiplier === 3) multiplier = 1;
 
-  state.turnDarts.push({ base, multiplier, value: base * multiplier });
+  const dartValue = base * multiplier;
+  state.turnDarts.push({ base, multiplier, value: dartValue });
   state.activeMultiplier = 1;
 
   renderGame();
+
+  if (state.jokesEnabled) {
+    const sport = getSportJoke(dartValue);
+    if (sport) {
+      const playerName = state.players[state.currentPlayer].name;
+      showLiveBanner(sport.text({ player: playerName, amount: dartValue }));
+    }
+  }
 }
 
 function submitDartsTurn() {
@@ -906,7 +992,7 @@ function submitDartsTurn() {
   if (legWon) {
     showLegWinModal(current.name, legStandings);
   } else {
-    reactToTurnResult(current.name, sum, bust);
+    reactToTurnResult(current, sum, bust);
   }
 }
 
@@ -1003,6 +1089,55 @@ rulesModal?.addEventListener('click', (e) => {
   if (e.target === rulesModal) closeModal(rulesModal);
 });
 
+function loadVisibleMenuImages() {
+  document.querySelectorAll('.menu-image').forEach((img) => {
+    const panel = img.closest('.menu-panel');
+    if (!panel || panel.hidden) return;
+    if (img.style.display === 'none') return;
+    if (!img.src && img.dataset.src) {
+      img.src = img.dataset.src;
+    }
+  });
+}
+
+menuLink?.addEventListener('click', () => {
+  bounceClass(menuLink, 'pressed');
+  openModal(menuModal);
+  loadVisibleMenuImages();
+});
+menuClose?.addEventListener('click', () => closeModal(menuModal));
+menuModal?.addEventListener('click', (e) => {
+  if (e.target === menuModal) closeModal(menuModal);
+});
+
+menuTabs.forEach((tab) => {
+  tab.addEventListener('click', () => {
+    bounceClass(tab, 'key-flash');
+    menuTabs.forEach((t) => t.classList.toggle('active', t === tab));
+    const target = tab.dataset.menuTab;
+    menuPanels.forEach((p) => {
+      p.hidden = p.dataset.menuPanel !== target;
+    });
+    loadVisibleMenuImages();
+  });
+});
+
+menuSubtabs.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    bounceClass(btn, 'key-flash');
+    menuSubtabs.forEach((b) => b.classList.toggle('active', b === btn));
+    const page = btn.dataset.menuPage;
+    document.querySelectorAll('[data-menu-panel="main"] .menu-image').forEach((img) => {
+      img.style.display = img.dataset.page === page ? 'block' : 'none';
+    });
+    loadVisibleMenuImages();
+  });
+});
+
+document.querySelectorAll('.menu-image').forEach((img) => {
+  img.addEventListener('click', () => img.classList.toggle('zoomed'));
+});
+
 legwinClose?.addEventListener('click', () => {
   bounceClass(legwinClose, 'pressed');
   closeModal(legwinModal);
@@ -1033,6 +1168,7 @@ document.addEventListener('keydown', (e) => {
     closeModal(rulesModal);
     closeModal(legwinModal);
     closeModal(nakkaModal);
+    closeModal(menuModal);
   }
 });
 

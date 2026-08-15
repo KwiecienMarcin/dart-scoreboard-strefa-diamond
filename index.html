@@ -21,6 +21,7 @@
       <header class="topbar">
         <img src="/assets/logo_full.png" alt="Strefa Diamond" class="topbar-logo brand-logo" />
         <div class="topbar-actions">
+          <button id="menu-link" class="ghost-btn" type="button">Menu</button>
           <button id="rules-link" class="ghost-btn" type="button">Zasady darta</button>
           <button id="home-link" class="ghost-btn" type="button">Strona główna</button>
         </div>
@@ -193,6 +194,43 @@
             <div class="modal-body" id="rules-body"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div id="menu-modal" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card menu-card">
+        <button id="menu-close" class="modal-close" type="button" aria-label="Zamknij">×</button>
+
+        <div class="menu-tabs" role="tablist">
+          <button type="button" class="menu-tab active" data-menu-tab="main">Menu główne</button>
+          <button type="button" class="menu-tab" data-menu-tab="drinks">Karta drinków</button>
+          <button type="button" class="menu-tab" data-menu-tab="wine">Karta win</button>
+        </div>
+
+        <div class="menu-panel" data-menu-panel="main">
+          <div class="menu-subtabs">
+            <button type="button" class="menu-subtab active" data-menu-page="1">Strona 1</button>
+            <button type="button" class="menu-subtab" data-menu-page="2">Strona 2</button>
+          </div>
+          <div class="menu-image-viewer">
+            <img data-src="/assets/menu_full_1.png" alt="Menu główne, strona 1" class="menu-image" data-page="1" />
+            <img data-src="/assets/menu_full_2.png" alt="Menu główne, strona 2" class="menu-image" data-page="2" style="display: none" />
+          </div>
+        </div>
+
+        <div class="menu-panel" data-menu-panel="drinks" hidden>
+          <div class="menu-image-viewer">
+            <img data-src="/assets/menu_drinki.png" alt="Karta drinków" class="menu-image menu-image-large" />
+          </div>
+        </div>
+
+        <div class="menu-panel" data-menu-panel="wine" hidden>
+          <div class="menu-image-viewer">
+            <img data-src="/assets/menu_wino.png" alt="Karta win" class="menu-image" />
+          </div>
+        </div>
+
+        <p class="menu-hint">Kliknij grafikę, aby przybliżyć.</p>
       </div>
     </div>
 
