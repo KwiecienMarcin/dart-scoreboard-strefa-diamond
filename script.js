@@ -461,12 +461,20 @@ function showLegWinModal(name, standings) {
   openModal(legwinModal);
 }
 
+const LIVE_BANNER_DURATION_MS = 15000;
+let lastBannerShownAt = 0;
+
 function showLiveBanner(message) {
   if (!liveBannerEl) return;
+
+  const now = Date.now();
+  if (now - lastBannerShownAt < LIVE_BANNER_DURATION_MS) return;
+  lastBannerShownAt = now;
+
   liveBannerEl.textContent = message;
   liveBannerEl.classList.add('show');
   clearTimeout(liveBannerTimer);
-  liveBannerTimer = setTimeout(() => liveBannerEl.classList.remove('show'), 10000);
+  liveBannerTimer = setTimeout(() => liveBannerEl.classList.remove('show'), LIVE_BANNER_DURATION_MS);
 }
 
 function maybeRoastBust(playerName) {
