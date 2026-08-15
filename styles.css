@@ -90,12 +90,11 @@ body {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  min-height: calc(100vh - 90px);
   display: grid;
   place-items: center;
   text-align: center;
   gap: 14px;
-  padding: 30px 24px;
+  padding: 34px 24px;
 }
 
 .hero-card::before {
@@ -119,8 +118,7 @@ body {
 
 .logo-wrap {
   z-index: 2;
-  width: min(88vw, 980px);
-  min-height: 120px;
+  width: min(46vw, 420px);
 }
 
 .hero-logo {
@@ -155,20 +153,6 @@ body {
   transform: translateX(-50%);
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
   animation: slogan-line 2.6s ease-in-out infinite;
-}
-
-.brand-title {
-  z-index: 2;
-  margin: 0;
-  font-size: clamp(2.8rem, 7vw, 5.2rem);
-  letter-spacing: 3px;
-  background: linear-gradient(100deg, #ffffff 0%, #ffd449 22%, #f2ba2a 45%, #ffffff 60%, #ffd449 82%, #f2ba2a 100%);
-  background-size: 220% auto;
-  background-position: 0 center;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shine-sweep 6s linear infinite;
 }
 
 .home-cta {
@@ -227,16 +211,11 @@ body {
 
 h1,
 h2,
-.match-font,
-.brand-title {
+.match-font {
   margin: 0;
   font-family: "Rajdhani", sans-serif;
   font-weight: 700;
   letter-spacing: 1px;
-}
-
-.hero-card h1 {
-  font-size: clamp(2.8rem, 7vw, 5rem);
 }
 
 .hero-card p {
@@ -969,12 +948,6 @@ select,
 @keyframes spin-border {
   to {
     transform: rotate(1turn);
-  }
-}
-
-@keyframes shine-sweep {
-  to {
-    background-position: 220% center;
   }
 }
 
