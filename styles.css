@@ -399,9 +399,48 @@ select,
   border-bottom: none;
 }
 
+.input-mode-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mode-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 10px;
+  min-height: 46px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mode-btn.active {
+  background: linear-gradient(120deg, var(--accent-2), var(--accent));
+  color: #151515;
+}
+
+.input-side .score-input-box,
+.input-side .darts-input-box,
+.input-side #keypad,
+.input-side #keypad-darts {
+  display: none;
+}
+
+.input-side.mode-sum .score-input-box,
+.input-side.mode-sum #keypad {
+  display: grid;
+}
+
+.input-side.mode-darts .darts-input-box,
+.input-side.mode-darts #keypad-darts {
+  display: grid;
+}
+
 .score-input-box {
   padding: 10px;
-  display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
 }
@@ -416,12 +455,58 @@ select,
   text-align: center;
 }
 
+.darts-input-box {
+  padding: 10px;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.dart-slots {
+  display: flex;
+  gap: 6px;
+}
+
+.dart-slot {
+  flex: 1;
+  min-width: 52px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dart-slot.filled {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: transparent;
+  color: #171717;
+}
+
+.dart-sum {
+  min-width: 64px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  color: #171717;
+  border-radius: 12px;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
 .keypad {
   margin-top: 10px;
   padding: 8px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+}
+
+.keypad-darts {
+  grid-template-columns: repeat(5, 1fr);
 }
 
 .keypad button {
@@ -434,8 +519,29 @@ select,
   color: var(--text);
 }
 
+.keypad-darts button {
+  min-height: 46px;
+  font-size: 1.5rem;
+}
+
+.keypad-darts button.mult-btn {
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+}
+
 .keypad button.action {
   background: rgba(242, 186, 42, 0.28);
+}
+
+.keypad-darts button.mult-active {
+  background: var(--accent);
+  color: #151515;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.keypad-darts button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 #orientation-warning {

@@ -17,6 +17,13 @@ const playersList = document.getElementById('players-list');
 const scoreInput = document.getElementById('score-input');
 const submitScoreBtn = document.getElementById('submit-score');
 const keypad = document.getElementById('keypad');
+const keypadDarts = document.getElementById('keypad-darts');
+const inputSideEl = document.querySelector('.input-side');
+const modeSumBtn = document.getElementById('mode-sum');
+const modeDartsBtn = document.getElementById('mode-darts');
+const dartSlotsEl = document.getElementById('dart-slots');
+const dartSumEl = document.getElementById('dart-sum');
+const submitDartsBtn = document.getElementById('submit-darts');
 const matchTitle = document.getElementById('match-title');
 const scoreInputEl = document.getElementById('score-input');
 const submitScoreLabel = document.getElementById('submit-score');
@@ -32,9 +39,20 @@ const state = {
   startScore: 501,
   turnInput: '',
   lang: 'pl',
+  inputMode: 'darts',
+  turnDarts: [],
+  activeMultiplier: 1,
 };
 
 const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'C'];
+
+const dartsKeypadLayout = [
+  '1', '2', '3', '4', '5',
+  '6', '7', '8', '9', '10',
+  '11', '12', '13', '14', '15',
+  '16', '17', '18', '19', '20',
+  '0', '25', 'DOUBLE', 'TRIPLE', '⌫',
+];
 
 
 
@@ -50,7 +68,7 @@ const t = {
     outSingle: 'Single out',
     backToSetup: 'Edytuj zawodników',
     newGame: 'Nowa gra',
-    enterScore: 'Wpisz wynik tury',
+    enterScore: 'Wpisz sumę rzutów',
     submit: 'Zatwierdź',
     nowThrowing: 'Rzuca teraz',
     remaining: 'Pozostało',
@@ -60,6 +78,8 @@ const t = {
     legWin: (name) => `${name} wygrywa lega! Startujemy nowego lega.`,
     modeDouble: 'Double out',
     modeSingle: 'Single out',
+    inputModeSum: 'Suma rzutów',
+    inputModeDarts: 'Pojedyncze rzuty',
   },
   en: {
     setupTitle: 'Match settings',
@@ -71,7 +91,7 @@ const t = {
     outSingle: 'Single out',
     backToSetup: 'Edit players',
     newGame: 'New game',
-    enterScore: 'Enter turn score',
+    enterScore: 'Enter throws sum',
     submit: 'Submit',
     nowThrowing: 'Now throwing',
     remaining: 'Remaining',
@@ -81,6 +101,8 @@ const t = {
     legWin: (name) => `${name} wins the leg! Starting a new leg.`,
     modeDouble: 'Double out',
     modeSingle: 'Single out',
+    inputModeSum: 'Throws sum',
+    inputModeDarts: 'Single throws',
   },
 };
 
@@ -108,6 +130,9 @@ function applyTranslations() {
   if (newGameLabel) newGameLabel.textContent = tr('newGame');
   if (scoreInputEl) scoreInputEl.placeholder = tr('enterScore');
   if (submitScoreLabel) submitScoreLabel.textContent = tr('submit');
+  if (submitDartsBtn) submitDartsBtn.textContent = tr('submit');
+  if (modeSumBtn) modeSumBtn.textContent = tr('inputModeSum');
+  if (modeDartsBtn) modeDartsBtn.textContent = tr('inputModeDarts');
   if (startGameBtn) startGameBtn.textContent = tr('next');
 
   langPlBtn?.classList.toggle('active', state.lang === 'pl');
@@ -158,6 +183,8 @@ function collectPlayers() {
   state.startScore = start;
   state.outMode = document.querySelector('input[name="out-mode"]:checked').value;
   state.turnInput = '';
+  state.turnDarts = [];
+  state.activeMultiplier = 1;
   applyTranslations();
 }
 
@@ -245,6 +272,38 @@ function renderGame() {
   });
 
   scoreInput.value = state.turnInput;
+  renderDartSlots();
+  updateDartsKeypadState();
+}
+
+function renderDartSlots() {
+  if (!dartSlotsEl) return;
+  const slots = dartSlotsEl.querySelectorAll('.dart-slot');
+  slots.forEach((slot, i) => {
+    const dart = state.turnDarts[i];
+    slot.textContent = dart ? String(dart.value) : '';
+    slot.classList.toggle('filled', Boolean(dart));
+  });
+
+  if (dartSumEl) {
+    const sum = state.turnDarts.reduce((acc, d) => acc + d.value, 0);
+    dartSumEl.textContent = String(sum);
+  }
+}
+
+function updateDartsKeypadState() {
+  if (!keypadDarts) return;
+  const doubleBtn = keypadDarts.querySelector('[data-key="DOUBLE"]');
+  const tripleBtn = keypadDarts.querySelector('[data-key="TRIPLE"]');
+  doubleBtn?.classList.toggle('mult-active', state.activeMultiplier === 2);
+  tripleBtn?.classList.toggle('mult-active', state.activeMultiplier === 3);
+
+  const full = state.turnDarts.length >= 3;
+  keypadDarts.querySelectorAll('button').forEach((btn) => {
+    const key = btn.dataset.key;
+    if (key === 'DOUBLE' || key === 'TRIPLE' || key === '⌫') return;
+    btn.disabled = full;
+  });
 }
 
 function rotatePlayer() {
@@ -303,9 +362,112 @@ function submitTurn() {
 function handleHomeReset() {
   state.players = [];
   state.turnInput = '';
+  state.turnDarts = [];
+  state.activeMultiplier = 1;
   playerCountSelect.value = '2';
   renderPlayerInputs();
   showScreen('home');
+}
+
+function setInputMode(mode) {
+  state.inputMode = mode;
+  state.turnInput = '';
+  state.turnDarts = [];
+  state.activeMultiplier = 1;
+
+  modeSumBtn?.classList.toggle('active', mode === 'sum');
+  modeDartsBtn?.classList.toggle('active', mode === 'darts');
+  inputSideEl?.classList.toggle('mode-sum', mode === 'sum');
+  inputSideEl?.classList.toggle('mode-darts', mode === 'darts');
+
+  renderGame();
+}
+
+function handleDartKey(key) {
+  if (key === '⌫') {
+    if (state.activeMultiplier !== 1) {
+      state.activeMultiplier = 1;
+    } else {
+      state.turnDarts.pop();
+    }
+    renderGame();
+    return;
+  }
+
+  if (key === 'DOUBLE') {
+    state.activeMultiplier = state.activeMultiplier === 2 ? 1 : 2;
+    renderGame();
+    return;
+  }
+
+  if (key === 'TRIPLE') {
+    state.activeMultiplier = state.activeMultiplier === 3 ? 1 : 3;
+    renderGame();
+    return;
+  }
+
+  if (state.turnDarts.length >= 3) return;
+
+  const base = Number(key);
+  let multiplier = state.activeMultiplier;
+  if (base === 0) multiplier = 1;
+  if (base === 25 && multiplier === 3) multiplier = 1;
+
+  state.turnDarts.push({ base, multiplier, value: base * multiplier });
+  state.activeMultiplier = 1;
+
+  renderGame();
+  maybeAutoFinishTurn();
+}
+
+function maybeAutoFinishTurn() {
+  const current = state.players[state.currentPlayer];
+  const sum = state.turnDarts.reduce((acc, d) => acc + d.value, 0);
+  const remaining = current.score - sum;
+  const forcedBust = remaining < 0 || (state.outMode === 'double' && remaining === 1);
+
+  if (forcedBust || remaining === 0 || state.turnDarts.length === 3) {
+    submitDartsTurn();
+  }
+}
+
+function submitDartsTurn() {
+  if (!state.turnDarts.length) return;
+
+  const current = state.players[state.currentPlayer];
+  const sum = state.turnDarts.reduce((acc, d) => acc + d.value, 0);
+  const lastDart = state.turnDarts[state.turnDarts.length - 1];
+  const remaining = current.score - sum;
+
+  let bust = false;
+
+  if (remaining < 0) {
+    bust = true;
+  } else if (state.outMode === 'double' && remaining === 1) {
+    bust = true;
+  } else if (remaining === 0 && !isValidFinishingDart(lastDart, state.outMode)) {
+    bust = true;
+  }
+
+  if (!bust) {
+    current.score = remaining;
+    current.turns += 1;
+    current.scoredPoints += sum;
+
+    if (current.score === 0) {
+      alert(tr('legWin')(current.name));
+      state.players.forEach((p) => {
+        p.score = state.startScore;
+      });
+    }
+  } else {
+    current.turns += 1;
+  }
+
+  state.turnDarts = [];
+  state.activeMultiplier = 1;
+  rotatePlayer();
+  renderGame();
 }
 
 function buildKeypad() {
@@ -333,6 +495,30 @@ function buildKeypad() {
     keypad.appendChild(btn);
   });
 }
+
+function buildDartsKeypad() {
+  if (!keypadDarts) return;
+  keypadDarts.innerHTML = '';
+  dartsKeypadLayout.forEach((key) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = key;
+    btn.dataset.key = key;
+
+    if (key === 'DOUBLE' || key === 'TRIPLE') {
+      btn.classList.add('action', 'mult-btn');
+    } else if (key === '⌫') {
+      btn.classList.add('action');
+    }
+
+    btn.addEventListener('click', () => handleDartKey(key));
+    keypadDarts.appendChild(btn);
+  });
+}
+
+modeSumBtn?.addEventListener('click', () => setInputMode('sum'));
+modeDartsBtn?.addEventListener('click', () => setInputMode('darts'));
+submitDartsBtn?.addEventListener('click', submitDartsTurn);
 
 playerCountSelect.addEventListener('change', renderPlayerInputs);
 langPlBtn?.addEventListener('click', () => {
@@ -381,6 +567,7 @@ homeLink.addEventListener('click', handleHomeReset);
 submitScoreBtn.addEventListener('click', submitTurn);
 
 buildKeypad();
+buildDartsKeypad();
 renderPlayerInputs();
 applyTranslations();
 showScreen('home');

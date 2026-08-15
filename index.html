@@ -103,13 +103,29 @@
             <ul id="players-list" class="players-list"></ul>
           </div>
 
-          <div class="input-side">
+          <div class="input-side mode-darts">
+            <div class="input-mode-toggle" role="group" aria-label="Tryb wpisywania wyniku">
+              <button id="mode-sum" class="mode-btn" type="button" data-pl="Suma rzutów" data-en="Throws sum">Suma rzutów</button>
+              <button id="mode-darts" class="mode-btn active" type="button" data-pl="Pojedyncze rzuty" data-en="Single throws">Pojedyncze rzuty</button>
+            </div>
+
             <div class="score-input-box">
-              <input id="score-input" type="text" inputmode="numeric" placeholder="Wpisz wynik tury" data-pl="Wpisz wynik tury" data-en="Enter turn score" readonly />
+              <input id="score-input" type="text" inputmode="numeric" placeholder="Wpisz sumę rzutów" data-pl="Wpisz sumę rzutów" data-en="Enter throws sum" readonly />
               <button id="submit-score" class="primary-btn" data-pl="Zatwierdź" data-en="Submit">Zatwierdź</button>
             </div>
 
+            <div class="darts-input-box">
+              <div class="dart-slots" id="dart-slots">
+                <span class="dart-slot"></span>
+                <span class="dart-slot"></span>
+                <span class="dart-slot"></span>
+              </div>
+              <div class="dart-sum" id="dart-sum">0</div>
+              <button id="submit-darts" class="primary-btn" data-pl="Zatwierdź" data-en="Submit">Zatwierdź</button>
+            </div>
+
             <div class="keypad" id="keypad"></div>
+            <div class="keypad keypad-darts" id="keypad-darts"></div>
           </div>
         </div>
       </section>
