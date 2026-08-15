@@ -161,26 +161,44 @@ body {
   font-size: clamp(1.45rem, 2.2vw, 1.9rem);
   border-radius: 20px;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
   letter-spacing: 1.4px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.home-cta span {
-  display: inline-block;
-  transform: translateY(1px);
+.home-cta-main {
   font-size: inherit;
   line-height: 1;
   font-weight: 700;
-  min-width: 14ch;
-  text-align: center;
+}
+
+.home-cta-sub {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  opacity: 0.72;
 }
 
 .home-cta:hover {
   transform: translateY(-2px) scale(1.01);
   box-shadow: 0 16px 34px rgba(242, 186, 42, 0.22);
+}
+
+.home-cta-secondary {
+  width: 80%;
+  min-height: 60px;
+  font-size: 1rem;
+  align-self: center;
+  justify-self: center;
+  box-shadow: none;
+}
+
+.home-cta-secondary .home-cta-sub {
+  font-size: 0.72rem;
 }
 
 .home-badges {
@@ -670,15 +688,32 @@ select,
   color: #171717;
 }
 
+.dart-sum-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.dart-sum-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+}
+
 .dart-sum {
   min-width: 64px;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.9);
-  color: #171717;
+  background: linear-gradient(120deg, var(--accent-2), var(--accent));
+  color: #151515;
   border-radius: 12px;
   font-size: 1.4rem;
   font-weight: 800;
+  box-shadow: 0 0 16px rgba(242, 186, 42, 0.4);
 }
 
 .submit-btn {
@@ -881,6 +916,48 @@ select,
   color: rgba(255, 255, 255, 0.88);
   font-size: 1.05rem;
   line-height: 1.5;
+}
+
+.nakka-card {
+  max-width: 420px;
+}
+
+.nakka-info {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  margin: 4px 0 16px;
+}
+
+.nakka-pin-input {
+  width: 100%;
+  border: 1px solid rgba(242, 186, 42, 0.4);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 6px;
+}
+
+.nakka-pin-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(242, 186, 42, 0.25);
+}
+
+.nakka-error {
+  color: var(--accent-2);
+  font-weight: 700;
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+}
+
+.nakka-card .submit-btn {
+  width: 100%;
+  margin-top: 16px;
 }
 
 .legwin-card {

@@ -23,6 +23,7 @@ const modeSumBtn = document.getElementById('mode-sum');
 const modeDartsBtn = document.getElementById('mode-darts');
 const dartSlotsEl = document.getElementById('dart-slots');
 const dartSumEl = document.getElementById('dart-sum');
+const dartSumLabelEl = document.getElementById('dart-sum-label');
 const submitDartsBtn = document.getElementById('submit-darts');
 const scoreInputEl = document.getElementById('score-input');
 const backToSetupLabel = document.getElementById('back-to-setup-label');
@@ -41,6 +42,14 @@ const legwinModal = document.getElementById('legwin-modal');
 const legwinClose = document.getElementById('legwin-close');
 const legwinLabelEl = document.getElementById('legwin-label');
 const legwinNameEl = document.getElementById('legwin-name');
+const nakkaBtn = document.getElementById('nakka-btn');
+const nakkaModal = document.getElementById('nakka-modal');
+const nakkaClose = document.getElementById('nakka-close');
+const nakkaPinInput = document.getElementById('nakka-pin-input');
+const nakkaConfirm = document.getElementById('nakka-confirm');
+const nakkaError = document.getElementById('nakka-error');
+
+const NAKKA_URL = 'https://n01darts.com/n01/';
 
 const state = {
   players: [],
@@ -99,6 +108,7 @@ const t = {
     inputModeDarts: 'Pojedyncze rzuty',
     sumCaption: 'Grasz w darta od dawna i dobrze liczysz w pamięci? Ten tryb jest dla Ciebie.',
     dartsCaption: 'Wpisuj każdy z rzutów osobno — bez liczenia.',
+    dartsSumLabel: 'Suma',
     undoEntry: 'Cofnij wpisanie',
     rulesButton: 'Zasady darta',
     rulesTitle: 'Zasady gry w darta',
@@ -139,6 +149,7 @@ const t = {
     inputModeDarts: 'Single throws',
     sumCaption: "Been playing darts a while and good at mental math? This mode's for you.",
     dartsCaption: 'Enter every throw separately — no counting needed.',
+    dartsSumLabel: 'Sum',
     undoEntry: 'Undo entry',
     rulesButton: 'Darts rules',
     rulesTitle: 'Darts rules',
@@ -215,6 +226,38 @@ function showToast(message) {
   toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
 }
 
+function getISOWeekNumber(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+}
+
+function getNakkaPin() {
+  const week = getISOWeekNumber(new Date());
+  return String(week + 10);
+}
+
+function openNakkaModal() {
+  if (!nakkaModal) return;
+  if (nakkaError) nakkaError.hidden = true;
+  if (nakkaPinInput) nakkaPinInput.value = '';
+  openModal(nakkaModal);
+  nakkaPinInput?.focus();
+}
+
+function submitNakkaPin() {
+  if (!nakkaPinInput) return;
+  if (nakkaPinInput.value.trim() === getNakkaPin()) {
+    closeModal(nakkaModal);
+    window.location.href = NAKKA_URL;
+  } else {
+    if (nakkaError) nakkaError.hidden = false;
+    bounceClass(nakkaPinInput, 'key-flash');
+  }
+}
+
 function showLegWinModal(name) {
   if (legwinNameEl) legwinNameEl.textContent = tr('legWin')(name);
   openModal(legwinModal);
@@ -249,6 +292,7 @@ function applyTranslations() {
   if (modeDartsBtn) modeDartsBtn.textContent = tr('inputModeDarts');
   if (sumCaptionEl) sumCaptionEl.textContent = tr('sumCaption');
   if (dartsCaptionEl) dartsCaptionEl.textContent = tr('dartsCaption');
+  if (dartSumLabelEl) dartSumLabelEl.textContent = tr('dartsSumLabel');
   if (legwinLabelEl) legwinLabelEl.textContent = tr('legWinBadge');
   if (legwinClose) legwinClose.textContent = tr('legWinOk');
   if (startGameBtn) startGameBtn.textContent = tr('next');
@@ -751,10 +795,27 @@ legwinModal?.addEventListener('click', (e) => {
   if (e.target === legwinModal) closeModal(legwinModal);
 });
 
+nakkaBtn?.addEventListener('click', () => {
+  bounceClass(nakkaBtn, 'pressed');
+  openNakkaModal();
+});
+nakkaClose?.addEventListener('click', () => closeModal(nakkaModal));
+nakkaModal?.addEventListener('click', (e) => {
+  if (e.target === nakkaModal) closeModal(nakkaModal);
+});
+nakkaConfirm?.addEventListener('click', () => {
+  bounceClass(nakkaConfirm, 'pressed');
+  submitNakkaPin();
+});
+nakkaPinInput?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submitNakkaPin();
+});
+
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeModal(rulesModal);
     closeModal(legwinModal);
+    closeModal(nakkaModal);
   }
 });
 

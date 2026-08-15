@@ -40,8 +40,14 @@
           </div>
 
           <div class="home-actions">
-            <button id="go-scoreboard" class="primary-btn home-cta"><span>DART SCOREBOARD</span></button>
-            <a class="secondary-btn home-cta" href="https://n01darts.com/n01/" target="_blank" rel="noreferrer"><span>NAKKA</span></a>
+            <button id="go-scoreboard" class="primary-btn home-cta">
+              <span class="home-cta-main">DART SCOREBOARD</span>
+              <span class="home-cta-sub">Liczenie punktów</span>
+            </button>
+            <button type="button" id="nakka-btn" class="secondary-btn home-cta home-cta-secondary">
+              <span class="home-cta-main">NAKKA</span>
+              <span class="home-cta-sub">Dostępne tylko na turnieje darterskie</span>
+            </button>
           </div>
 
           <div class="home-badges">
@@ -124,7 +130,10 @@
                 <span class="dart-slot"></span>
                 <span class="dart-slot"></span>
               </div>
-              <div class="dart-sum" id="dart-sum">0</div>
+              <div class="dart-sum-wrap">
+                <span class="dart-sum-label" id="dart-sum-label">Suma</span>
+                <div class="dart-sum" id="dart-sum">0</div>
+              </div>
               <button id="submit-darts" class="primary-btn submit-btn" type="button">Zatwierdź</button>
             </div>
 
@@ -173,6 +182,17 @@
         </svg>
         <h2 id="rules-title">Zasady gry w darta</h2>
         <div class="modal-body" id="rules-body"></div>
+      </div>
+    </div>
+
+    <div id="nakka-modal" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card nakka-card">
+        <button id="nakka-close" class="modal-close" type="button" aria-label="Zamknij">×</button>
+        <h2>Dostęp do NAKKA</h2>
+        <p class="nakka-info">Dostępne tylko na turnieje darterskie. PIN otrzymasz od organizatora turnieju.</p>
+        <input type="text" inputmode="numeric" id="nakka-pin-input" class="nakka-pin-input" placeholder="PIN" maxlength="4" />
+        <p class="nakka-error" id="nakka-error" hidden>Nieprawidłowy PIN. Spróbuj ponownie.</p>
+        <button type="button" id="nakka-confirm" class="primary-btn submit-btn">Wejdź</button>
       </div>
     </div>
 
