@@ -24,7 +24,6 @@ const modeDartsBtn = document.getElementById('mode-darts');
 const dartSlotsEl = document.getElementById('dart-slots');
 const dartSumEl = document.getElementById('dart-sum');
 const submitDartsBtn = document.getElementById('submit-darts');
-const matchTitle = document.getElementById('match-title');
 const scoreInputEl = document.getElementById('score-input');
 const backToSetupLabel = document.getElementById('back-to-setup-label');
 const newGameLabel = document.getElementById('new-game-label');
@@ -353,19 +352,18 @@ function renderGame() {
   const current = state.players[state.currentPlayer];
   const checkout = findCheckout(current.score, state.outMode);
 
-  matchTitle.textContent = `${state.outMode === 'double' ? tr('modeDouble') : tr('modeSingle')} • ${state.startScore}`;
-
   const currentChanged = previousScores[current.id] !== undefined && previousScores[current.id] !== current.score;
   const playerRotated = lastActivePlayerIndex !== state.currentPlayer;
   lastActivePlayerIndex = state.currentPlayer;
 
   currentPlayerCard.innerHTML = `
-    <h3>${tr('nowThrowing')}: ${current.name}</h3>
+    <p class="now-throwing-label">${tr('nowThrowing')}</p>
+    <h3 class="current-player-name">${current.name}</h3>
     <div class="current-player-score">
       <span class="big${currentChanged ? ' score-pulse' : ''}">${current.score}</span>
-      <span>${tr('remaining')}</span>
+      <span class="remaining-label">${tr('remaining')}</span>
     </div>
-    <div>${tr('average')}: ${getAverage(current)}</div>
+    <div class="avg-line">${tr('average')}: ${getAverage(current)}</div>
     ${checkout ? `<div class="checkout">${tr('checkout')}: ${checkout}</div>` : ''}
   `;
 
@@ -647,20 +645,32 @@ function buildDartsKeypad() {
   });
 }
 
-modeSumBtn?.addEventListener('click', () => setInputMode('sum'));
-modeDartsBtn?.addEventListener('click', () => setInputMode('darts'));
+modeSumBtn?.addEventListener('click', () => {
+  bounceClass(modeSumBtn, 'key-flash');
+  setInputMode('sum');
+});
+modeDartsBtn?.addEventListener('click', () => {
+  bounceClass(modeDartsBtn, 'key-flash');
+  setInputMode('darts');
+});
 submitDartsBtn?.addEventListener('click', () => {
   bounceClass(submitDartsBtn, 'pressed');
   submitDartsTurn();
 });
 
-rulesLink?.addEventListener('click', () => openModal(rulesModal));
+rulesLink?.addEventListener('click', () => {
+  bounceClass(rulesLink, 'pressed');
+  openModal(rulesModal);
+});
 rulesClose?.addEventListener('click', () => closeModal(rulesModal));
 rulesModal?.addEventListener('click', (e) => {
   if (e.target === rulesModal) closeModal(rulesModal);
 });
 
-legwinClose?.addEventListener('click', () => closeModal(legwinModal));
+legwinClose?.addEventListener('click', () => {
+  bounceClass(legwinClose, 'pressed');
+  closeModal(legwinModal);
+});
 legwinModal?.addEventListener('click', (e) => {
   if (e.target === legwinModal) closeModal(legwinModal);
 });
@@ -674,28 +684,33 @@ document.addEventListener('keydown', (e) => {
 
 playerCountSelect.addEventListener('change', renderPlayerInputs);
 langPlBtn?.addEventListener('click', () => {
+  bounceClass(langPlBtn, 'key-flash');
   state.lang = 'pl';
   applyTranslations();
   if (state.players.length && screens.game.classList.contains('active')) renderGame();
 });
 
 langEnBtn?.addEventListener('click', () => {
+  bounceClass(langEnBtn, 'key-flash');
   state.lang = 'en';
   applyTranslations();
   if (state.players.length && screens.game.classList.contains('active')) renderGame();
 });
 
 goScoreboardBtn.addEventListener('click', () => {
+  bounceClass(goScoreboardBtn, 'pressed');
   showScreen('setup');
 });
 
 startGameBtn.addEventListener('click', () => {
+  bounceClass(startGameBtn, 'pressed');
   collectPlayers();
   showScreen('game');
   renderGame();
 });
 
 backToSetupBtn.addEventListener('click', () => {
+  bounceClass(backToSetupBtn, 'pressed');
   const count = state.players.length || 2;
   playerCountSelect.value = String(count);
   renderPlayerInputs();
@@ -713,8 +728,14 @@ backToSetupBtn.addEventListener('click', () => {
   showScreen('setup');
 });
 
-newGameBtn.addEventListener('click', handleHomeReset);
-homeLink.addEventListener('click', handleHomeReset);
+newGameBtn.addEventListener('click', () => {
+  bounceClass(newGameBtn, 'pressed');
+  handleHomeReset();
+});
+homeLink.addEventListener('click', () => {
+  bounceClass(homeLink, 'pressed');
+  handleHomeReset();
+});
 
 buildKeypad();
 buildDartsKeypad();

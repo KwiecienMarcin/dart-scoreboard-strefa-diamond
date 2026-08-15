@@ -34,6 +34,8 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .topbar-actions {
@@ -74,6 +76,7 @@ body {
   background: linear-gradient(120deg, rgba(15, 19, 30, 0.97), rgba(24, 29, 44, 0.95));
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
 }
 
 .hero-card {
@@ -237,7 +240,7 @@ h2,
 }
 
 .lang-btn:active {
-  transform: scale(0.94);
+  transform: scale(0.88);
 }
 
 .lang-btn.active {
@@ -277,7 +280,7 @@ input {
 
 .primary-btn:active,
 .ghost-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.9);
 }
 
 .primary-btn {
@@ -336,13 +339,9 @@ select,
 
 .game-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   gap: 10px;
-}
-
-.game-header h2 {
-  font-size: clamp(2.2rem, 4vw, 3.8rem);
 }
 
 .game-controls {
@@ -366,8 +365,7 @@ select,
 
 .current-player-card {
   padding: 30px 32px;
-  background: linear-gradient(130deg, #f2ba2a, #ffd449);
-  color: #101010;
+  border-color: rgba(242, 186, 42, 0.4);
   animation: glow-breathe 3.2s ease-in-out infinite;
 }
 
@@ -375,16 +373,27 @@ select,
   animation: glow-breathe 3.2s ease-in-out infinite, card-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.current-player-card h3 {
+.now-throwing-label {
   margin: 0;
-  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.current-player-name {
+  margin: 6px 0 0;
+  font-size: clamp(1.9rem, 3.6vw, 2.8rem);
+  font-weight: 700;
+  color: var(--accent-2);
 }
 
 .current-player-score {
   display: flex;
   align-items: baseline;
   gap: 12px;
-  margin-top: 14px;
+  margin-top: 16px;
 }
 
 .current-player-score .big {
@@ -392,17 +401,33 @@ select,
   font-weight: 700;
   font-size: clamp(5.5rem, 11vw, 9rem);
   line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 0 40px rgba(242, 186, 42, 0.35);
+}
+
+.remaining-label {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.avg-line {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.95rem;
 }
 
 .checkout {
   margin-top: 14px;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: 10px;
   width: fit-content;
-  background: rgba(8, 8, 8, 0.72);
-  color: #ffe27c;
+  background: linear-gradient(120deg, var(--accent-2), var(--accent));
+  color: #151515;
   font-weight: 800;
   font-size: 1.1rem;
+  box-shadow: 0 0 20px rgba(242, 186, 42, 0.35);
 }
 
 .players-list {
@@ -490,7 +515,7 @@ select,
 }
 
 .mode-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.92);
 }
 
 .mode-btn.active {
@@ -871,14 +896,17 @@ select,
   0% {
     transform: scale(1);
     filter: brightness(1);
+    box-shadow: 0 0 0 rgba(242, 186, 42, 0);
   }
-  40% {
-    transform: scale(0.9);
-    filter: brightness(1.4);
+  35% {
+    transform: scale(0.85);
+    filter: brightness(1.6);
+    box-shadow: 0 0 18px rgba(242, 186, 42, 0.6);
   }
   100% {
     transform: scale(1);
     filter: brightness(1);
+    box-shadow: 0 0 0 rgba(242, 186, 42, 0);
   }
 }
 
@@ -892,8 +920,8 @@ select,
     box-shadow: 0 0 0 rgba(242, 186, 42, 0);
   }
   35% {
-    transform: scale(0.92);
-    box-shadow: 0 0 30px rgba(242, 186, 42, 0.7);
+    transform: scale(0.87);
+    box-shadow: 0 0 34px rgba(242, 186, 42, 0.75);
   }
   100% {
     transform: scale(1);
