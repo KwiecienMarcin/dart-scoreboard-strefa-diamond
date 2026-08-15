@@ -42,6 +42,8 @@ const legwinModal = document.getElementById('legwin-modal');
 const legwinClose = document.getElementById('legwin-close');
 const legwinLabelEl = document.getElementById('legwin-label');
 const legwinNameEl = document.getElementById('legwin-name');
+const legwinJokeEl = document.getElementById('legwin-joke');
+const liveBannerEl = document.getElementById('live-banner');
 const nakkaBtn = document.getElementById('nakka-btn');
 const nakkaModal = document.getElementById('nakka-modal');
 const nakkaClose = document.getElementById('nakka-close');
@@ -68,8 +70,83 @@ let previousScores = {};
 let lastActivePlayerIndex = -1;
 let toastTimer = null;
 let legWinTimer = null;
+let liveBannerTimer = null;
 let selectedPlayerCount = 2;
 let selectedStartScore = 301;
+
+const legWinJokes = {
+  pl: [
+    { min: 1, text: () => 'Dolejcie sobie piwka przy barze, zasłużyliście.' },
+    { min: 1, text: () => 'Ekipa od tarczy 20 już się z was śmieje.' },
+    { min: 1, text: () => 'Barman już liczy, ile dziś piw wypiliście.' },
+    { min: 2, text: (c) => `${c.loser} stawia kolejkę, taka tradycja w Strefie Diamond.` },
+    { min: 2, text: (c) => `${c.loser}, po takiej grze należy ci się tylko jedno. Kolejka dla reszty.` },
+    { min: 2, text: (c) => `${c.loser} dziś grał jakby lotki widział pierwszy raz. Kolejka się należy.` },
+    { min: 2, text: (c) => `${c.winner} wygrał tego lega, ale ${c.thirdOrSecond} już szykuje rewanż przy stole bilardowym.` },
+    { min: 2, text: (c) => `${c.winner} kontra ${c.loser}. I chyba wiadomo, kto dziś stawia.` },
+    { min: 3, text: (c) => `${c.third}, podgoń wynik, bo zaraz stawiasz bilard dla całej ekipy.` },
+    { min: 3, text: (c) => `${c.third} trzyma się kurczowo trzeciego miejsca. Jeszcze chwila i leci stawiać bilard.` },
+  ],
+  en: [
+    { min: 1, text: () => 'Grab a round at the bar, you earned it.' },
+    { min: 1, text: () => 'The crew at board 20 is already laughing at you.' },
+    { min: 1, text: () => "The bartender's already counting how many beers you had tonight." },
+    { min: 2, text: (c) => `${c.loser} is buying the next round. House rule at Strefa Diamond.` },
+    { min: 2, text: (c) => `${c.loser}, after that game you owe everyone a round.` },
+    { min: 2, text: (c) => `${c.loser} played like they'd never seen a dart before. Round's on them.` },
+    { min: 2, text: (c) => `${c.winner} took the leg, but ${c.thirdOrSecond} is already plotting a pool table rematch.` },
+    { min: 2, text: (c) => `${c.winner} versus ${c.loser}. We all know who's buying tonight.` },
+    { min: 3, text: (c) => `${c.third}, better catch up, you're about to be buying pool for everyone.` },
+    { min: 3, text: (c) => `${c.third} is clinging to third place. One more round and they're off to buy pool.` },
+  ],
+};
+
+const lowScoreJokes = {
+  pl: [
+    (c) => `${c.player}, ${c.amount} punktów w trzech rzutach? Wydaje mi się, że da się rzucić więcej.`,
+    (c) => `${c.player} chyba dziś trenuje rzucanie do podłogi. ${c.amount} punktów.`,
+    (c) => `${c.amount} punktów, ${c.player}? Tarcza jest tuż przed tobą, przysięgam.`,
+  ],
+  en: [
+    (c) => `${c.player}, ${c.amount} points in three darts? I feel like you can do better than that.`,
+    (c) => `${c.player} might be practicing throwing at the floor today. ${c.amount} points.`,
+    (c) => `${c.amount} points, ${c.player}? The board is right in front of you, I promise.`,
+  ],
+};
+
+const liveBannerJokes = {
+  pl: [
+    (c) => `${c.target}, podgoń wynik, bo ${c.player} zaraz kończy lega.`,
+    (c) => `${c.target}, ostatni dzwonek. ${c.player} ma szansę na checkout.`,
+    (c) => `Uwaga, ${c.player} może skończyć tę turę. ${c.target}, teraz albo nigdy.`,
+  ],
+  en: [
+    (c) => `${c.target}, catch up, ${c.player} is about to finish the leg.`,
+    (c) => `${c.target}, last call. ${c.player} has a shot at checkout.`,
+    (c) => `Heads up, ${c.player} could close this out. ${c.target}, now or never.`,
+  ],
+};
+
+function buildLegWinContext(standings) {
+  const winner = standings[0];
+  const loser = standings[standings.length - 1];
+  const thirdOrSecondIdx = standings.length >= 3 ? 2 : 1;
+  const thirdOrSecond = standings[Math.min(thirdOrSecondIdx, standings.length - 1)];
+  const third = standings.length >= 3 ? standings[2] : null;
+  return {
+    winner: winner.name,
+    loser: loser.name,
+    thirdOrSecond: thirdOrSecond.name,
+    third: third ? third.name : '',
+  };
+}
+
+function pickLegWinJoke(standings) {
+  const pool = legWinJokes[state.lang] ?? legWinJokes.pl;
+  const eligible = pool.filter((j) => j.min <= standings.length);
+  const chosen = eligible[Math.floor(Math.random() * eligible.length)];
+  return chosen.text(buildLegWinContext(standings));
+}
 
 const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'UNDO', '0', 'SUBMIT'];
 
@@ -258,11 +335,48 @@ function submitNakkaPin() {
   }
 }
 
-function showLegWinModal(name) {
+function showLegWinModal(name, standings) {
   if (legwinNameEl) legwinNameEl.textContent = tr('legWin')(name);
+  if (legwinJokeEl) {
+    const sorted = [...standings].sort((a, b) => a.score - b.score);
+    legwinJokeEl.textContent = pickLegWinJoke(sorted);
+  }
   openModal(legwinModal);
   clearTimeout(legWinTimer);
-  legWinTimer = setTimeout(() => closeModal(legwinModal), 3200);
+  legWinTimer = setTimeout(() => closeModal(legwinModal), 4500);
+}
+
+function showLiveBanner(message) {
+  if (!liveBannerEl) return;
+  liveBannerEl.textContent = message;
+  liveBannerEl.classList.remove('show');
+  void liveBannerEl.offsetWidth;
+  liveBannerEl.classList.add('show');
+  clearTimeout(liveBannerTimer);
+  liveBannerTimer = setTimeout(() => liveBannerEl.classList.remove('show'), 4000);
+}
+
+function maybeRoastLowScore(playerName, amount) {
+  if (!Number.isInteger(amount) || amount > 10) return;
+  const pool = lowScoreJokes[state.lang] ?? lowScoreJokes.pl;
+  const template = pool[Math.floor(Math.random() * pool.length)];
+  showLiveBanner(template({ player: playerName, amount }));
+}
+
+let lastBannerPlayerIndex = -1;
+
+function maybeTriggerLiveBanner(current, checkoutAvailable) {
+  if (!checkoutAvailable) return;
+  if (lastBannerPlayerIndex === state.currentPlayer) return;
+  lastBannerPlayerIndex = state.currentPlayer;
+
+  const others = state.players.filter((p) => p.id !== current.id);
+  if (!others.length) return;
+
+  const worst = [...others].sort((a, b) => b.score - a.score)[0];
+  const pool = liveBannerJokes[state.lang] ?? liveBannerJokes.pl;
+  const template = pool[Math.floor(Math.random() * pool.length)];
+  showLiveBanner(template({ target: worst.name, player: current.name }));
 }
 
 function applyTranslations() {
@@ -369,6 +483,7 @@ function collectPlayers() {
   state.history = [];
   previousScores = {};
   lastActivePlayerIndex = -1;
+  lastBannerPlayerIndex = -1;
   applyTranslations();
 }
 
@@ -452,12 +567,24 @@ function renderGame() {
     bounceClass(currentPlayerCard, 'card-enter');
   }
 
+  if (playerRotated && state.players.length >= 2) {
+    maybeTriggerLiveBanner(current, Boolean(checkout));
+  }
+
+  const rankById = {};
+  [...state.players]
+    .sort((a, b) => a.score - b.score)
+    .forEach((p, i) => {
+      rankById[p.id] = i + 1;
+    });
+
   playersList.innerHTML = '';
   state.players.forEach((player, idx) => {
     const changed = previousScores[player.id] !== undefined && previousScores[player.id] !== player.score;
     const li = document.createElement('li');
     li.className = idx === state.currentPlayer ? 'is-current' : '';
     li.innerHTML = `
+      <span class="player-rank">${rankById[player.id]}</span>
       <span>${player.name}</span>
       <strong class="${changed ? 'score-pulse' : ''}">${player.score}</strong>
     `;
@@ -555,6 +682,7 @@ function submitTurn() {
   pushHistory();
 
   let legWon = false;
+  let legStandings = null;
 
   if (!bust) {
     current.score = remaining;
@@ -563,6 +691,7 @@ function submitTurn() {
 
     if (current.score === 0) {
       legWon = true;
+      legStandings = state.players.map((p) => ({ id: p.id, name: p.name, score: p.score }));
       state.players.forEach((p) => {
         p.score = state.startScore;
       });
@@ -576,7 +705,9 @@ function submitTurn() {
   renderGame();
 
   if (legWon) {
-    showLegWinModal(current.name);
+    showLegWinModal(current.name, legStandings);
+  } else {
+    maybeRoastLowScore(current.name, entered);
   }
 }
 
@@ -588,6 +719,7 @@ function handleHomeReset() {
   state.history = [];
   previousScores = {};
   lastActivePlayerIndex = -1;
+  lastBannerPlayerIndex = -1;
   selectedPlayerCount = 2;
   playerCountControl.setActive('2');
   renderPlayerInputs();
@@ -668,6 +800,7 @@ function submitDartsTurn() {
   pushHistory();
 
   let legWon = false;
+  let legStandings = null;
 
   if (!bust) {
     current.score = remaining;
@@ -676,6 +809,7 @@ function submitDartsTurn() {
 
     if (current.score === 0) {
       legWon = true;
+      legStandings = state.players.map((p) => ({ id: p.id, name: p.name, score: p.score }));
       state.players.forEach((p) => {
         p.score = state.startScore;
       });
@@ -690,7 +824,9 @@ function submitDartsTurn() {
   renderGame();
 
   if (legWon) {
-    showLegWinModal(current.name);
+    showLegWinModal(current.name, legStandings);
+  } else {
+    maybeRoastLowScore(current.name, sum);
   }
 }
 

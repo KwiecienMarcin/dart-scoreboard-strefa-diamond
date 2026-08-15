@@ -662,6 +662,31 @@ select,
   color: var(--accent-2);
 }
 
+.players-list li {
+  position: relative;
+}
+
+.players-list li span.player-rank {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  display: grid;
+  place-items: center;
+}
+
+.players-list li.is-current span.player-rank {
+  background: var(--accent-2);
+  color: #151515;
+}
+
 .score-input-box {
   padding: 10px;
   display: grid;
@@ -1083,8 +1108,35 @@ select,
 
 .legwin-card h2 {
   font-size: clamp(2rem, 5vw, 3rem);
-  margin: 0 0 22px;
+  margin: 0 0 4px;
   padding-right: 0;
+}
+
+.legwin-joke {
+  margin: 0 0 22px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.live-banner {
+  display: none;
+  width: 75%;
+  margin: 14px auto 0;
+  padding: 14px 20px;
+  border-radius: 14px;
+  background: linear-gradient(120deg, rgba(242, 186, 42, 0.18), rgba(242, 186, 42, 0.08));
+  border: 1px solid rgba(242, 186, 42, 0.45);
+  color: var(--accent-2);
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.live-banner.show {
+  display: block;
+  animation: toast-in 0.3s ease;
 }
 
 @media (orientation: portrait) {
