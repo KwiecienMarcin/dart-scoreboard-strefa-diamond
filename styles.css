@@ -1096,47 +1096,57 @@ select,
 
 .legwin-card {
   text-align: center;
-  max-width: 420px;
+  max-width: 520px;
 }
 
 .legwin-label {
   letter-spacing: 3px;
   color: var(--accent-2);
   font-weight: 700;
-  margin: 0 0 6px;
+  font-size: 1.15rem;
+  margin: 0 0 8px;
 }
 
 .legwin-card h2 {
-  font-size: clamp(2rem, 5vw, 3rem);
-  margin: 0 0 4px;
+  font-size: clamp(2.2rem, 5.5vw, 3.4rem);
+  margin: 0 0 14px;
   padding-right: 0;
 }
 
 .legwin-joke {
-  margin: 0 0 22px;
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 1.05rem;
-  line-height: 1.5;
+  margin: 0 0 26px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.65rem;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 .live-banner {
-  display: none;
   width: 75%;
-  margin: 14px auto 0;
-  padding: 14px 20px;
+  margin: 0 auto;
+  padding: 0 20px;
   border-radius: 14px;
   background: linear-gradient(120deg, rgba(242, 186, 42, 0.18), rgba(242, 186, 42, 0.08));
-  border: 1px solid rgba(242, 186, 42, 0.45);
+  border: 1px solid transparent;
   color: var(--accent-2);
   font-weight: 700;
   font-size: 1.05rem;
   text-align: center;
   line-height: 1.4;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: max-height 0.5s ease, opacity 0.45s ease, transform 0.45s ease, margin 0.5s ease, padding 0.5s ease, border-color 0.45s ease;
 }
 
 .live-banner.show {
-  display: block;
-  animation: toast-in 0.3s ease;
+  max-height: 120px;
+  opacity: 1;
+  transform: translateY(0);
+  margin: 14px auto 0;
+  padding: 14px 20px;
+  border-color: rgba(242, 186, 42, 0.45);
 }
 
 @media (orientation: portrait) {

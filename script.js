@@ -40,6 +40,7 @@ const rulesTitleEl = document.getElementById('rules-title');
 const rulesBodyEl = document.getElementById('rules-body');
 const legwinModal = document.getElementById('legwin-modal');
 const legwinClose = document.getElementById('legwin-close');
+const legwinXClose = document.getElementById('legwin-x-close');
 const legwinLabelEl = document.getElementById('legwin-label');
 const legwinNameEl = document.getElementById('legwin-name');
 const legwinJokeEl = document.getElementById('legwin-joke');
@@ -64,12 +65,12 @@ const state = {
   turnDarts: [],
   activeMultiplier: 1,
   history: [],
+  jokesEnabled: true,
 };
 
 let previousScores = {};
 let lastActivePlayerIndex = -1;
 let toastTimer = null;
-let legWinTimer = null;
 let liveBannerTimer = null;
 let selectedPlayerCount = 2;
 let selectedStartScore = 301;
@@ -84,6 +85,7 @@ const legWinJokes = {
     { min: 2, text: (c) => `${c.loser} dziś grał jakby lotki widział pierwszy raz. Kolejka się należy.` },
     { min: 2, text: (c) => `${c.winner} wygrał tego lega, ale ${c.thirdOrSecond} już szykuje rewanż przy stole bilardowym.` },
     { min: 2, text: (c) => `${c.winner} kontra ${c.loser}. I chyba wiadomo, kto dziś stawia.` },
+    { min: 2, text: (c) => `${c.loser}, teraz Twoja decyzja: Pilsner, Mojito czy może Pornstar Martini dla ${c.winner}? Wybieraj mądrze.` },
     { min: 3, text: (c) => `${c.third}, podgoń wynik, bo zaraz stawiasz bilard dla całej ekipy.` },
     { min: 3, text: (c) => `${c.third} trzyma się kurczowo trzeciego miejsca. Jeszcze chwila i leci stawiać bilard.` },
   ],
@@ -96,8 +98,22 @@ const legWinJokes = {
     { min: 2, text: (c) => `${c.loser} played like they'd never seen a dart before. Round's on them.` },
     { min: 2, text: (c) => `${c.winner} took the leg, but ${c.thirdOrSecond} is already plotting a pool table rematch.` },
     { min: 2, text: (c) => `${c.winner} versus ${c.loser}. We all know who's buying tonight.` },
+    { min: 2, text: (c) => `${c.loser}, your call now: Pilsner, Mojito, or maybe a Pornstar Martini for ${c.winner}? Choose wisely.` },
     { min: 3, text: (c) => `${c.third}, better catch up, you're about to be buying pool for everyone.` },
     { min: 3, text: (c) => `${c.third} is clinging to third place. One more round and they're off to buy pool.` },
+  ],
+};
+
+const bustJokes = {
+  pl: [
+    (c) => `${c.player}, przeholowałeś. Wynik wraca do poprzedniego.`,
+    (c) => `Haha, ${c.player} rzucił za dużo. Tura się nie liczy, wracamy do punktu wyjścia.`,
+    (c) => `${c.player}, ambicja większa niż tarcza. Ta tura się nie liczy.`,
+  ],
+  en: [
+    (c) => `${c.player}, you overshot. Score goes back to where it was.`,
+    (c) => `Haha, ${c.player} threw way too much. Turn doesn't count, back to square one.`,
+    (c) => `${c.player}, ambition bigger than the board. That turn's void.`,
   ],
 };
 
@@ -116,15 +132,42 @@ const lowScoreJokes = {
 
 const liveBannerJokes = {
   pl: [
-    (c) => `${c.target}, podgoń wynik, bo ${c.player} zaraz kończy lega.`,
-    (c) => `${c.target}, ostatni dzwonek. ${c.player} ma szansę na checkout.`,
-    (c) => `Uwaga, ${c.player} może skończyć tę turę. ${c.target}, teraz albo nigdy.`,
+    (c) => `${c.target}, podgoń wynik, bo ${c.player} zaraz kończy tę grę.`,
+    (c) => `${c.target}, ostatni dzwonek. ${c.player} ma szansę skończyć tę grę.`,
+    (c) => `Uwaga, ${c.player} może skończyć tę grę. ${c.target}, teraz albo nigdy.`,
   ],
   en: [
-    (c) => `${c.target}, catch up, ${c.player} is about to finish the leg.`,
-    (c) => `${c.target}, last call. ${c.player} has a shot at checkout.`,
-    (c) => `Heads up, ${c.player} could close this out. ${c.target}, now or never.`,
+    (c) => `${c.target}, catch up, ${c.player} is about to finish this game.`,
+    (c) => `${c.target}, last call. ${c.player} has a chance to finish this game.`,
+    (c) => `Heads up, ${c.player} could finish this game. ${c.target}, now or never.`,
   ],
+};
+
+const highScoreJokes = {
+  pl: {
+    great: [
+      (c) => `${c.player}, ${c.amount} punktów? Ale wynik! Tak trzymać.`,
+      (c) => `${c.amount} punktów od ${c.player}. Ktoś tu dziś w formie.`,
+      (c) => `${c.player} wchodzi na wysoki poziom. ${c.amount} punktów robi robotę.`,
+    ],
+    pro: [
+      (c) => `${c.player}, ${c.amount} punktów?! Grasz jak zawodowiec.`,
+      (c) => `${c.amount} punktów od ${c.player}. Ktoś tu chyba trenuje na mistrzostwa świata.`,
+      (c) => `${c.player} właśnie zagrał jak prawdziwy pro. ${c.amount} punktów, szacunek.`,
+    ],
+  },
+  en: {
+    great: [
+      (c) => `${c.player}, ${c.amount} points? Now that's a score. Keep it up.`,
+      (c) => `${c.amount} points from ${c.player}. Someone's on fire tonight.`,
+      (c) => `${c.player} is stepping it up. ${c.amount} points, nice work.`,
+    ],
+    pro: [
+      (c) => `${c.player}, ${c.amount} points?! Playing like a pro.`,
+      (c) => `${c.amount} points from ${c.player}. Someone's training for the world championship.`,
+      (c) => `${c.player} just played like a total pro. ${c.amount} points, respect.`,
+    ],
+  },
 };
 
 function buildLegWinContext(standings) {
@@ -167,6 +210,9 @@ const t = {
     next: 'Dalej',
     outDouble: 'Double out',
     outSingle: 'Single out',
+    jokesToggle: 'Żarty w grze',
+    jokesOn: 'Włączone',
+    jokesOff: 'Wyłączone',
     backToSetup: 'Edytuj zawodników',
     newGame: 'Nowa gra',
     homeLink: 'Strona główna',
@@ -196,7 +242,7 @@ const t = {
       { title: 'Wartość pól', body: 'Pojedyncze pole (1-20) daje jego wartość. Double (zewnętrzny cienki pierścień) mnoży ją razy 2, Triple (wewnętrzny pierścień) razy 3. Zewnętrzne koło środka to 25 punktów (Bull), środek tarczy to 50 punktów (Bullseye).' },
       { title: 'Double Out', body: 'Aby zakończyć lega, ostatnia lotka musi trafić w pole double (lub w Bullseye, czyli 50). Zejście do zera bez trafienia w double na finiszu to bust — tura się nie liczy.' },
       { title: 'Single Out', body: 'W tym trybie do zakończenia lega wystarczy dowolny rzut, który sprowadzi wynik dokładnie do zera — bez wymogu trafienia w double.' },
-      { title: 'Bust', body: 'Jeśli rzut zejdzie poniżej zera, zostawi dokładnie 1 punkt (przy Double Out) albo trafi zero bez wymaganego finiszu, cała tura zostaje anulowana, a wynik wraca do stanu sprzed tury.' },
+      { title: 'Rzuciłeś za dużo', body: 'Jeśli rzut zejdzie poniżej zera, zostawi dokładnie 1 punkt (przy Double Out) albo trafi zero bez wymaganego finiszu, cała tura zostaje anulowana, a wynik wraca do stanu sprzed tury.' },
       { title: 'Nowy leg', body: 'Po wygranej ledze wszyscy zawodnicy wracają do wybranej liczby punktów startowych i rozgrywka toczy się dalej.' },
     ],
   },
@@ -208,6 +254,9 @@ const t = {
     next: 'Next',
     outDouble: 'Double out',
     outSingle: 'Single out',
+    jokesToggle: 'In-game jokes',
+    jokesOn: 'On',
+    jokesOff: 'Off',
     backToSetup: 'Edit players',
     newGame: 'New game',
     homeLink: 'Home',
@@ -237,7 +286,7 @@ const t = {
       { title: 'Segment values', body: 'A single segment (1-20) scores its face value. Double (thin outer ring) multiplies it by 2, Triple (inner ring) by 3. The outer bull ring scores 25, the center bullseye scores 50.' },
       { title: 'Double Out', body: 'To win a leg, the final dart of the turn must land on a double (or the bullseye, 50). Reaching zero without a double finish is a bust — the whole turn is voided.' },
       { title: 'Single Out', body: 'In this mode any throw that brings the score to exactly zero finishes the leg — no double required.' },
-      { title: 'Bust', body: 'If a throw would take the score below zero, leave exactly 1 point (in Double Out), or reach zero without a valid finish, the whole turn is cancelled and the score reverts to what it was before the turn.' },
+      { title: 'You threw too much', body: 'If a throw would take the score below zero, leave exactly 1 point (in Double Out), or reach zero without a valid finish, the whole turn is cancelled and the score reverts to what it was before the turn.' },
       { title: 'New leg', body: 'After a leg is won, every player resets to the chosen starting score and play continues.' },
     ],
   },
@@ -338,34 +387,58 @@ function submitNakkaPin() {
 function showLegWinModal(name, standings) {
   if (legwinNameEl) legwinNameEl.textContent = tr('legWin')(name);
   if (legwinJokeEl) {
-    const sorted = [...standings].sort((a, b) => a.score - b.score);
-    legwinJokeEl.textContent = pickLegWinJoke(sorted);
+    legwinJokeEl.textContent = state.jokesEnabled ? pickLegWinJoke([...standings].sort((a, b) => a.score - b.score)) : '';
   }
   openModal(legwinModal);
-  clearTimeout(legWinTimer);
-  legWinTimer = setTimeout(() => closeModal(legwinModal), 4500);
 }
 
 function showLiveBanner(message) {
   if (!liveBannerEl) return;
   liveBannerEl.textContent = message;
-  liveBannerEl.classList.remove('show');
-  void liveBannerEl.offsetWidth;
   liveBannerEl.classList.add('show');
   clearTimeout(liveBannerTimer);
-  liveBannerTimer = setTimeout(() => liveBannerEl.classList.remove('show'), 4000);
+  liveBannerTimer = setTimeout(() => liveBannerEl.classList.remove('show'), 10000);
+}
+
+function maybeRoastBust(playerName) {
+  const pool = bustJokes[state.lang] ?? bustJokes.pl;
+  const template = pool[Math.floor(Math.random() * pool.length)];
+  showLiveBanner(template({ player: playerName }));
 }
 
 function maybeRoastLowScore(playerName, amount) {
-  if (!Number.isInteger(amount) || amount > 10) return;
   const pool = lowScoreJokes[state.lang] ?? lowScoreJokes.pl;
   const template = pool[Math.floor(Math.random() * pool.length)];
   showLiveBanner(template({ player: playerName, amount }));
 }
 
+function maybeCelebrateHighScore(playerName, amount) {
+  const tiers = highScoreJokes[state.lang] ?? highScoreJokes.pl;
+  const pool = amount > 170 ? tiers.pro : tiers.great;
+  const template = pool[Math.floor(Math.random() * pool.length)];
+  showLiveBanner(template({ player: playerName, amount }));
+}
+
+function reactToTurnResult(playerName, amount, bust) {
+  if (!state.jokesEnabled) return;
+
+  if (bust) {
+    maybeRoastBust(playerName);
+    return;
+  }
+
+  if (!Number.isInteger(amount)) return;
+  if (amount <= 10) {
+    maybeRoastLowScore(playerName, amount);
+  } else if (amount > 120) {
+    maybeCelebrateHighScore(playerName, amount);
+  }
+}
+
 let lastBannerPlayerIndex = -1;
 
 function maybeTriggerLiveBanner(current, checkoutAvailable) {
+  if (!state.jokesEnabled) return;
   if (!checkoutAvailable) return;
   if (lastBannerPlayerIndex === state.currentPlayer) return;
   lastBannerPlayerIndex = state.currentPlayer;
@@ -394,6 +467,13 @@ function applyTranslations() {
   const outSingleLabel = document.querySelector('label[for="out-mode-single"]');
   if (outDoubleLabel) outDoubleLabel.textContent = tr('outDouble');
   if (outSingleLabel) outSingleLabel.textContent = tr('outSingle');
+
+  const labelJokes = document.getElementById('label-jokes');
+  const jokesOnLabel = document.querySelector('label[for="jokes-on"]');
+  const jokesOffLabel = document.querySelector('label[for="jokes-off"]');
+  if (labelJokes) labelJokes.textContent = tr('jokesToggle');
+  if (jokesOnLabel) jokesOnLabel.textContent = tr('jokesOn');
+  if (jokesOffLabel) jokesOffLabel.textContent = tr('jokesOff');
 
   if (backToSetupLabel) backToSetupLabel.textContent = tr('backToSetup');
   if (newGameLabel) newGameLabel.textContent = tr('newGame');
@@ -477,6 +557,7 @@ function collectPlayers() {
   state.currentPlayer = 0;
   state.startScore = start;
   state.outMode = document.querySelector('input[name="out-mode"]:checked').value;
+  state.jokesEnabled = document.querySelector('input[name="jokes-mode"]:checked').value === 'on';
   state.turnInput = '';
   state.turnDarts = [];
   state.activeMultiplier = 1;
@@ -645,7 +726,6 @@ function undoLastTurn() {
   state.players = last.players.map((p) => ({ ...p }));
   state.currentPlayer = last.currentPlayer;
 
-  clearTimeout(legWinTimer);
   closeModal(legwinModal);
   renderGame();
 }
@@ -707,7 +787,7 @@ function submitTurn() {
   if (legWon) {
     showLegWinModal(current.name, legStandings);
   } else {
-    maybeRoastLowScore(current.name, entered);
+    reactToTurnResult(current.name, entered, bust);
   }
 }
 
@@ -826,7 +906,7 @@ function submitDartsTurn() {
   if (legWon) {
     showLegWinModal(current.name, legStandings);
   } else {
-    maybeRoastLowScore(current.name, sum);
+    reactToTurnResult(current.name, sum, bust);
   }
 }
 
@@ -927,6 +1007,7 @@ legwinClose?.addEventListener('click', () => {
   bounceClass(legwinClose, 'pressed');
   closeModal(legwinModal);
 });
+legwinXClose?.addEventListener('click', () => closeModal(legwinModal));
 legwinModal?.addEventListener('click', (e) => {
   if (e.target === legwinModal) closeModal(legwinModal);
 });
@@ -999,6 +1080,8 @@ backToSetupBtn.addEventListener('click', () => {
   startScoreControl.setActive(String(selectedStartScore));
   const outRadio = document.querySelector(`input[name="out-mode"][value="${state.outMode}"]`);
   if (outRadio) outRadio.checked = true;
+  const jokesRadio = document.querySelector(`input[name="jokes-mode"][value="${state.jokesEnabled ? 'on' : 'off'}"]`);
+  if (jokesRadio) jokesRadio.checked = true;
   showScreen('setup');
 });
 

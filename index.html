@@ -110,6 +110,17 @@
             </div>
           </div>
 
+          <div class="field-row">
+            <span id="label-jokes">Żarty w grze</span>
+            <div class="switch-toggle" id="jokes-switch">
+              <input type="radio" id="jokes-on" name="jokes-mode" value="on" checked />
+              <label for="jokes-on">Włączone</label>
+              <input type="radio" id="jokes-off" name="jokes-mode" value="off" />
+              <label for="jokes-off">Wyłączone</label>
+              <span class="switch-thumb" aria-hidden="true"></span>
+            </div>
+          </div>
+
           <button id="start-game" class="primary-btn start-game-btn">Dalej</button>
         </div>
       </section>
@@ -198,6 +209,7 @@
 
     <div id="legwin-modal" class="modal-overlay legwin-overlay" aria-hidden="true">
       <div class="modal-card legwin-card">
+        <button id="legwin-x-close" class="modal-close" type="button" aria-label="Zamknij">×</button>
         <p class="legwin-label" id="legwin-label">WYGRANA LEGA</p>
         <h2 id="legwin-name"></h2>
         <p class="legwin-joke" id="legwin-joke"></p>
