@@ -112,7 +112,12 @@ body {
   position: absolute;
   inset: 2px;
   border-radius: 20px;
-  background: linear-gradient(120deg, rgba(11, 14, 22, 0.98), rgba(22, 26, 39, 0.96));
+  background:
+    radial-gradient(circle at 15% 12%, rgba(242, 186, 42, 0.14), transparent 42%),
+    radial-gradient(circle at 88% 82%, rgba(242, 186, 42, 0.1), transparent 46%),
+    radial-gradient(rgba(242, 186, 42, 0.1) 1px, transparent 1px),
+    linear-gradient(120deg, rgba(11, 14, 22, 0.98), rgba(22, 26, 39, 0.96));
+  background-size: auto, auto, 26px 26px, auto;
   z-index: -1;
 }
 
@@ -135,11 +140,11 @@ body {
 .slogan {
   z-index: 2;
   margin: 0;
-  font-family: "Rajdhani", sans-serif;
-  font-weight: 600;
-  letter-spacing: 4px;
+  font-family: "Bebas Neue", "Rajdhani", sans-serif;
+  font-weight: 400;
+  letter-spacing: 6px;
   color: var(--accent-2);
-  font-size: clamp(1.3rem, 2.4vw, 2rem);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
   position: relative;
   padding-bottom: 16px;
 }
@@ -171,9 +176,11 @@ body {
 }
 
 .home-cta-main {
-  font-size: inherit;
+  font-family: "Bebas Neue", "Rajdhani", sans-serif;
+  font-size: 1.4em;
   line-height: 1;
-  font-weight: 700;
+  font-weight: 400;
+  letter-spacing: 2px;
 }
 
 .home-cta-sub {
@@ -211,10 +218,12 @@ body {
 
 .home-badges span {
   border: 1px solid rgba(255, 255, 255, 0.18);
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 999px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-family: "Bebas Neue", "Rajdhani", sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 1.5px;
+  font-weight: 400;
   background: rgba(255, 255, 255, 0.06);
 }
 
