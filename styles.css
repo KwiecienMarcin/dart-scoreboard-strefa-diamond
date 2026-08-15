@@ -705,13 +705,15 @@ select,
 }
 
 .dart-sum {
-  min-width: 64px;
+  min-width: 96px;
+  min-height: 62px;
+  padding: 0 16px;
   display: grid;
   place-items: center;
   background: linear-gradient(120deg, var(--accent-2), var(--accent));
   color: #151515;
   border-radius: 12px;
-  font-size: 1.4rem;
+  font-size: 2.1rem;
   font-weight: 800;
   box-shadow: 0 0 16px rgba(242, 186, 42, 0.4);
 }
@@ -889,14 +891,6 @@ select,
   font-size: clamp(1.6rem, 3vw, 2.2rem);
   margin-bottom: 6px;
   padding-right: 30px;
-}
-
-.rules-illustration {
-  display: block;
-  width: 120px;
-  height: 120px;
-  margin: 0 auto 12px;
-  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.45));
 }
 
 .modal-body h3 {
