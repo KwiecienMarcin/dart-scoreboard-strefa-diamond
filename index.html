@@ -29,30 +29,45 @@
       <section id="home-screen" class="screen active">
         <div class="hero-card">
           <div class="hero-glow"></div>
-          <div class="logo-wrap">
-            <img src="/assets/logo_full.png" alt="Strefa Diamond logo" class="hero-logo brand-logo" />
-          </div>
-          <p class="slogan">NAJLEPSZY WYMIAR DARTA</p>
 
-          <div class="home-language" role="group" aria-label="Language selector">
-            <button id="lang-pl" class="lang-btn active" type="button">PL</button>
-            <button id="lang-en" class="lang-btn" type="button">EN</button>
+          <div class="hero-brand">
+            <div class="logo-wrap">
+              <img src="/assets/logo_full.png" alt="Strefa Diamond logo" class="hero-logo brand-logo" />
+            </div>
+            <p class="slogan">NAJLEPSZY WYMIAR DARTA</p>
           </div>
 
-          <div class="home-actions">
-            <button id="go-scoreboard" class="primary-btn home-cta">
-              <span class="home-cta-main">DART SCOREBOARD</span>
-              <span class="home-cta-sub">Liczenie punktów</span>
+          <div class="hero-divider"></div>
+
+          <div class="hero-actions-zone">
+            <div class="home-language" role="group" aria-label="Language selector">
+              <button id="lang-pl" class="lang-btn active" type="button">PL</button>
+              <button id="lang-en" class="lang-btn" type="button">EN</button>
+            </div>
+
+            <button id="go-scoreboard" class="primary-btn hero-main-cta">
+              <span class="hero-cta-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="9" />
+                  <circle cx="12" cy="12" r="5.2" />
+                  <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
+                </svg>
+              </span>
+              <span class="hero-cta-text">
+                <span class="home-cta-main">DART SCOREBOARD</span>
+                <span class="home-cta-sub">Liczenie punktów</span>
+              </span>
             </button>
-            <button type="button" id="nakka-btn" class="secondary-btn home-cta home-cta-secondary">
-              <span class="home-cta-main">NAKKA</span>
-              <span class="home-cta-sub">Dostępne tylko na turnieje darterskie</span>
-            </button>
-          </div>
 
-          <div class="home-badges">
-            <span>1-4 GRACZY</span>
-            <span>DOUBLE / SINGLE OUT</span>
+            <button type="button" id="nakka-btn" class="nakka-link">
+              <span class="nakka-name">NAKKA</span>
+              <span class="nakka-link-sub">Dostępne tylko na turnieje darterskie</span>
+            </button>
+
+            <div class="home-badges">
+              <span>1-4 GRACZY</span>
+              <span>DOUBLE / SINGLE OUT</span>
+            </div>
           </div>
 
           <div class="hero-credit">by Marcin Kwiecień</div>

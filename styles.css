@@ -121,15 +121,20 @@ body {
   z-index: -1;
 }
 
-.logo-wrap {
+.hero-brand {
   z-index: 2;
-  width: min(46vw, 420px);
+  display: grid;
+  place-items: center;
+  gap: 12px;
+}
+
+.logo-wrap {
+  width: min(42vw, 380px);
 }
 
 .hero-logo {
   width: 100%;
   height: auto;
-  z-index: 2;
   filter: drop-shadow(0 0 24px rgba(242, 186, 42, 0.35));
 }
 
@@ -138,12 +143,11 @@ body {
 }
 
 .slogan {
-  z-index: 2;
   margin: 0;
   font-family: "Bebas Neue", "Rajdhani", sans-serif;
   font-weight: 400;
   letter-spacing: 6px;
-  color: var(--accent-2);
+  color: #fec429;
   font-size: clamp(1.6rem, 3vw, 2.4rem);
   position: relative;
   padding-bottom: 16px;
@@ -160,52 +164,106 @@ body {
   animation: slogan-line 2.6s ease-in-out infinite;
 }
 
-.home-cta {
+.hero-divider {
+  z-index: 2;
+  width: min(60%, 340px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(242, 186, 42, 0.5), transparent);
+}
+
+.hero-actions-zone {
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  gap: 16px;
   width: 100%;
-  min-height: 94px;
-  font-size: clamp(1.45rem, 2.2vw, 1.9rem);
+  max-width: 440px;
+}
+
+.hero-main-cta {
+  width: 100%;
+  min-height: 96px;
   border-radius: 20px;
-  display: inline-flex;
-  flex-direction: column;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  gap: 16px;
+  padding: 16px 26px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
   letter-spacing: 1.4px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.hero-main-cta:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 18px 40px rgba(242, 186, 42, 0.25);
+}
+
+.hero-cta-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(21, 21, 21, 0.15);
+  color: #151515;
+  flex-shrink: 0;
+}
+
+.hero-cta-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
 .home-cta-main {
   font-family: "Bebas Neue", "Rajdhani", sans-serif;
-  font-size: 1.4em;
+  font-size: 1.7rem;
   line-height: 1;
   font-weight: 400;
   letter-spacing: 2px;
 }
 
 .home-cta-sub {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.5px;
   opacity: 0.72;
 }
 
-.home-cta:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 16px 34px rgba(242, 186, 42, 0.22);
+.nakka-link {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
-.home-cta-secondary {
-  width: 80%;
-  min-height: 60px;
-  font-size: 1rem;
-  align-self: center;
-  justify-self: center;
-  box-shadow: none;
+.nakka-link:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.home-cta-secondary .home-cta-sub {
-  font-size: 0.72rem;
+.nakka-link:active {
+  transform: scale(0.95);
+}
+
+.nakka-name {
+  font-family: "Bebas Neue", "Rajdhani", sans-serif;
+  color: var(--accent-2);
+  letter-spacing: 1.5px;
+  font-size: 1.15rem;
+}
+
+.nakka-link-sub {
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 500;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .home-badges {
@@ -549,44 +607,54 @@ select,
 .players-list {
   list-style: none;
   margin: 0;
-  padding: 12px;
+  padding: 14px;
   display: grid;
-  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  align-content: start;
 }
 
 .players-list li {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-  padding: 10px 8px 10px 6px;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  padding: 16px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.players-list li:last-child {
-  border-bottom: none;
+.players-list li span {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.5px;
+}
+
+.players-list strong {
+  font-family: "Bebas Neue", "Rajdhani", sans-serif;
+  font-size: 2.4rem;
+  font-weight: 400;
+  line-height: 1;
 }
 
 .players-list li.is-current {
-  border-left: 4px solid var(--accent);
-  padding: 10px 14px 10px 10px;
-  background: rgba(242, 186, 42, 0.08);
-  border-radius: 10px;
+  background: rgba(242, 186, 42, 0.1);
+  border-color: rgba(242, 186, 42, 0.5);
+  box-shadow: 0 0 22px rgba(242, 186, 42, 0.22);
 }
 
 .players-list li.is-current span {
   color: var(--accent-2);
   font-weight: 700;
-  font-size: 1.1rem;
 }
 
 .players-list li.is-current strong {
   color: var(--accent-2);
-  font-size: 1.4rem;
-}
-
-.players-list strong {
-  font-size: 1.2rem;
 }
 
 .score-input-box {

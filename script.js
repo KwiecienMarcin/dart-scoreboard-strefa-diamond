@@ -796,7 +796,7 @@ legwinModal?.addEventListener('click', (e) => {
 });
 
 nakkaBtn?.addEventListener('click', () => {
-  bounceClass(nakkaBtn, 'pressed');
+  bounceClass(nakkaBtn, 'key-flash');
   openNakkaModal();
 });
 nakkaClose?.addEventListener('click', () => closeModal(nakkaModal));
