@@ -1101,11 +1101,8 @@ rulesModal?.addEventListener('click', (e) => {
   if (e.target === rulesModal) closeModal(rulesModal);
 });
 
-function loadVisibleMenuImages() {
+function preloadAllMenuImages() {
   document.querySelectorAll('.menu-image').forEach((img) => {
-    const panel = img.closest('.menu-panel');
-    if (!panel || panel.hidden) return;
-    if (img.style.display === 'none') return;
     if (!img.src && img.dataset.src) {
       img.src = img.dataset.src;
     }
@@ -1121,7 +1118,7 @@ function resetMenuInactivityTimer() {
 
 function openMenuModal() {
   openModal(menuModal);
-  loadVisibleMenuImages();
+  preloadAllMenuImages();
   resetMenuInactivityTimer();
 }
 
@@ -1149,7 +1146,6 @@ menuTabs.forEach((tab) => {
     menuPanels.forEach((p) => {
       p.hidden = p.dataset.menuPanel !== target;
     });
-    loadVisibleMenuImages();
   });
 });
 
@@ -1161,7 +1157,6 @@ menuSubtabs.forEach((btn) => {
     document.querySelectorAll('[data-menu-panel="main"] .menu-image').forEach((img) => {
       img.style.display = img.dataset.page === page ? 'block' : 'none';
     });
-    loadVisibleMenuImages();
   });
 });
 
