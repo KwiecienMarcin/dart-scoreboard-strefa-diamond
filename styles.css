@@ -18,7 +18,14 @@ body {
   font-family: "Rajdhani", "Inter", sans-serif;
   font-weight: 500;
   color: var(--text);
-  background: radial-gradient(circle at 30% 20%, #191f31, var(--bg));
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(to right, #000000 0, rgba(0, 0, 0, 0) 90px),
+    linear-gradient(to left, #000000 0, rgba(0, 0, 0, 0) 90px),
+    radial-gradient(circle at 30% 20%, #191f31, var(--bg));
+  background-repeat: no-repeat;
+  background-attachment: fixed, fixed, scroll;
+  background-size: 100% 100%, 100% 100%, auto;
   min-height: 100vh;
 }
 
@@ -132,9 +139,22 @@ body {
   margin: 0;
   font-family: "Rajdhani", sans-serif;
   font-weight: 600;
-  letter-spacing: 3px;
-  color: #ffffff;
+  letter-spacing: 4px;
+  color: var(--accent-2);
   font-size: clamp(1.3rem, 2.4vw, 2rem);
+  position: relative;
+  padding-bottom: 16px;
+}
+
+.slogan::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  height: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: slogan-line 2.6s ease-in-out infinite;
 }
 
 .brand-title {
@@ -142,8 +162,13 @@ body {
   margin: 0;
   font-size: clamp(2.8rem, 7vw, 5.2rem);
   letter-spacing: 3px;
-  color: #ffffff;
-  text-shadow: 0 0 22px rgba(242, 186, 42, 0.2);
+  background: linear-gradient(100deg, #ffffff 0%, #ffd449 22%, #f2ba2a 45%, #ffffff 60%, #ffd449 82%, #f2ba2a 100%);
+  background-size: 220% auto;
+  background-position: 0 center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine-sweep 6s linear infinite;
 }
 
 .home-cta {
@@ -332,9 +357,94 @@ select,
   gap: 10px;
 }
 
-.toggle-wrap {
-  display: flex;
-  gap: 14px;
+.switch-toggle {
+  position: relative;
+  display: inline-flex;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 4px;
+}
+
+.switch-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.switch-toggle label {
+  position: relative;
+  z-index: 1;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.25s ease;
+  text-align: center;
+  min-width: 110px;
+}
+
+.switch-toggle input:checked + label {
+  color: #151515;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--accent-2), var(--accent));
+  box-shadow: 0 0 16px rgba(242, 186, 42, 0.4);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#out-mode-single:checked ~ .switch-thumb {
+  transform: translateX(100%);
+}
+
+.tile-picker {
+  display: inline-flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  padding: 4px;
+}
+
+.tile-btn {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 700;
+  font-size: 1.05rem;
+  min-width: 46px;
+  min-height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.tile-btn:active {
+  transform: scale(0.88);
+}
+
+.tile-btn.active {
+  background: linear-gradient(120deg, var(--accent-2), var(--accent));
+  color: #151515;
+  box-shadow: 0 0 14px rgba(242, 186, 42, 0.4);
+}
+
+.start-game-btn {
+  display: block;
+  margin: 26px auto 0;
+  min-width: 240px;
+  min-height: 60px;
+  font-size: 1.35rem;
 }
 
 .game-header {
@@ -443,8 +553,7 @@ select,
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-  padding-bottom: 8px;
-  padding-left: 6px;
+  padding: 10px 8px 10px 6px;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
@@ -454,7 +563,7 @@ select,
 
 .players-list li.is-current {
   border-left: 4px solid var(--accent);
-  padding-left: 10px;
+  padding: 10px 14px 10px 10px;
   background: rgba(242, 186, 42, 0.08);
   border-radius: 10px;
 }
@@ -462,6 +571,12 @@ select,
 .players-list li.is-current span {
   color: var(--accent-2);
   font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.players-list li.is-current strong {
+  color: var(--accent-2);
+  font-size: 1.4rem;
 }
 
 .players-list strong {
@@ -649,6 +764,13 @@ select,
   background: rgba(242, 186, 42, 0.28);
 }
 
+.keypad button.undo-btn {
+  font-size: 1rem;
+  white-space: normal;
+  line-height: 1.15;
+  letter-spacing: 0.3px;
+}
+
 .keypad-darts button.mult-btn {
   background: rgba(242, 186, 42, 0.16);
   border: 1.5px solid rgba(242, 186, 42, 0.55);
@@ -755,6 +877,14 @@ select,
   padding-right: 30px;
 }
 
+.rules-illustration {
+  display: block;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 12px;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.45));
+}
+
 .modal-body h3 {
   color: var(--accent-2);
   margin: 18px 0 6px;
@@ -839,6 +969,24 @@ select,
 @keyframes spin-border {
   to {
     transform: rotate(1turn);
+  }
+}
+
+@keyframes shine-sweep {
+  to {
+    background-position: 220% center;
+  }
+}
+
+@keyframes slogan-line {
+  0%,
+  100% {
+    width: 40px;
+    opacity: 0.5;
+  }
+  50% {
+    width: 110px;
+    opacity: 1;
   }
 }
 

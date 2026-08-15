@@ -7,10 +7,10 @@ const screens = {
 const homeLink = document.getElementById('home-link');
 const rulesLink = document.getElementById('rules-link');
 const goScoreboardBtn = document.getElementById('go-scoreboard');
-const playerCountSelect = document.getElementById('player-count');
+const playerCountPicker = document.getElementById('player-count-picker');
 const playersInputs = document.getElementById('players-inputs');
 const startGameBtn = document.getElementById('start-game');
-const startScoreSelect = document.getElementById('start-score');
+const startScorePicker = document.getElementById('start-score-picker');
 const backToSetupBtn = document.getElementById('back-to-setup');
 const newGameBtn = document.getElementById('new-game');
 const currentPlayerCard = document.getElementById('current-player-card');
@@ -46,20 +46,23 @@ const state = {
   players: [],
   currentPlayer: 0,
   outMode: 'double',
-  startScore: 501,
+  startScore: 301,
   turnInput: '',
   lang: 'pl',
   inputMode: 'darts',
   turnDarts: [],
   activeMultiplier: 1,
+  history: [],
 };
 
 let previousScores = {};
 let lastActivePlayerIndex = -1;
 let toastTimer = null;
 let legWinTimer = null;
+let selectedPlayerCount = 2;
+let selectedStartScore = 301;
 
-const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'SUBMIT'];
+const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'UNDO', '0', 'SUBMIT'];
 
 const dartsKeypadLayout = [
   '1', '2', '3', '4', '5',
@@ -156,6 +159,27 @@ function tr(key) {
   return t[state.lang]?.[key] ?? t.pl[key] ?? key;
 }
 
+function setupTilePicker(container, onSelect) {
+  if (!container) return { setActive: () => {} };
+  const buttons = [...container.querySelectorAll('.tile-btn')];
+
+  function setActive(value) {
+    buttons.forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.value === String(value));
+    });
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      bounceClass(btn, 'key-flash');
+      setActive(btn.dataset.value);
+      onSelect(btn.dataset.value);
+    });
+  });
+
+  return { setActive };
+}
+
 function bounceClass(el, cls) {
   if (!el) return;
   el.classList.remove(cls);
@@ -209,10 +233,10 @@ function applyTranslations() {
   if (labelOutMode) labelOutMode.textContent = tr('outMode');
   if (labelStartScore) labelStartScore.textContent = tr('startScore');
 
-  const outDouble = document.querySelector('input[name="out-mode"][value="double"]')?.parentElement;
-  const outSingle = document.querySelector('input[name="out-mode"][value="single"]')?.parentElement;
-  if (outDouble) outDouble.childNodes[outDouble.childNodes.length - 1].textContent = ` ${tr('outDouble')}`;
-  if (outSingle) outSingle.childNodes[outSingle.childNodes.length - 1].textContent = ` ${tr('outSingle')}`;
+  const outDoubleLabel = document.querySelector('label[for="out-mode-double"]');
+  const outSingleLabel = document.querySelector('label[for="out-mode-single"]');
+  if (outDoubleLabel) outDoubleLabel.textContent = tr('outDouble');
+  if (outSingleLabel) outSingleLabel.textContent = tr('outSingle');
 
   if (backToSetupLabel) backToSetupLabel.textContent = tr('backToSetup');
   if (newGameLabel) newGameLabel.textContent = tr('newGame');
@@ -232,8 +256,9 @@ function applyTranslations() {
   const submitCell = keypad?.querySelector('.submit-cell');
   if (submitCell) submitCell.textContent = tr('submit');
 
-  const undoBtn = keypadDarts?.querySelector('[data-key="UNDO"]');
-  if (undoBtn) undoBtn.textContent = tr('undoEntry');
+  document.querySelectorAll('[data-key="UNDO"]').forEach((btn) => {
+    btn.textContent = tr('undoEntry');
+  });
 
   renderRulesContent();
 
@@ -251,8 +276,19 @@ function defaultPlayerName(i) {
   return `Zawodnik ${i + 1}`;
 }
 
+const playerCountControl = setupTilePicker(playerCountPicker, (value) => {
+  selectedPlayerCount = Number(value);
+  renderPlayerInputs();
+});
+playerCountControl.setActive(String(selectedPlayerCount));
+
+const startScoreControl = setupTilePicker(startScorePicker, (value) => {
+  selectedStartScore = Number(value);
+});
+startScoreControl.setActive(String(selectedStartScore));
+
 function renderPlayerInputs() {
-  const count = Number(playerCountSelect.value);
+  const count = selectedPlayerCount;
   const previous = [...playersInputs.querySelectorAll('input')].map((el) => el.value.trim());
 
   playersInputs.innerHTML = '';
@@ -269,7 +305,7 @@ function renderPlayerInputs() {
 
 function collectPlayers() {
   const names = [...playersInputs.querySelectorAll('input')].map((input, i) => input.value.trim() || defaultPlayerName(i));
-  const start = Number(startScoreSelect.value);
+  const start = selectedStartScore;
 
   state.players = names.map((name, index) => ({
     id: index,
@@ -286,6 +322,7 @@ function collectPlayers() {
   state.turnInput = '';
   state.turnDarts = [];
   state.activeMultiplier = 1;
+  state.history = [];
   previousScores = {};
   lastActivePlayerIndex = -1;
   applyTranslations();
@@ -423,6 +460,25 @@ function rotatePlayer() {
   state.currentPlayer = (state.currentPlayer + 1) % state.players.length;
 }
 
+function pushHistory() {
+  state.history.push({
+    players: state.players.map((p) => ({ ...p })),
+    currentPlayer: state.currentPlayer,
+  });
+}
+
+function undoLastTurn() {
+  const last = state.history.pop();
+  if (!last) return;
+
+  state.players = last.players.map((p) => ({ ...p }));
+  state.currentPlayer = last.currentPlayer;
+
+  clearTimeout(legWinTimer);
+  closeModal(legwinModal);
+  renderGame();
+}
+
 function submitTurn() {
   const current = state.players[state.currentPlayer];
   const entered = Number(state.turnInput);
@@ -451,6 +507,8 @@ function submitTurn() {
       bust = true;
     }
   }
+
+  pushHistory();
 
   let legWon = false;
 
@@ -483,9 +541,11 @@ function handleHomeReset() {
   state.turnInput = '';
   state.turnDarts = [];
   state.activeMultiplier = 1;
+  state.history = [];
   previousScores = {};
   lastActivePlayerIndex = -1;
-  playerCountSelect.value = '2';
+  selectedPlayerCount = 2;
+  playerCountControl.setActive('2');
   renderPlayerInputs();
   showScreen('home');
 }
@@ -508,10 +568,13 @@ function handleDartKey(key) {
   if (key === 'UNDO') {
     if (state.activeMultiplier !== 1) {
       state.activeMultiplier = 1;
-    } else {
+      renderGame();
+    } else if (state.turnDarts.length) {
       state.turnDarts.pop();
+      renderGame();
+    } else {
+      undoLastTurn();
     }
-    renderGame();
     return;
   }
 
@@ -558,6 +621,8 @@ function submitDartsTurn() {
     bust = true;
   }
 
+  pushHistory();
+
   let legWon = false;
 
   if (!bust) {
@@ -590,13 +655,16 @@ function buildKeypad() {
   keypadLayout.forEach((key) => {
     const btn = document.createElement('button');
     btn.type = 'button';
+    btn.dataset.key = key;
 
     if (key === 'SUBMIT') {
       btn.textContent = tr('submit');
       btn.classList.add('action', 'submit-cell');
+    } else if (key === 'UNDO') {
+      btn.textContent = tr('undoEntry');
+      btn.classList.add('action', 'undo-btn');
     } else {
       btn.textContent = key;
-      if (key === '⌫') btn.classList.add('action');
     }
 
     btn.addEventListener('click', () => {
@@ -607,9 +675,17 @@ function buildKeypad() {
         return;
       }
 
-      if (key === '⌫') {
-        state.turnInput = state.turnInput.slice(0, -1);
-      } else if (state.turnInput.length < 3) {
+      if (key === 'UNDO') {
+        if (state.turnInput.length) {
+          state.turnInput = state.turnInput.slice(0, -1);
+          scoreInput.value = state.turnInput;
+        } else {
+          undoLastTurn();
+        }
+        return;
+      }
+
+      if (state.turnInput.length < 3) {
         state.turnInput += key;
       }
       scoreInput.value = state.turnInput;
@@ -682,7 +758,6 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-playerCountSelect.addEventListener('change', renderPlayerInputs);
 langPlBtn?.addEventListener('click', () => {
   bounceClass(langPlBtn, 'key-flash');
   state.lang = 'pl';
@@ -712,7 +787,8 @@ startGameBtn.addEventListener('click', () => {
 backToSetupBtn.addEventListener('click', () => {
   bounceClass(backToSetupBtn, 'pressed');
   const count = state.players.length || 2;
-  playerCountSelect.value = String(count);
+  selectedPlayerCount = count;
+  playerCountControl.setActive(String(count));
   renderPlayerInputs();
 
   const inputs = [...playersInputs.querySelectorAll('input')];
@@ -722,7 +798,8 @@ backToSetupBtn.addEventListener('click', () => {
     }
   });
 
-  startScoreSelect.value = String(state.startScore || 501);
+  selectedStartScore = state.startScore || 301;
+  startScoreControl.setActive(String(selectedStartScore));
   const outRadio = document.querySelector(`input[name="out-mode"][value="${state.outMode}"]`);
   if (outRadio) outRadio.checked = true;
   showScreen('setup');

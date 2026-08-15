@@ -42,7 +42,7 @@
 
           <div class="home-actions">
             <button id="go-scoreboard" class="primary-btn home-cta"><span>DART SCOREBOARD</span></button>
-            <a class="secondary-btn home-cta" href="https://nakka.com/n01/online/" target="_blank" rel="noreferrer"><span>NAKKA</span></a>
+            <a class="secondary-btn home-cta" href="https://n01darts.com/n01/" target="_blank" rel="noreferrer"><span>NAKKA</span></a>
           </div>
 
           <div class="home-badges">
@@ -59,35 +59,38 @@
           <h2 id="setup-title">Ustawienia meczu</h2>
 
           <div class="field-row">
-            <label id="label-player-count" for="player-count">Liczba zawodników</label>
-            <select id="player-count">
-              <option value="1">1</option>
-              <option value="2" selected>2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-            </select>
+            <span id="label-player-count">Liczba zawodników</span>
+            <div class="tile-picker" id="player-count-picker" role="group" aria-label="Liczba zawodników">
+              <button type="button" class="tile-btn" data-value="1">1</button>
+              <button type="button" class="tile-btn" data-value="2">2</button>
+              <button type="button" class="tile-btn" data-value="3">3</button>
+              <button type="button" class="tile-btn" data-value="4">4</button>
+            </div>
           </div>
 
           <div id="players-inputs" class="players-grid"></div>
 
           <div class="field-row">
             <span id="label-out-mode">Zakończenie lega</span>
-            <div class="toggle-wrap">
-              <label><input type="radio" name="out-mode" value="double" checked /> Double out</label>
-              <label><input type="radio" name="out-mode" value="single" /> Single out</label>
+            <div class="switch-toggle" id="out-mode-switch">
+              <input type="radio" id="out-mode-double" name="out-mode" value="double" checked />
+              <label for="out-mode-double">Double out</label>
+              <input type="radio" id="out-mode-single" name="out-mode" value="single" />
+              <label for="out-mode-single">Single out</label>
+              <span class="switch-thumb" aria-hidden="true"></span>
             </div>
           </div>
 
           <div class="field-row">
-            <label id="label-start-score" for="start-score">Start punktów</label>
-            <select id="start-score">
-              <option value="301">301</option>
-              <option value="501" selected>501</option>
-              <option value="701">701</option>
-            </select>
+            <span id="label-start-score">Start punktów</span>
+            <div class="tile-picker" id="start-score-picker" role="group" aria-label="Start punktów">
+              <button type="button" class="tile-btn" data-value="301">301</button>
+              <button type="button" class="tile-btn" data-value="501">501</button>
+              <button type="button" class="tile-btn" data-value="701">701</button>
+            </div>
           </div>
 
-          <button id="start-game" class="primary-btn">Dalej</button>
+          <button id="start-game" class="primary-btn start-game-btn">Dalej</button>
         </div>
       </section>
 
@@ -145,6 +148,30 @@
     <div id="rules-modal" class="modal-overlay" aria-hidden="true">
       <div class="modal-card">
         <button id="rules-close" class="modal-close" type="button" aria-label="Zamknij">×</button>
+        <svg class="rules-illustration" viewBox="0 0 200 200" aria-hidden="true">
+          <circle cx="100" cy="100" r="94" fill="#1a2131" />
+          <circle cx="100" cy="100" r="94" fill="none" stroke="rgba(242,186,42,0.35)" stroke-width="2" />
+          <circle cx="100" cy="100" r="78" fill="#f2ba2a" />
+          <circle cx="100" cy="100" r="64" fill="#0c0f18" />
+          <circle cx="100" cy="100" r="48" fill="#f2ba2a" />
+          <circle cx="100" cy="100" r="32" fill="#0c0f18" />
+          <circle cx="100" cy="100" r="16" fill="#f2ba2a" />
+          <circle cx="100" cy="100" r="7" fill="#ffd449" />
+          <g stroke="rgba(6,8,15,0.55)" stroke-width="1.5">
+            <line x1="100" y1="6" x2="100" y2="194" />
+            <line x1="6" y1="100" x2="194" y2="100" />
+            <line x1="33" y1="33" x2="167" y2="167" />
+            <line x1="167" y1="33" x2="33" y2="167" />
+          </g>
+          <g transform="rotate(18 100 100)">
+            <line x1="100" y1="100" x2="132" y2="30" stroke="#e9e9ee" stroke-width="3" stroke-linecap="round" />
+            <path d="M132 30 L124 20 L140 22 Z" fill="#f2ba2a" />
+          </g>
+          <g transform="rotate(-24 100 100)">
+            <line x1="100" y1="100" x2="52" y2="46" stroke="#e9e9ee" stroke-width="3" stroke-linecap="round" />
+            <path d="M52 46 L40 42 L46 56 Z" fill="#ffd449" />
+          </g>
+        </svg>
         <h2 id="rules-title">Zasady gry w darta</h2>
         <div class="modal-body" id="rules-body"></div>
       </div>
