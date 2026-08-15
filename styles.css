@@ -670,22 +670,23 @@ select,
 }
 
 .dart-slot {
-  flex: 1;
-  min-width: 52px;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
   display: grid;
   place-items: center;
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: 1.6rem;
+  font-weight: 800;
   color: rgba(255, 255, 255, 0.7);
 }
 
 .dart-slot.filled {
-  background: rgba(255, 255, 255, 0.92);
-  border-color: transparent;
-  color: #171717;
+  background: rgba(242, 186, 42, 0.16);
+  border: 1.5px solid rgba(242, 186, 42, 0.55);
+  color: var(--accent-2);
 }
 
 .dart-sum-wrap {
@@ -891,6 +892,42 @@ select,
   font-size: clamp(1.6rem, 3vw, 2.2rem);
   margin-bottom: 6px;
   padding-right: 30px;
+}
+
+.rules-card {
+  max-width: 920px;
+}
+
+.rules-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.rules-image-col {
+  background: #fff;
+  border-radius: 16px;
+  padding: 10px;
+  align-self: center;
+}
+
+.rules-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+@media (max-width: 720px) {
+  .rules-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rules-image-col {
+    max-width: 260px;
+    margin: 0 auto;
+  }
 }
 
 .modal-body h3 {
