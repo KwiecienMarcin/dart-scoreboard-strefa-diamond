@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -20,7 +20,10 @@
     <main id="app">
       <header class="topbar">
         <img src="/assets/logo_full.png" alt="Strefa Diamond" class="topbar-logo brand-logo" />
-        <button id="home-link" class="ghost-btn">🏠 Strona główna</button>
+        <div class="topbar-actions">
+          <button id="rules-link" class="ghost-btn" type="button">Zasady darta</button>
+          <button id="home-link" class="ghost-btn" type="button">Strona główna</button>
+        </div>
       </header>
 
       <section id="home-screen" class="screen active">
@@ -38,8 +41,8 @@
           </div>
 
           <div class="home-actions">
-            <button id="go-scoreboard" class="primary-btn home-cta"><span>🎯 DART SCOREBOARD</span></button>
-            <a class="secondary-btn home-cta" href="https://nakka.com/n01/online/" target="_blank" rel="noreferrer"><span>📈 NAKKA</span></a>
+            <button id="go-scoreboard" class="primary-btn home-cta"><span>DART SCOREBOARD</span></button>
+            <a class="secondary-btn home-cta" href="https://nakka.com/n01/online/" target="_blank" rel="noreferrer"><span>NAKKA</span></a>
           </div>
 
           <div class="home-badges">
@@ -104,14 +107,14 @@
           </div>
 
           <div class="input-side mode-darts">
+            <p class="input-mode-heading" id="input-mode-heading">Wybierz sposób wpisywania punktów</p>
             <div class="input-mode-toggle" role="group" aria-label="Tryb wpisywania wyniku">
-              <button id="mode-sum" class="mode-btn" type="button" data-pl="Suma rzutów" data-en="Throws sum">Suma rzutów</button>
-              <button id="mode-darts" class="mode-btn active" type="button" data-pl="Pojedyncze rzuty" data-en="Single throws">Pojedyncze rzuty</button>
+              <button id="mode-sum" class="mode-btn" type="button">Suma rzutów</button>
+              <button id="mode-darts" class="mode-btn active" type="button">Pojedyncze rzuty</button>
             </div>
 
             <div class="score-input-box">
-              <input id="score-input" type="text" inputmode="numeric" placeholder="Wpisz sumę rzutów" data-pl="Wpisz sumę rzutów" data-en="Enter throws sum" readonly />
-              <button id="submit-score" class="primary-btn" data-pl="Zatwierdź" data-en="Submit">Zatwierdź</button>
+              <input id="score-input" type="text" inputmode="numeric" placeholder="Wpisz sumę rzutów" readonly />
             </div>
 
             <div class="darts-input-box">
@@ -121,15 +124,40 @@
                 <span class="dart-slot"></span>
               </div>
               <div class="dart-sum" id="dart-sum">0</div>
-              <button id="submit-darts" class="primary-btn" data-pl="Zatwierdź" data-en="Submit">Zatwierdź</button>
+              <button id="submit-darts" class="primary-btn submit-btn" type="button">Zatwierdź</button>
             </div>
 
-            <div class="keypad" id="keypad"></div>
-            <div class="keypad keypad-darts" id="keypad-darts"></div>
+            <div class="keypad-group" id="keypad-group-sum">
+              <div class="keypad" id="keypad"></div>
+              <p class="keypad-caption" id="sum-caption">Grasz w darta od dawna i dobrze liczysz w pamięci? Ten tryb jest dla Ciebie.</p>
+            </div>
+
+            <div class="keypad-group" id="keypad-group-darts">
+              <div class="keypad keypad-darts" id="keypad-darts"></div>
+              <p class="keypad-caption" id="darts-caption">Wpisuj każdy z rzutów osobno — bez liczenia.</p>
+            </div>
           </div>
         </div>
       </section>
     </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <div id="rules-modal" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card">
+        <button id="rules-close" class="modal-close" type="button" aria-label="Zamknij">×</button>
+        <h2 id="rules-title">Zasady gry w darta</h2>
+        <div class="modal-body" id="rules-body"></div>
+      </div>
+    </div>
+
+    <div id="legwin-modal" class="modal-overlay legwin-overlay" aria-hidden="true">
+      <div class="modal-card legwin-card">
+        <p class="legwin-label" id="legwin-label">WYGRANA LEGA</p>
+        <h2 id="legwin-name"></h2>
+        <button id="legwin-close" class="primary-btn submit-btn" type="button">Dalej</button>
+      </div>
+    </div>
 
     <script src="script.js"></script>
   </body>

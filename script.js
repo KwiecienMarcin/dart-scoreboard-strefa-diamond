@@ -5,6 +5,7 @@ const screens = {
 };
 
 const homeLink = document.getElementById('home-link');
+const rulesLink = document.getElementById('rules-link');
 const goScoreboardBtn = document.getElementById('go-scoreboard');
 const playerCountSelect = document.getElementById('player-count');
 const playersInputs = document.getElementById('players-inputs');
@@ -15,7 +16,6 @@ const newGameBtn = document.getElementById('new-game');
 const currentPlayerCard = document.getElementById('current-player-card');
 const playersList = document.getElementById('players-list');
 const scoreInput = document.getElementById('score-input');
-const submitScoreBtn = document.getElementById('submit-score');
 const keypad = document.getElementById('keypad');
 const keypadDarts = document.getElementById('keypad-darts');
 const inputSideEl = document.querySelector('.input-side');
@@ -26,11 +26,22 @@ const dartSumEl = document.getElementById('dart-sum');
 const submitDartsBtn = document.getElementById('submit-darts');
 const matchTitle = document.getElementById('match-title');
 const scoreInputEl = document.getElementById('score-input');
-const submitScoreLabel = document.getElementById('submit-score');
 const backToSetupLabel = document.getElementById('back-to-setup-label');
 const newGameLabel = document.getElementById('new-game-label');
 const langPlBtn = document.getElementById('lang-pl');
 const langEnBtn = document.getElementById('lang-en');
+const inputModeHeadingEl = document.getElementById('input-mode-heading');
+const sumCaptionEl = document.getElementById('sum-caption');
+const dartsCaptionEl = document.getElementById('darts-caption');
+const toastEl = document.getElementById('toast');
+const rulesModal = document.getElementById('rules-modal');
+const rulesClose = document.getElementById('rules-close');
+const rulesTitleEl = document.getElementById('rules-title');
+const rulesBodyEl = document.getElementById('rules-body');
+const legwinModal = document.getElementById('legwin-modal');
+const legwinClose = document.getElementById('legwin-close');
+const legwinLabelEl = document.getElementById('legwin-label');
+const legwinNameEl = document.getElementById('legwin-name');
 
 const state = {
   players: [],
@@ -44,18 +55,20 @@ const state = {
   activeMultiplier: 1,
 };
 
-const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'C'];
+let previousScores = {};
+let lastActivePlayerIndex = -1;
+let toastTimer = null;
+let legWinTimer = null;
+
+const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'SUBMIT'];
 
 const dartsKeypadLayout = [
   '1', '2', '3', '4', '5',
   '6', '7', '8', '9', '10',
   '11', '12', '13', '14', '15',
   '16', '17', '18', '19', '20',
-  '0', '25', 'DOUBLE', 'TRIPLE', '⌫',
+  '0', '25', 'DOUBLE', 'TRIPLE', 'UNDO',
 ];
-
-
-
 
 const t = {
   pl: {
@@ -68,6 +81,7 @@ const t = {
     outSingle: 'Single out',
     backToSetup: 'Edytuj zawodników',
     newGame: 'Nowa gra',
+    homeLink: 'Strona główna',
     enterScore: 'Wpisz sumę rzutów',
     submit: 'Zatwierdź',
     nowThrowing: 'Rzuca teraz',
@@ -75,11 +89,27 @@ const t = {
     average: 'Średnia 3-dart',
     checkout: 'Checkout',
     invalidTurn: 'Podaj poprawny wynik tury (0-180).',
-    legWin: (name) => `${name} wygrywa lega! Startujemy nowego lega.`,
+    legWin: (name) => `${name} wygrywa lega!`,
     modeDouble: 'Double out',
     modeSingle: 'Single out',
+    inputModeHeading: 'Wybierz sposób wpisywania punktów',
     inputModeSum: 'Suma rzutów',
     inputModeDarts: 'Pojedyncze rzuty',
+    sumCaption: 'Grasz w darta od dawna i dobrze liczysz w pamięci? Ten tryb jest dla Ciebie.',
+    dartsCaption: 'Wpisuj każdy z rzutów osobno — bez liczenia.',
+    undoEntry: 'Cofnij wpisanie',
+    rulesButton: 'Zasady darta',
+    rulesTitle: 'Zasady gry w darta',
+    legWinBadge: 'WYGRANA LEGA',
+    legWinOk: 'Dalej',
+    rulesSections: [
+      { title: 'Cel gry', body: 'Każdy zawodnik zaczyna z ustaloną liczbą punktów (301, 501 lub 701) i rzuca po trzy lotki w turze, dążąc do zejścia z wynikiem dokładnie do zera.' },
+      { title: 'Wartość pól', body: 'Pojedyncze pole (1-20) daje jego wartość. Double (zewnętrzny cienki pierścień) mnoży ją razy 2, Triple (wewnętrzny pierścień) razy 3. Zewnętrzne koło środka to 25 punktów (Bull), środek tarczy to 50 punktów (Bullseye).' },
+      { title: 'Double Out', body: 'Aby zakończyć lega, ostatnia lotka musi trafić w pole double (lub w Bullseye, czyli 50). Zejście do zera bez trafienia w double na finiszu to bust — tura się nie liczy.' },
+      { title: 'Single Out', body: 'W tym trybie do zakończenia lega wystarczy dowolny rzut, który sprowadzi wynik dokładnie do zera — bez wymogu trafienia w double.' },
+      { title: 'Bust', body: 'Jeśli rzut zejdzie poniżej zera, zostawi dokładnie 1 punkt (przy Double Out) albo trafi zero bez wymaganego finiszu, cała tura zostaje anulowana, a wynik wraca do stanu sprzed tury.' },
+      { title: 'Nowy leg', body: 'Po wygranej ledze wszyscy zawodnicy wracają do wybranej liczby punktów startowych i rozgrywka toczy się dalej.' },
+    ],
   },
   en: {
     setupTitle: 'Match settings',
@@ -91,6 +121,7 @@ const t = {
     outSingle: 'Single out',
     backToSetup: 'Edit players',
     newGame: 'New game',
+    homeLink: 'Home',
     enterScore: 'Enter throws sum',
     submit: 'Submit',
     nowThrowing: 'Now throwing',
@@ -98,16 +129,74 @@ const t = {
     average: '3-dart avg',
     checkout: 'Checkout',
     invalidTurn: 'Enter a valid turn score (0-180).',
-    legWin: (name) => `${name} wins the leg! Starting a new leg.`,
+    legWin: (name) => `${name} wins the leg!`,
     modeDouble: 'Double out',
     modeSingle: 'Single out',
+    inputModeHeading: 'Choose how to enter points',
     inputModeSum: 'Throws sum',
     inputModeDarts: 'Single throws',
+    sumCaption: "Been playing darts a while and good at mental math? This mode's for you.",
+    dartsCaption: 'Enter every throw separately — no counting needed.',
+    undoEntry: 'Undo entry',
+    rulesButton: 'Darts rules',
+    rulesTitle: 'Darts rules',
+    legWinBadge: 'LEG WON',
+    legWinOk: 'Continue',
+    rulesSections: [
+      { title: 'Goal', body: 'Each player starts with a fixed score (301, 501 or 701) and throws three darts per turn, aiming to bring the score down to exactly zero.' },
+      { title: 'Segment values', body: 'A single segment (1-20) scores its face value. Double (thin outer ring) multiplies it by 2, Triple (inner ring) by 3. The outer bull ring scores 25, the center bullseye scores 50.' },
+      { title: 'Double Out', body: 'To win a leg, the final dart of the turn must land on a double (or the bullseye, 50). Reaching zero without a double finish is a bust — the whole turn is voided.' },
+      { title: 'Single Out', body: 'In this mode any throw that brings the score to exactly zero finishes the leg — no double required.' },
+      { title: 'Bust', body: 'If a throw would take the score below zero, leave exactly 1 point (in Double Out), or reach zero without a valid finish, the whole turn is cancelled and the score reverts to what it was before the turn.' },
+      { title: 'New leg', body: 'After a leg is won, every player resets to the chosen starting score and play continues.' },
+    ],
   },
 };
 
 function tr(key) {
   return t[state.lang]?.[key] ?? t.pl[key] ?? key;
+}
+
+function bounceClass(el, cls) {
+  if (!el) return;
+  el.classList.remove(cls);
+  void el.offsetWidth;
+  el.classList.add(cls);
+}
+
+function renderRulesContent() {
+  if (!rulesBodyEl) return;
+  const sections = tr('rulesSections');
+  rulesBodyEl.innerHTML = sections.map((s) => `<h3>${s.title}</h3><p>${s.body}</p>`).join('');
+}
+
+function openModal(overlay) {
+  if (!overlay) return;
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden', 'false');
+}
+
+function closeModal(overlay) {
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden', 'true');
+}
+
+function showToast(message) {
+  if (!toastEl) return;
+  toastEl.textContent = message;
+  toastEl.classList.remove('show');
+  void toastEl.offsetWidth;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+}
+
+function showLegWinModal(name) {
+  if (legwinNameEl) legwinNameEl.textContent = tr('legWin')(name);
+  openModal(legwinModal);
+  clearTimeout(legWinTimer);
+  legWinTimer = setTimeout(() => closeModal(legwinModal), 3200);
 }
 
 function applyTranslations() {
@@ -128,17 +217,30 @@ function applyTranslations() {
 
   if (backToSetupLabel) backToSetupLabel.textContent = tr('backToSetup');
   if (newGameLabel) newGameLabel.textContent = tr('newGame');
+  if (rulesLink) rulesLink.textContent = tr('rulesButton');
+  if (rulesTitleEl) rulesTitleEl.textContent = tr('rulesTitle');
   if (scoreInputEl) scoreInputEl.placeholder = tr('enterScore');
-  if (submitScoreLabel) submitScoreLabel.textContent = tr('submit');
   if (submitDartsBtn) submitDartsBtn.textContent = tr('submit');
+  if (inputModeHeadingEl) inputModeHeadingEl.textContent = tr('inputModeHeading');
   if (modeSumBtn) modeSumBtn.textContent = tr('inputModeSum');
   if (modeDartsBtn) modeDartsBtn.textContent = tr('inputModeDarts');
+  if (sumCaptionEl) sumCaptionEl.textContent = tr('sumCaption');
+  if (dartsCaptionEl) dartsCaptionEl.textContent = tr('dartsCaption');
+  if (legwinLabelEl) legwinLabelEl.textContent = tr('legWinBadge');
+  if (legwinClose) legwinClose.textContent = tr('legWinOk');
   if (startGameBtn) startGameBtn.textContent = tr('next');
+
+  const submitCell = keypad?.querySelector('.submit-cell');
+  if (submitCell) submitCell.textContent = tr('submit');
+
+  const undoBtn = keypadDarts?.querySelector('[data-key="UNDO"]');
+  if (undoBtn) undoBtn.textContent = tr('undoEntry');
+
+  renderRulesContent();
 
   langPlBtn?.classList.toggle('active', state.lang === 'pl');
   langEnBtn?.classList.toggle('active', state.lang === 'en');
 }
-
 
 function showScreen(name) {
   Object.entries(screens).forEach(([screenName, element]) => {
@@ -185,6 +287,8 @@ function collectPlayers() {
   state.turnInput = '';
   state.turnDarts = [];
   state.activeMultiplier = 1;
+  previousScores = {};
+  lastActivePlayerIndex = -1;
   applyTranslations();
 }
 
@@ -251,24 +355,35 @@ function renderGame() {
 
   matchTitle.textContent = `${state.outMode === 'double' ? tr('modeDouble') : tr('modeSingle')} • ${state.startScore}`;
 
+  const currentChanged = previousScores[current.id] !== undefined && previousScores[current.id] !== current.score;
+  const playerRotated = lastActivePlayerIndex !== state.currentPlayer;
+  lastActivePlayerIndex = state.currentPlayer;
+
   currentPlayerCard.innerHTML = `
     <h3>${tr('nowThrowing')}: ${current.name}</h3>
     <div class="current-player-score">
-      <span class="big">${current.score}</span>
+      <span class="big${currentChanged ? ' score-pulse' : ''}">${current.score}</span>
       <span>${tr('remaining')}</span>
     </div>
     <div>${tr('average')}: ${getAverage(current)}</div>
     ${checkout ? `<div class="checkout">${tr('checkout')}: ${checkout}</div>` : ''}
   `;
 
+  if (playerRotated) {
+    bounceClass(currentPlayerCard, 'card-enter');
+  }
+
   playersList.innerHTML = '';
   state.players.forEach((player, idx) => {
+    const changed = previousScores[player.id] !== undefined && previousScores[player.id] !== player.score;
     const li = document.createElement('li');
+    li.className = idx === state.currentPlayer ? 'is-current' : '';
     li.innerHTML = `
-      <span>${idx === state.currentPlayer ? '🎯 ' : ''}${player.name}</span>
-      <strong>${player.score}</strong>
+      <span>${player.name}</span>
+      <strong class="${changed ? 'score-pulse' : ''}">${player.score}</strong>
     `;
     playersList.appendChild(li);
+    previousScores[player.id] = player.score;
   });
 
   scoreInput.value = state.turnInput;
@@ -301,7 +416,7 @@ function updateDartsKeypadState() {
   const full = state.turnDarts.length >= 3;
   keypadDarts.querySelectorAll('button').forEach((btn) => {
     const key = btn.dataset.key;
-    if (key === 'DOUBLE' || key === 'TRIPLE' || key === '⌫') return;
+    if (key === 'DOUBLE' || key === 'TRIPLE' || key === 'UNDO') return;
     btn.disabled = full;
   });
 }
@@ -315,7 +430,7 @@ function submitTurn() {
   const entered = Number(state.turnInput);
 
   if (!Number.isInteger(entered) || entered < 0 || entered > 180) {
-    alert(tr('invalidTurn'));
+    showToast(tr('invalidTurn'));
     return;
   }
 
@@ -339,13 +454,15 @@ function submitTurn() {
     }
   }
 
+  let legWon = false;
+
   if (!bust) {
     current.score = remaining;
     current.turns += 1;
     current.scoredPoints += entered;
 
     if (current.score === 0) {
-      alert(tr('legWin')(current.name));
+      legWon = true;
       state.players.forEach((p) => {
         p.score = state.startScore;
       });
@@ -357,6 +474,10 @@ function submitTurn() {
   state.turnInput = '';
   rotatePlayer();
   renderGame();
+
+  if (legWon) {
+    showLegWinModal(current.name);
+  }
 }
 
 function handleHomeReset() {
@@ -364,6 +485,8 @@ function handleHomeReset() {
   state.turnInput = '';
   state.turnDarts = [];
   state.activeMultiplier = 1;
+  previousScores = {};
+  lastActivePlayerIndex = -1;
   playerCountSelect.value = '2';
   renderPlayerInputs();
   showScreen('home');
@@ -384,7 +507,7 @@ function setInputMode(mode) {
 }
 
 function handleDartKey(key) {
-  if (key === '⌫') {
+  if (key === 'UNDO') {
     if (state.activeMultiplier !== 1) {
       state.activeMultiplier = 1;
     } else {
@@ -417,18 +540,6 @@ function handleDartKey(key) {
   state.activeMultiplier = 1;
 
   renderGame();
-  maybeAutoFinishTurn();
-}
-
-function maybeAutoFinishTurn() {
-  const current = state.players[state.currentPlayer];
-  const sum = state.turnDarts.reduce((acc, d) => acc + d.value, 0);
-  const remaining = current.score - sum;
-  const forcedBust = remaining < 0 || (state.outMode === 'double' && remaining === 1);
-
-  if (forcedBust || remaining === 0 || state.turnDarts.length === 3) {
-    submitDartsTurn();
-  }
 }
 
 function submitDartsTurn() {
@@ -449,13 +560,15 @@ function submitDartsTurn() {
     bust = true;
   }
 
+  let legWon = false;
+
   if (!bust) {
     current.score = remaining;
     current.turns += 1;
     current.scoredPoints += sum;
 
     if (current.score === 0) {
-      alert(tr('legWin')(current.name));
+      legWon = true;
       state.players.forEach((p) => {
         p.score = state.startScore;
       });
@@ -468,6 +581,10 @@ function submitDartsTurn() {
   state.activeMultiplier = 1;
   rotatePlayer();
   renderGame();
+
+  if (legWon) {
+    showLegWinModal(current.name);
+  }
 }
 
 function buildKeypad() {
@@ -475,17 +592,25 @@ function buildKeypad() {
   keypadLayout.forEach((key) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.textContent = key;
 
-    if (key === '⌫' || key === 'C') {
-      btn.classList.add('action');
+    if (key === 'SUBMIT') {
+      btn.textContent = tr('submit');
+      btn.classList.add('action', 'submit-cell');
+    } else {
+      btn.textContent = key;
+      if (key === '⌫') btn.classList.add('action');
     }
 
     btn.addEventListener('click', () => {
+      bounceClass(btn, key === 'SUBMIT' ? 'pressed' : 'key-flash');
+
+      if (key === 'SUBMIT') {
+        submitTurn();
+        return;
+      }
+
       if (key === '⌫') {
         state.turnInput = state.turnInput.slice(0, -1);
-      } else if (key === 'C') {
-        state.turnInput = '';
       } else if (state.turnInput.length < 3) {
         state.turnInput += key;
       }
@@ -502,23 +627,50 @@ function buildDartsKeypad() {
   dartsKeypadLayout.forEach((key) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.textContent = key;
     btn.dataset.key = key;
 
-    if (key === 'DOUBLE' || key === 'TRIPLE') {
+    if (key === 'UNDO') {
+      btn.textContent = tr('undoEntry');
+      btn.classList.add('action', 'undo-btn');
+    } else if (key === 'DOUBLE' || key === 'TRIPLE') {
+      btn.textContent = key;
       btn.classList.add('action', 'mult-btn');
-    } else if (key === '⌫') {
-      btn.classList.add('action');
+    } else {
+      btn.textContent = key;
     }
 
-    btn.addEventListener('click', () => handleDartKey(key));
+    btn.addEventListener('click', () => {
+      bounceClass(btn, 'key-flash');
+      handleDartKey(key);
+    });
     keypadDarts.appendChild(btn);
   });
 }
 
 modeSumBtn?.addEventListener('click', () => setInputMode('sum'));
 modeDartsBtn?.addEventListener('click', () => setInputMode('darts'));
-submitDartsBtn?.addEventListener('click', submitDartsTurn);
+submitDartsBtn?.addEventListener('click', () => {
+  bounceClass(submitDartsBtn, 'pressed');
+  submitDartsTurn();
+});
+
+rulesLink?.addEventListener('click', () => openModal(rulesModal));
+rulesClose?.addEventListener('click', () => closeModal(rulesModal));
+rulesModal?.addEventListener('click', (e) => {
+  if (e.target === rulesModal) closeModal(rulesModal);
+});
+
+legwinClose?.addEventListener('click', () => closeModal(legwinModal));
+legwinModal?.addEventListener('click', (e) => {
+  if (e.target === legwinModal) closeModal(legwinModal);
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeModal(rulesModal);
+    closeModal(legwinModal);
+  }
+});
 
 playerCountSelect.addEventListener('change', renderPlayerInputs);
 langPlBtn?.addEventListener('click', () => {
@@ -563,8 +715,6 @@ backToSetupBtn.addEventListener('click', () => {
 
 newGameBtn.addEventListener('click', handleHomeReset);
 homeLink.addEventListener('click', handleHomeReset);
-
-submitScoreBtn.addEventListener('click', submitTurn);
 
 buildKeypad();
 buildDartsKeypad();
