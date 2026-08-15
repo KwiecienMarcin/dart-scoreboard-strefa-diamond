@@ -86,12 +86,14 @@ const legWinJokes = {
     { min: 1, text: () => 'Dolejcie sobie piwka przy barze, zasłużyliście.' },
     { min: 1, text: () => 'Ekipa od tarczy 20 już się z was śmieje.' },
     { min: 1, text: () => 'Barman już liczy, ile dziś piw wypiliście.' },
+    { min: 1, text: (c) => `Legenda Strefy Diamond właśnie urosła o jedno nazwisko: ${c.winner}.` },
     { min: 2, text: (c) => `${c.loser} stawia kolejkę, taka tradycja w Strefie Diamond.` },
     { min: 2, text: (c) => `${c.loser}, po takiej grze należy ci się tylko jedno. Kolejka dla reszty.` },
     { min: 2, text: (c) => `${c.loser} dziś grał jakby lotki widział pierwszy raz. Kolejka się należy.` },
     { min: 2, text: (c) => `${c.winner} wygrał tego lega, ale ${c.thirdOrSecond} już szykuje rewanż przy stole bilardowym.` },
     { min: 2, text: (c) => `${c.winner} kontra ${c.loser}. I chyba wiadomo, kto dziś stawia.` },
     { min: 2, text: (c) => `${c.loser}, teraz Twoja decyzja: Pilsner, Mojito czy może Pornstar Martini dla ${c.winner}? Wybieraj mądrze.` },
+    { min: 2, text: (c) => `${c.loser}, po tej kolejce może czas zamówić Ubera zamiast kolejnej gry.` },
     { min: 3, text: (c) => `${c.third}, podgoń wynik, bo zaraz stawiasz bilard dla całej ekipy.` },
     { min: 3, text: (c) => `${c.third} trzyma się kurczowo trzeciego miejsca. Jeszcze chwila i leci stawiać bilard.` },
   ],
@@ -99,12 +101,14 @@ const legWinJokes = {
     { min: 1, text: () => 'Grab a round at the bar, you earned it.' },
     { min: 1, text: () => 'The crew at board 20 is already laughing at you.' },
     { min: 1, text: () => "The bartender's already counting how many beers you had tonight." },
+    { min: 1, text: (c) => `The Strefa Diamond legend just grew by one name: ${c.winner}.` },
     { min: 2, text: (c) => `${c.loser} is buying the next round. House rule at Strefa Diamond.` },
     { min: 2, text: (c) => `${c.loser}, after that game you owe everyone a round.` },
     { min: 2, text: (c) => `${c.loser} played like they'd never seen a dart before. Round's on them.` },
     { min: 2, text: (c) => `${c.winner} took the leg, but ${c.thirdOrSecond} is already plotting a pool table rematch.` },
     { min: 2, text: (c) => `${c.winner} versus ${c.loser}. We all know who's buying tonight.` },
     { min: 2, text: (c) => `${c.loser}, your call now: Pilsner, Mojito, or maybe a Pornstar Martini for ${c.winner}? Choose wisely.` },
+    { min: 2, text: (c) => `${c.loser}, after that round, maybe it's time to call an Uber instead of another game.` },
     { min: 3, text: (c) => `${c.third}, better catch up, you're about to be buying pool for everyone.` },
     { min: 3, text: (c) => `${c.third} is clinging to third place. One more round and they're off to buy pool.` },
   ],
@@ -129,12 +133,20 @@ const lowScoreJokes = {
     { min: 0, max: 10, text: (c) => `${c.player} chyba dziś trenuje rzucanie do podłogi. ${c.amount} punktów.` },
     { min: 0, max: 10, text: (c) => `${c.amount} punktów, ${c.player}? Tarcza jest tuż przed tobą, przysięgam.` },
     { min: 0, max: 10, text: (c) => `${c.player}, po takim rzucie numer do trenera dostaniesz przy barze.` },
+    { min: 0, max: 10, text: (c) => `${c.player}, ręka drży czy to już piąte piwo?` },
+    { min: 0, max: 10, text: (c) => `${c.player}, chyba dziś Merkury w retrogradacji. Lotki nie chcą współpracować.` },
+    { min: 0, max: 10, text: (c) => `${c.player} i tarcza mają dziś kryzys w związku.` },
+    { min: 0, max: 10, text: (c) => `${c.player}, nawet w Strefie Diamond zdarzają się gorsze dni. Dziś chyba Twój.` },
   ],
   en: [
     { min: 0, max: 10, text: (c) => `${c.player}, ${c.amount} points in three darts? I feel like you can do better than that.` },
     { min: 0, max: 10, text: (c) => `${c.player} might be practicing throwing at the floor today. ${c.amount} points.` },
     { min: 0, max: 10, text: (c) => `${c.amount} points, ${c.player}? The board is right in front of you, I promise.` },
     { min: 0, max: 10, text: (c) => `${c.player}, after that throw, the bar has a coach's number ready for you.` },
+    { min: 0, max: 10, text: (c) => `${c.player}, is your hand shaking or is that your fifth beer?` },
+    { min: 0, max: 10, text: (c) => `${c.player}, Mercury must be in retrograde today. The darts refuse to cooperate.` },
+    { min: 0, max: 10, text: (c) => `${c.player} and the dartboard are going through a rough patch today.` },
+    { min: 0, max: 10, text: (c) => `${c.player}, even Strefa Diamond has its off days. Today's yours.` },
   ],
 };
 
@@ -503,7 +515,7 @@ function reactToTurnResult(current, amount, bust) {
 
   if (amount <= 10) {
     maybeRoastLowScore(current.name, amount);
-  } else if (amount <= 54) {
+  } else if (amount <= 54 && Math.random() < 0.3) {
     const pool = tableNumberJokes[state.lang] ?? tableNumberJokes.pl;
     const template = pool[Math.floor(Math.random() * pool.length)];
     showLiveBanner(template({ player: current.name, amount }));
@@ -1100,15 +1112,34 @@ function loadVisibleMenuImages() {
   });
 }
 
-menuLink?.addEventListener('click', () => {
-  bounceClass(menuLink, 'pressed');
+let menuInactivityTimer = null;
+
+function resetMenuInactivityTimer() {
+  clearTimeout(menuInactivityTimer);
+  menuInactivityTimer = setTimeout(closeMenuModal, 60000);
+}
+
+function openMenuModal() {
   openModal(menuModal);
   loadVisibleMenuImages();
+  resetMenuInactivityTimer();
+}
+
+function closeMenuModal() {
+  clearTimeout(menuInactivityTimer);
+  closeModal(menuModal);
+}
+
+menuLink?.addEventListener('click', () => {
+  bounceClass(menuLink, 'pressed');
+  openMenuModal();
 });
-menuClose?.addEventListener('click', () => closeModal(menuModal));
+menuClose?.addEventListener('click', () => closeMenuModal());
 menuModal?.addEventListener('click', (e) => {
-  if (e.target === menuModal) closeModal(menuModal);
+  if (e.target === menuModal) closeMenuModal();
 });
+menuModal?.addEventListener('click', resetMenuInactivityTimer);
+menuModal?.addEventListener('scroll', resetMenuInactivityTimer, true);
 
 menuTabs.forEach((tab) => {
   tab.addEventListener('click', () => {
@@ -1132,10 +1163,6 @@ menuSubtabs.forEach((btn) => {
     });
     loadVisibleMenuImages();
   });
-});
-
-document.querySelectorAll('.menu-image').forEach((img) => {
-  img.addEventListener('click', () => img.classList.toggle('zoomed'));
 });
 
 legwinClose?.addEventListener('click', () => {
@@ -1168,7 +1195,7 @@ document.addEventListener('keydown', (e) => {
     closeModal(rulesModal);
     closeModal(legwinModal);
     closeModal(nakkaModal);
-    closeModal(menuModal);
+    closeMenuModal();
   }
 });
 

@@ -33,7 +33,7 @@ body {
   width: min(100vw, 1280px);
   max-width: 1280px;
   margin: 0 auto;
-  padding: 12px 20px 40px;
+  padding: 24px 20px 40px;
 }
 
 .topbar {
@@ -1126,32 +1126,6 @@ select,
   width: 100%;
   height: auto;
   margin: 0 auto;
-  cursor: zoom-in;
-}
-
-.menu-image.zoomed {
-  width: 190%;
-  max-width: 190%;
-  height: auto;
-  cursor: zoom-out;
-}
-
-.menu-image-large {
-  width: 135%;
-  max-width: 135%;
-}
-
-.menu-image-large.zoomed {
-  width: 220%;
-  max-width: 220%;
-}
-
-.menu-hint {
-  margin: 10px 0 0;
-  text-align: center;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.5);
-  font-style: italic;
 }
 
 .nakka-card {
