@@ -187,6 +187,18 @@ const sportJokes = {
 const RECENT_TEXT_WINDOW_MS = 90000;
 let recentJokeTexts = [];
 
+const JOKE_CATEGORY_COOLDOWN_MS = 120000;
+let categoryLastShownAt = {};
+
+function categoryOnCooldown(category) {
+  const last = categoryLastShownAt[category] || 0;
+  return Date.now() - last < JOKE_CATEGORY_COOLDOWN_MS;
+}
+
+function markCategoryShown(category) {
+  categoryLastShownAt[category] = Date.now();
+}
+
 function rememberJokeText(text) {
   if (!text) return;
   const now = Date.now();
@@ -513,37 +525,42 @@ function showLegWinModal(name, standings) {
   openModal(legwinModal);
 }
 
-const LIVE_BANNER_DURATION_MS = 25000;
-let lastBannerShownAt = 0;
+const LIVE_BANNER_DISPLAY_MS = 5000;
 
 function showLiveBanner(message) {
   if (!liveBannerEl || !message) return;
 
-  const now = Date.now();
-  if (now - lastBannerShownAt < LIVE_BANNER_DURATION_MS) return;
-  lastBannerShownAt = now;
   rememberJokeText(message);
 
   liveBannerEl.textContent = message;
   liveBannerEl.classList.add('show');
   clearTimeout(liveBannerTimer);
-  liveBannerTimer = setTimeout(() => liveBannerEl.classList.remove('show'), LIVE_BANNER_DURATION_MS);
+  liveBannerTimer = setTimeout(() => liveBannerEl.classList.remove('show'), LIVE_BANNER_DISPLAY_MS);
 }
 
 function maybeRoastBust(playerName) {
+  if (categoryOnCooldown('bust')) return;
   const pool = bustJokes[state.lang] ?? bustJokes.pl;
   const candidates = pool.map((t) => t({ player: playerName }));
-  showLiveBanner(pickJokeText(candidates));
+  const text = pickJokeText(candidates);
+  if (!text) return;
+  showLiveBanner(text);
+  markCategoryShown('bust');
 }
 
 function maybeRoastLowScore(playerName, amount) {
+  if (categoryOnCooldown('lowScore')) return;
   const pool = lowScoreJokes[state.lang] ?? lowScoreJokes.pl;
   const eligible = pool.filter((j) => amount >= j.min && amount <= j.max);
   const candidates = eligible.map((j) => j.text({ player: playerName, amount }));
-  showLiveBanner(pickJokeText(candidates));
+  const text = pickJokeText(candidates);
+  if (!text) return;
+  showLiveBanner(text);
+  markCategoryShown('lowScore');
 }
 
 function maybeCelebrateHighScore(current, amount) {
+  if (categoryOnCooldown('highScore')) return;
   const tiers = highScoreJokes[state.lang] ?? highScoreJokes.pl;
   const tier = amount > 170 ? 'pro' : amount > 120 ? 'great' : 'tourney';
   const pool = tiers[tier];
@@ -555,7 +572,29 @@ function maybeCelebrateHighScore(current, amount) {
   }
 
   const candidates = pool.map((t) => t({ player: current.name, amount, weakest }));
-  showLiveBanner(pickJokeText(candidates));
+  const text = pickJokeText(candidates);
+  if (!text) return;
+  showLiveBanner(text);
+  markCategoryShown('highScore');
+}
+
+function maybeShowSportJoke(current, amount) {
+  if (categoryOnCooldown('sport')) return false;
+  const text = getSportJokeText(amount, current.name);
+  if (!text) return false;
+  showLiveBanner(text);
+  markCategoryShown('sport');
+  return true;
+}
+
+function maybeShowTableNumberJoke(playerName, amount) {
+  if (categoryOnCooldown('tableNumber')) return;
+  const pool = tableNumberJokes[state.lang] ?? tableNumberJokes.pl;
+  const candidates = pool.map((t) => t({ player: playerName, amount }));
+  const text = pickJokeText(candidates);
+  if (!text) return;
+  showLiveBanner(text);
+  markCategoryShown('tableNumber');
 }
 
 function reactToTurnResult(current, amount, bust) {
@@ -568,18 +607,12 @@ function reactToTurnResult(current, amount, bust) {
 
   if (!Number.isInteger(amount)) return;
 
-  const sportText = getSportJokeText(amount, current.name);
-  if (sportText) {
-    showLiveBanner(sportText);
-    return;
-  }
+  if (maybeShowSportJoke(current, amount)) return;
 
   if (amount <= 10) {
     maybeRoastLowScore(current.name, amount);
-  } else if (amount <= 54 && Math.random() < 0.3) {
-    const pool = tableNumberJokes[state.lang] ?? tableNumberJokes.pl;
-    const candidates = pool.map((t) => t({ player: current.name, amount }));
-    showLiveBanner(pickJokeText(candidates));
+  } else if (amount <= 54) {
+    maybeShowTableNumberJoke(current.name, amount);
   } else if (amount > 90) {
     maybeCelebrateHighScore(current, amount);
   }
@@ -592,6 +625,7 @@ function maybeTriggerLiveBanner(current, checkoutAvailable) {
   if (!checkoutAvailable) return;
   if (lastBannerPlayerIndex === state.currentPlayer) return;
   lastBannerPlayerIndex = state.currentPlayer;
+  if (categoryOnCooldown('checkout')) return;
 
   const others = state.players.filter((p) => p.id !== current.id);
   if (!others.length) return;
@@ -599,7 +633,10 @@ function maybeTriggerLiveBanner(current, checkoutAvailable) {
   const worst = [...others].sort((a, b) => b.score - a.score)[0];
   const pool = liveBannerJokes[state.lang] ?? liveBannerJokes.pl;
   const candidates = pool.map((t) => t({ target: worst.name, player: current.name }));
-  showLiveBanner(pickJokeText(candidates));
+  const text = pickJokeText(candidates);
+  if (!text) return;
+  showLiveBanner(text);
+  markCategoryShown('checkout');
 }
 
 function applyTranslations() {
@@ -1031,9 +1068,7 @@ function handleDartKey(key) {
   renderGame();
 
   if (state.jokesEnabled) {
-    const playerName = state.players[state.currentPlayer].name;
-    const sportText = getSportJokeText(dartValue, playerName);
-    if (sportText) showLiveBanner(sportText);
+    maybeShowSportJoke(state.players[state.currentPlayer], dartValue);
   }
 }
 
