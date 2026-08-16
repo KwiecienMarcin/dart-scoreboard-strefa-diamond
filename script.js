@@ -730,6 +730,15 @@ function collectPlayers() {
   applyTranslations();
 }
 
+const EN_ORDINAL_SUFFIX = { 1: 'st', 2: 'nd', 3: 'rd', 4: 'th' };
+
+function formatRankLabel(rank) {
+  if (state.lang === 'en') {
+    return `${rank}${EN_ORDINAL_SUFFIX[rank] || 'th'} place`;
+  }
+  return `${rank}. miejsce`;
+}
+
 function getAverage(player) {
   if (!player.turns) return '0.00';
   return ((player.scoredPoints / (player.turns * 3)) * 3).toFixed(2);
@@ -827,8 +836,8 @@ function renderGame() {
     const li = document.createElement('li');
     li.className = idx === state.currentPlayer ? 'is-current' : '';
     li.innerHTML = `
-      <span class="player-rank">${rankById[player.id]}</span>
-      <span>${player.name}</span>
+      <span class="player-rank">${formatRankLabel(rankById[player.id])}</span>
+      <span class="player-name">${player.name}</span>
       <strong class="${changed ? 'score-pulse' : ''}">${player.score}</strong>
     `;
     playersList.appendChild(li);

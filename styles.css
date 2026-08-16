@@ -636,7 +636,7 @@ select,
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.players-list li span {
+.players-list li .player-name {
   font-size: 1.35rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.8);
@@ -656,7 +656,7 @@ select,
   box-shadow: 0 0 22px rgba(242, 186, 42, 0.22);
 }
 
-.players-list li.is-current span {
+.players-list li.is-current .player-name {
   color: var(--accent-2);
   font-weight: 700;
 }
@@ -665,28 +665,20 @@ select,
   color: var(--accent-2);
 }
 
-.players-list li {
-  position: relative;
-}
-
-.players-list li span.player-rank {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.72rem;
+.players-list li .player-rank {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0;
-  display: grid;
-  place-items: center;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
 }
 
-.players-list li.is-current span.player-rank {
-  background: var(--accent-2);
+.players-list li.is-current .player-rank {
+  background: linear-gradient(120deg, var(--accent-2), var(--accent));
   color: #151515;
 }
 
@@ -713,6 +705,7 @@ select,
   font-size: 1.05rem;
   letter-spacing: 1.5px;
   text-transform: uppercase;
+  text-align: center;
   color: rgba(255, 255, 255, 0.72);
   font-weight: 600;
 }
