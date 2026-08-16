@@ -119,19 +119,25 @@ const bustJokes = {
     (c) => `${c.player}, przeholowałeś. Wynik wraca do poprzedniego.`,
     (c) => `Haha, ${c.player} rzucił za dużo. Tura się nie liczy, wracamy do punktu wyjścia.`,
     (c) => `${c.player}, ambicja większa niż tarcza. Ta tura się nie liczy.`,
+    (c) => `${c.player}, tarcza powiedziała "nie dzisiaj". Tura się nie liczy.`,
+    (c) => `${c.player}, może jednak ta ostatnia lotka powinna była zostać w ręce.`,
+    (c) => `${c.player}, matematyka nie zagrała dziś po twojej stronie. Cofamy wynik.`,
   ],
   en: [
     (c) => `${c.player}, you overshot. Score goes back to where it was.`,
     (c) => `Haha, ${c.player} threw way too much. Turn doesn't count, back to square one.`,
     (c) => `${c.player}, ambition bigger than the board. That turn's void.`,
+    (c) => `${c.player}, the board just said "not today". Turn doesn't count.`,
+    (c) => `${c.player}, maybe that last dart should've stayed in your hand.`,
+    (c) => `${c.player}, the math wasn't on your side tonight. Score reverts.`,
   ],
 };
 
 const lowScoreJokes = {
   pl: [
-    { min: 0, max: 10, text: (c) => `${c.player}, ${c.amount} punktów w trzech rzutach? Wydaje mi się, że da się rzucić więcej.` },
+    { min: 0, max: 10, text: (c) => `${c.player}, trzy rzuty i ${c.amount} punktów. Da się lepiej, naprawdę.` },
     { min: 0, max: 10, text: (c) => `${c.player} chyba dziś trenuje rzucanie do podłogi. ${c.amount} punktów.` },
-    { min: 0, max: 10, text: (c) => `${c.amount} punktów, ${c.player}? Tarcza jest tuż przed tobą, przysięgam.` },
+    { min: 0, max: 10, text: (c) => `${c.player}, tarcza jest tuż przed tobą. Przysięgam.` },
     { min: 0, max: 10, text: (c) => `${c.player}, po takim rzucie numer do trenera dostaniesz przy barze.` },
     { min: 0, max: 10, text: (c) => `${c.player}, ręka drży czy to już piąte piwo?` },
     { min: 0, max: 10, text: (c) => `${c.player}, chyba dziś Merkury w retrogradacji. Lotki nie chcą współpracować.` },
@@ -139,9 +145,9 @@ const lowScoreJokes = {
     { min: 0, max: 10, text: (c) => `${c.player}, nawet w Strefie Diamond zdarzają się gorsze dni. Dziś chyba Twój.` },
   ],
   en: [
-    { min: 0, max: 10, text: (c) => `${c.player}, ${c.amount} points in three darts? I feel like you can do better than that.` },
+    { min: 0, max: 10, text: (c) => `${c.player}, three darts and ${c.amount} points. You can do better than that, honestly.` },
     { min: 0, max: 10, text: (c) => `${c.player} might be practicing throwing at the floor today. ${c.amount} points.` },
-    { min: 0, max: 10, text: (c) => `${c.amount} points, ${c.player}? The board is right in front of you, I promise.` },
+    { min: 0, max: 10, text: (c) => `${c.player}, the board is right in front of you. I promise.` },
     { min: 0, max: 10, text: (c) => `${c.player}, after that throw, the bar has a coach's number ready for you.` },
     { min: 0, max: 10, text: (c) => `${c.player}, is your hand shaking or is that your fifth beer?` },
     { min: 0, max: 10, text: (c) => `${c.player}, Mercury must be in retrograde today. The darts refuse to cooperate.` },
@@ -152,51 +158,110 @@ const lowScoreJokes = {
 
 const tableNumberJokes = {
   pl: [
-    (c) => `${c.player}, ${c.amount} punktów? To akurat numer jednego z naszych stołów bilardowych.`,
-    (c) => `${c.amount}, ${c.player}? Zgaduję, że to numer stolika bilardowego, bo na wynik w darta trochę słabo.`,
+    (c) => `${c.player}, to akurat numer naszego stołu bilardowego, nie wynik w darta.`,
+    (c) => `${c.player}, zgaduję, że to numer naszego stolika bilardowego. Na wynik w darta trochę słabo.`,
     (c) => `${c.player}, ${c.amount} punktów w darta, ale za to mamy stolik bilardowy z takim numerem.`,
     (c) => `${c.player}, stolik bilardowy numer ${c.amount} możesz mieć zarezerwowany już za godzinę.`,
     (c) => `${c.player}, może czas zamienić lotki na kij? Stolik numer ${c.amount} będzie wolny za godzinę.`,
+    (c) => `${c.player}. ${c.amount}. To numer naszego stołu bilardowego, nie wyniku.`,
   ],
   en: [
-    (c) => `${c.player}, ${c.amount} points? That's actually one of our pool table numbers.`,
-    (c) => `${c.amount}, ${c.player}? I'm guessing that's a pool table number, a bit weak for a darts score.`,
+    (c) => `${c.player}, that's actually one of our pool table numbers, not a darts score.`,
+    (c) => `${c.player}, I'm guessing that's one of our pool table numbers. A bit weak for a darts score.`,
     (c) => `${c.player}, ${c.amount} points in darts, but we've got a pool table with that exact number.`,
     (c) => `${c.player}, you could have pool table number ${c.amount} booked in an hour.`,
     (c) => `${c.player}, maybe it's time to trade the darts for a cue? Table number ${c.amount} opens up in an hour.`,
+    (c) => `${c.player}. ${c.amount}. That's our pool table number, not your score.`,
+  ],
+};
+
+const midScoreJokes = {
+  pl: [
+    (c) => `${c.player}, przyzwoity wynik. Ale przyzwoity to nie to samo, co dobry.`,
+    (c) => `${c.player}, jesteś w tej niewygodnej strefie: za dobrze na żarty, za słabo na oklaski.`,
+    (c) => `${c.player}, ${c.amount}. Środek stawki. Ani orzeł, ani reszka.`,
+    (c) => `${c.player}, ${c.amount} punktów. Barman jeszcze nie wie, czy gratulować, czy współczuć.`,
+  ],
+  en: [
+    (c) => `${c.player}, decent score. But decent isn't the same as good.`,
+    (c) => `${c.player}, you're in that awkward zone: too good to mock, not good enough to applaud.`,
+    (c) => `${c.player}, ${c.amount}. Right in the middle. Not heads, not tails.`,
+    (c) => `${c.player}, ${c.amount} points. The bartender doesn't know whether to congratulate you or feel sorry for you.`,
   ],
 };
 
 const sportJokes = {
   pl: [
     { min: 1, max: 3, text: (c) => `${c.player}, to nie koszykówka, żeby rzucać za ${c.amount}.` },
-    { min: 4, max: 8, text: (c) => `${c.player}, ${c.amount} punktów? Tyle goli Polska strzela San Marino, a nie punktów zdobywa się w darta.` },
-    { min: 15, max: 15, text: (c) => `${c.player}, ${c.amount}? Tak liczy się w tenisie, nie w darta.` },
-    { min: 30, max: 30, text: (c) => `${c.amount} punktów, ${c.player}? Ktoś tu chyba myśli, że gra w tenisa.` },
-    { min: 40, max: 40, text: (c) => `${c.player}, ${c.amount}, czyli tenisowy wynik. Ale to nie kort, to tarcza.` },
+    { min: 1, max: 3, text: (c) => `${c.player}, tarcza ma 20 pól, a ty trafiasz w ${c.amount}. Ambitnie.` },
+    { min: 1, max: 3, text: (c) => `${c.player}, tobie pomoże już chyba tylko podejście bliżej tarczy przed rzutem.` },
+    { min: 1, max: 3, text: (c) => `${c.player}, rzut monetą dałby chyba lepszy wynik niż to.` },
+    { min: 4, max: 8, text: (c) => `Gol! A właściwie ${c.amount} punktów, ${c.player}. San Marino by się ucieszyło.` },
+    { min: 15, max: 15, text: (c) => `${c.player}, 15? To tenis, nie darts.` },
+    { min: 15, max: 15, text: (c) => `${c.player}, 15 - no ok, ale to darts, nie kort.` },
+    { min: 15, max: 15, text: (c) => `${c.player}, sędzia w tenisie by się ucieszył z takiego wyniku. My nie bardzo.` },
+    { min: 30, max: 30, text: (c) => `${c.player}, chyba ktoś tu gra dziś w tenisa, nie w darta.` },
+    { min: 30, max: 30, text: (c) => `${c.player}, ${c.amount}? Fajny wynik, gdybyś trzymał rakietę, nie lotkę.` },
+    { min: 40, max: 40, text: (c) => `${c.player}. ${c.amount}. Kort tenisowy czeka.` },
+    { min: 11, max: 11, text: (c) => `${c.player}, tylu zawodników ma drużyna piłkarska. Ty masz tyle punktów po trzech rzutach.` },
+    { min: 13, max: 13, text: (c) => `Pechowa trzynastka, ${c.player}. Chyba się dziś sprawdza.` },
+    { min: 18, max: 18, text: (c) => `${c.player}, tyle lat trzeba mieć, żeby zamówić piwo przy barze. Na trzy rzuty to jednak za mało.` },
+    { min: 25, max: 25, text: (c) => `${c.player}, tyle trzeba w siatkówce, żeby wygrać seta. W darta to dopiero początek.` },
+    { min: 147, max: 147, text: (c) => `Maksymalny break w snookerze, ${c.player}. W darta też robi wrażenie.` },
+    { min: 44, max: 44, text: (c) => `Numer Hamiltona w F1, ${c.player}. W darta niestety nie robi już takiego wrażenia.` },
+    { min: 7, max: 7, text: (c) => `Szczęśliwa siódemka, ${c.player}. Szkoda, że akurat nie w darta.` },
+    { min: 0, max: 0, text: (c) => `${c.player}, zero punktów? Nawet tarcza czuje się dziś urażona.` },
+    { min: 0, max: 0, text: (c) => `${c.player}, trzy rzuty i zero punktów. To wymaga talentu w drugą stronę.` },
+    { min: 0, max: 0, text: (c) => `${c.player}, zero punktów w trzech rzutach. Ktoś tu chyba przyszedł popatrzeć, nie grać.` },
+    { min: 0, max: 0, text: (c) => `${c.player}, zero? Gratulacje, to prawie tak trudne, jak trafić za dużo.` },
+    { min: 12, max: 12, text: (c) => `${c.player}, ${c.amount} punktów to kalendarz na cały rok. Miesiąc po miesiącu.` },
+    { min: 32, max: 32, text: (c) => `${c.player}, tyle liter ma polski alfabet. Ty masz tyle punktów po trzech rzutach.` },
+    { min: 52, max: 52, text: (c) => `Talia do pokera ma tyle kart, ${c.player}. Rozdajesz gorzej, niż rzucasz.` },
+    { min: 50, max: 50, text: (c) => `${c.player}, tyle wynosi ograniczenie prędkości w mieście. A ty jedziesz jeszcze wolniej.` },
   ],
   en: [
     { min: 1, max: 3, text: (c) => `${c.player}, this isn't basketball, you don't throw for ${c.amount}.` },
-    { min: 4, max: 8, text: (c) => `${c.player}, ${c.amount} points? That's how many goals a solid team scores against San Marino, not how many darts points you should have.` },
-    { min: 15, max: 15, text: (c) => `${c.player}, ${c.amount}? That's how tennis keeps score, not darts.` },
-    { min: 30, max: 30, text: (c) => `${c.amount} points, ${c.player}? Someone thinks they're playing tennis.` },
-    { min: 40, max: 40, text: (c) => `${c.player}, ${c.amount}, that's a tennis score. But this isn't a court, it's a dartboard.` },
+    { min: 1, max: 3, text: (c) => `${c.player}, the board has 20 segments and you hit ${c.amount}. Ambitious.` },
+    { min: 1, max: 3, text: (c) => `${c.player}, at this point the only thing that'll help is standing closer to the board before you throw.` },
+    { min: 1, max: 3, text: (c) => `${c.player}, a coin flip would've probably scored better than that.` },
+    { min: 4, max: 8, text: (c) => `Goal! Well, ${c.amount} points, ${c.player}. San Marino would be thrilled.` },
+    { min: 15, max: 15, text: (c) => `${c.player}, 15? That's tennis, not darts.` },
+    { min: 15, max: 15, text: (c) => `${c.player}, 15 - fine, but this is darts, not a tennis court.` },
+    { min: 15, max: 15, text: (c) => `${c.player}, a tennis umpire would be thrilled with that score. We're not.` },
+    { min: 30, max: 30, text: (c) => `${c.player}, someone here is playing tennis tonight, not darts.` },
+    { min: 30, max: 30, text: (c) => `${c.player}, ${c.amount}? Nice score if you were holding a racket, not a dart.` },
+    { min: 40, max: 40, text: (c) => `${c.player}. ${c.amount}. The tennis court is waiting.` },
+    { min: 11, max: 11, text: (c) => `${c.player}, that's how many players are on a football team. That's how many points you've got after three darts.` },
+    { min: 13, max: 13, text: (c) => `Unlucky thirteen, ${c.player}. Checks out today.` },
+    { min: 18, max: 18, text: (c) => `${c.player}, that's the legal drinking age here. Still not enough for three darts, though.` },
+    { min: 25, max: 25, text: (c) => `${c.player}, that's the target score to win a volleyball set. In darts it's barely a start.` },
+    { min: 147, max: 147, text: (c) => `Maximum break in snooker, ${c.player}. Pretty impressive in darts too.` },
+    { min: 44, max: 44, text: (c) => `Hamilton's number in F1, ${c.player}. Doesn't quite land the same in darts.` },
+    { min: 7, max: 7, text: (c) => `Lucky seven, ${c.player}. Shame it's not the game where that helps.` },
+    { min: 0, max: 0, text: (c) => `${c.player}, zero points? Even the board feels a bit insulted tonight.` },
+    { min: 0, max: 0, text: (c) => `${c.player}, three darts and zero points. That takes a special kind of talent.` },
+    { min: 0, max: 0, text: (c) => `${c.player}, zero points in three darts. Feels like someone came to watch, not play.` },
+    { min: 0, max: 0, text: (c) => `${c.player}, zero? Congrats, that's almost as hard as overshooting.` },
+    { min: 12, max: 12, text: (c) => `${c.player}, ${c.amount} points is a whole calendar year. Month by month.` },
+    { min: 32, max: 32, text: (c) => `${c.player}, that's how many letters are in the Polish alphabet. That's how many points you've got after three darts.` },
+    { min: 52, max: 52, text: (c) => `A deck of cards has that many, ${c.player}. Your dealing's worse than your throwing.` },
+    { min: 50, max: 50, text: (c) => `${c.player}, that's the city speed limit. And you're driving even slower than that.` },
   ],
 };
 
 const RECENT_TEXT_WINDOW_MS = 90000;
 let recentJokeTexts = [];
 
-const JOKE_CATEGORY_COOLDOWN_MS = 120000;
-let categoryLastShownAt = {};
+const JOKE_REPEAT_COOLDOWN_MS = 120000;
+let jokeIdLastShownAt = {};
 
-function categoryOnCooldown(category) {
-  const last = categoryLastShownAt[category] || 0;
-  return Date.now() - last < JOKE_CATEGORY_COOLDOWN_MS;
+function jokeOnCooldown(id) {
+  const last = jokeIdLastShownAt[id] || 0;
+  return Date.now() - last < JOKE_REPEAT_COOLDOWN_MS;
 }
 
-function markCategoryShown(category) {
-  categoryLastShownAt[category] = Date.now();
+function markJokeShown(id) {
+  jokeIdLastShownAt[id] = Date.now();
 }
 
 function rememberJokeText(text) {
@@ -217,12 +282,24 @@ function pickJokeText(candidates) {
   return fresh[Math.floor(Math.random() * fresh.length)];
 }
 
+// Picks a random entry from `pool` whose specific id hasn't fired in the
+// last JOKE_REPEAT_COOLDOWN_MS, so a *specific* joke doesn't repeat too
+// often, without blocking unrelated jokes in the same pool from firing.
+function pickFreshFromPool(prefix, pool, isEligible, ctx) {
+  const candidates = pool
+    .map((entry, i) => ({ id: `${prefix}-${i}`, entry }))
+    .filter(({ entry }) => isEligible(entry))
+    .filter(({ id }) => !jokeOnCooldown(id));
+  if (!candidates.length) return null;
+  const picked = candidates[Math.floor(Math.random() * candidates.length)];
+  markJokeShown(picked.id);
+  const render = picked.entry.text ?? picked.entry;
+  return render(ctx);
+}
+
 function getSportJokeText(amount, playerName) {
   const pool = sportJokes[state.lang] ?? sportJokes.pl;
-  const eligible = pool.filter((j) => amount >= j.min && amount <= j.max);
-  if (!eligible.length) return null;
-  const candidates = eligible.map((j) => j.text({ player: playerName, amount }));
-  return pickJokeText(candidates);
+  return pickFreshFromPool('sport', pool, (j) => amount >= j.min && amount <= j.max, { player: playerName, amount });
 }
 
 const liveBannerJokes = {
@@ -245,12 +322,12 @@ const highScoreJokes = {
       (c) => `${c.player}, taki wynik kwalifikuje na wtorkowy turniej. ${c.weakest}, dla ciebie zostają poniedziałki przy bilardzie.`,
     ],
     great: [
-      (c) => `${c.player}, ${c.amount} punktów? Ale wynik! Tak trzymać.`,
+      (c) => `Mamy to! ${c.player} właśnie zaliczył ${c.amount} punktów. Ktoś tu się rozgrzał.`,
       (c) => `${c.amount} punktów od ${c.player}. Ktoś tu dziś w formie.`,
       (c) => `${c.player} wchodzi na wysoki poziom. ${c.amount} punktów robi robotę.`,
     ],
     pro: [
-      (c) => `${c.player}, ${c.amount} punktów?! Grasz jak zawodowiec.`,
+      (c) => `${c.player}. ${c.amount}. Szacunek.`,
       (c) => `${c.amount} punktów od ${c.player}. Ktoś tu chyba trenuje na mistrzostwa świata.`,
       (c) => `${c.player} właśnie zagrał jak prawdziwy pro. ${c.amount} punktów, szacunek.`,
     ],
@@ -261,17 +338,56 @@ const highScoreJokes = {
       (c) => `${c.player}, that score gets you into the Tuesday tournament. ${c.weakest}, Mondays at the pool table are more your speed.`,
     ],
     great: [
-      (c) => `${c.player}, ${c.amount} points? Now that's a score. Keep it up.`,
+      (c) => `There it is! ${c.player} just hit ${c.amount} points. Someone's heating up.`,
       (c) => `${c.amount} points from ${c.player}. Someone's on fire tonight.`,
       (c) => `${c.player} is stepping it up. ${c.amount} points, nice work.`,
     ],
     pro: [
-      (c) => `${c.player}, ${c.amount} points?! Playing like a pro.`,
+      (c) => `${c.player}. ${c.amount}. Respect.`,
       (c) => `${c.amount} points from ${c.player}. Someone's training for the world championship.`,
       (c) => `${c.player} just played like a total pro. ${c.amount} points, respect.`,
     ],
   },
 };
+
+const rivalJokes = {
+  pl: {
+    lowTurn: [
+      (c) => `${c.player}, ${c.leader} właśnie odetchnął z ulgą po tym rzucie.`,
+      (c) => `${c.player}, ${c.leader} dziękuje za taki prezent.`,
+      (c) => `${c.player}, dystans do ${c.leader} właśnie się powiększył. Ktoś tu potrzebuje nowej taktyki.`,
+    ],
+    highTurn: [
+      (c) => `${c.player}, ${c.leader} właśnie poczuł zimny pot na plecach.`,
+      (c) => `${c.player}, ${c.leader} zaczyna liczyć, ile jeszcze zostało do odrobienia.`,
+      (c) => `${c.leader}, czas na plan awaryjny. ${c.player} właśnie przyspieszył.`,
+    ],
+    bust: [
+      (c) => `${c.player}, taki rzut to najlepszy prezent, jaki ${c.leader} dostał dziś wieczorem.`,
+    ],
+  },
+  en: {
+    lowTurn: [
+      (c) => `${c.player}, ${c.leader} just breathed a sigh of relief after that throw.`,
+      (c) => `${c.player}, ${c.leader} says thanks for the gift.`,
+      (c) => `${c.player}, the gap to ${c.leader} just grew. Someone needs a new game plan.`,
+    ],
+    highTurn: [
+      (c) => `${c.player}, ${c.leader} just felt a cold sweat.`,
+      (c) => `${c.player}, ${c.leader} is starting to count how much ground they need to make up.`,
+      (c) => `${c.leader}, time for a backup plan. ${c.player} just picked up the pace.`,
+    ],
+    bust: [
+      (c) => `${c.player}, that throw is the best gift ${c.leader} got all night.`,
+    ],
+  },
+};
+
+function getLeaderName(current) {
+  const others = state.players.filter((p) => p.id !== current.id);
+  if (!others.length) return null;
+  return [...others].sort((a, b) => a.score - b.score)[0].name;
+}
 
 function buildLegWinContext(standings) {
   const winner = standings[0];
@@ -538,70 +654,72 @@ function showLiveBanner(message) {
   liveBannerTimer = setTimeout(() => liveBannerEl.classList.remove('show'), LIVE_BANNER_DISPLAY_MS);
 }
 
-function maybeRoastBust(playerName) {
-  if (categoryOnCooldown('bust')) return;
-  const pool = bustJokes[state.lang] ?? bustJokes.pl;
-  const candidates = pool.map((t) => t({ player: playerName }));
-  const text = pickJokeText(candidates);
+function maybeRoastBust(current) {
+  const leader = getLeaderName(current);
+  const basePool = bustJokes[state.lang] ?? bustJokes.pl;
+  const rivalPool = leader ? (rivalJokes[state.lang] ?? rivalJokes.pl).bust : [];
+  const pool = [...basePool, ...rivalPool];
+  const text = pickFreshFromPool('bust', pool, () => true, { player: current.name, leader });
   if (!text) return;
   showLiveBanner(text);
-  markCategoryShown('bust');
 }
 
-function maybeRoastLowScore(playerName, amount) {
-  if (categoryOnCooldown('lowScore')) return;
-  const pool = lowScoreJokes[state.lang] ?? lowScoreJokes.pl;
-  const eligible = pool.filter((j) => amount >= j.min && amount <= j.max);
-  const candidates = eligible.map((j) => j.text({ player: playerName, amount }));
-  const text = pickJokeText(candidates);
+function maybeRoastLowScore(current, amount) {
+  const leader = getLeaderName(current);
+  const basePool = lowScoreJokes[state.lang] ?? lowScoreJokes.pl;
+  const rivalPool = (leader ? (rivalJokes[state.lang] ?? rivalJokes.pl).lowTurn : []).map((text) => ({ min: 0, max: 10, text }));
+  const pool = [...basePool, ...rivalPool];
+  const text = pickFreshFromPool('lowscore', pool, (j) => amount >= j.min && amount <= j.max, { player: current.name, amount, leader });
   if (!text) return;
   showLiveBanner(text);
-  markCategoryShown('lowScore');
 }
 
 function maybeCelebrateHighScore(current, amount) {
-  if (categoryOnCooldown('highScore')) return;
   const tiers = highScoreJokes[state.lang] ?? highScoreJokes.pl;
   const tier = amount > 170 ? 'pro' : amount > 120 ? 'great' : 'tourney';
-  const pool = tiers[tier];
 
   let weakest = current.name;
   const others = state.players.filter((p) => p.id !== current.id);
   if (others.length) {
     weakest = [...others].sort((a, b) => b.score - a.score)[0].name;
   }
+  const leader = getLeaderName(current);
 
-  const candidates = pool.map((t) => t({ player: current.name, amount, weakest }));
-  const text = pickJokeText(candidates);
+  const basePool = tiers[tier];
+  const rivalPool = leader ? (rivalJokes[state.lang] ?? rivalJokes.pl).highTurn : [];
+  const pool = [...basePool, ...rivalPool];
+
+  const text = pickFreshFromPool(`highscore-${tier}`, pool, () => true, { player: current.name, amount, weakest, leader });
   if (!text) return;
   showLiveBanner(text);
-  markCategoryShown('highScore');
 }
 
 function maybeShowSportJoke(current, amount) {
-  if (categoryOnCooldown('sport')) return false;
   const text = getSportJokeText(amount, current.name);
   if (!text) return false;
   showLiveBanner(text);
-  markCategoryShown('sport');
   return true;
 }
 
 function maybeShowTableNumberJoke(playerName, amount) {
-  if (categoryOnCooldown('tableNumber')) return;
   const pool = tableNumberJokes[state.lang] ?? tableNumberJokes.pl;
-  const candidates = pool.map((t) => t({ player: playerName, amount }));
-  const text = pickJokeText(candidates);
+  const text = pickFreshFromPool('tablenum', pool, () => true, { player: playerName, amount });
   if (!text) return;
   showLiveBanner(text);
-  markCategoryShown('tableNumber');
+}
+
+function maybeShowMidScoreJoke(playerName, amount) {
+  const pool = midScoreJokes[state.lang] ?? midScoreJokes.pl;
+  const text = pickFreshFromPool('midscore', pool, () => true, { player: playerName, amount });
+  if (!text) return;
+  showLiveBanner(text);
 }
 
 function reactToTurnResult(current, amount, bust) {
   if (!state.jokesEnabled) return;
 
   if (bust) {
-    maybeRoastBust(current.name);
+    maybeRoastBust(current);
     return;
   }
 
@@ -610,10 +728,12 @@ function reactToTurnResult(current, amount, bust) {
   if (maybeShowSportJoke(current, amount)) return;
 
   if (amount <= 10) {
-    maybeRoastLowScore(current.name, amount);
+    maybeRoastLowScore(current, amount);
   } else if (amount <= 54) {
     maybeShowTableNumberJoke(current.name, amount);
-  } else if (amount > 90) {
+  } else if (amount <= 90) {
+    maybeShowMidScoreJoke(current.name, amount);
+  } else {
     maybeCelebrateHighScore(current, amount);
   }
 }
@@ -625,18 +745,15 @@ function maybeTriggerLiveBanner(current, checkoutAvailable) {
   if (!checkoutAvailable) return;
   if (lastBannerPlayerIndex === state.currentPlayer) return;
   lastBannerPlayerIndex = state.currentPlayer;
-  if (categoryOnCooldown('checkout')) return;
 
   const others = state.players.filter((p) => p.id !== current.id);
   if (!others.length) return;
 
   const worst = [...others].sort((a, b) => b.score - a.score)[0];
   const pool = liveBannerJokes[state.lang] ?? liveBannerJokes.pl;
-  const candidates = pool.map((t) => t({ target: worst.name, player: current.name }));
-  const text = pickJokeText(candidates);
+  const text = pickFreshFromPool('checkout', pool, () => true, { target: worst.name, player: current.name });
   if (!text) return;
   showLiveBanner(text);
-  markCategoryShown('checkout');
 }
 
 function applyTranslations() {
