@@ -837,10 +837,8 @@ function renderGame() {
     li.className = idx === state.currentPlayer ? 'is-current' : '';
     li.innerHTML = `
       <span class="player-name">${player.name}</span>
-      <span class="score-wrap">
-        <strong class="${changed ? 'score-pulse' : ''}">${player.score}</strong>
-        <span class="player-rank">${formatRankLabel(rankById[player.id])}</span>
-      </span>
+      <strong class="${changed ? 'score-pulse' : ''}">${player.score}</strong>
+      <span class="player-rank">${formatRankLabel(rankById[player.id])}</span>
     `;
     playersList.appendChild(li);
     previousScores[player.id] = player.score;
