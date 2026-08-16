@@ -184,11 +184,33 @@ const sportJokes = {
   ],
 };
 
-function getSportJoke(amount) {
+const RECENT_TEXT_WINDOW_MS = 90000;
+let recentJokeTexts = [];
+
+function rememberJokeText(text) {
+  if (!text) return;
+  const now = Date.now();
+  recentJokeTexts.push({ text, shownAt: now });
+  recentJokeTexts = recentJokeTexts.filter((r) => now - r.shownAt < RECENT_TEXT_WINDOW_MS);
+}
+
+function pickJokeText(candidates) {
+  if (!candidates.length) return null;
+  const now = Date.now();
+  const recentSet = new Set(
+    recentJokeTexts.filter((r) => now - r.shownAt < RECENT_TEXT_WINDOW_MS).map((r) => r.text)
+  );
+  const fresh = candidates.filter((t) => !recentSet.has(t));
+  if (!fresh.length) return null;
+  return fresh[Math.floor(Math.random() * fresh.length)];
+}
+
+function getSportJokeText(amount, playerName) {
   const pool = sportJokes[state.lang] ?? sportJokes.pl;
   const eligible = pool.filter((j) => amount >= j.min && amount <= j.max);
   if (!eligible.length) return null;
-  return eligible[Math.floor(Math.random() * eligible.length)];
+  const candidates = eligible.map((j) => j.text({ player: playerName, amount }));
+  return pickJokeText(candidates);
 }
 
 const liveBannerJokes = {
@@ -255,9 +277,12 @@ function buildLegWinContext(standings) {
 
 function pickLegWinJoke(standings) {
   const pool = legWinJokes[state.lang] ?? legWinJokes.pl;
+  const ctx = buildLegWinContext(standings);
   const eligible = pool.filter((j) => j.min <= standings.length);
-  const chosen = eligible[Math.floor(Math.random() * eligible.length)];
-  return chosen.text(buildLegWinContext(standings));
+  const candidates = eligible.map((j) => j.text(ctx));
+  const chosen = pickJokeText(candidates);
+  rememberJokeText(chosen);
+  return chosen;
 }
 
 const keypadLayout = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'UNDO', '0', 'SUBMIT'];
@@ -365,14 +390,25 @@ function tr(key) {
   return t[state.lang]?.[key] ?? t.pl[key] ?? key;
 }
 
+function positionSlidingThumb(container, activeEl) {
+  const thumb = container?.querySelector('.switch-thumb, .tile-thumb');
+  if (!thumb || !activeEl) return;
+  thumb.style.left = `${activeEl.offsetLeft}px`;
+  thumb.style.width = `${activeEl.offsetWidth}px`;
+}
+
 function setupTilePicker(container, onSelect) {
-  if (!container) return { setActive: () => {} };
+  if (!container) return { setActive: () => {}, refresh: () => {} };
   const buttons = [...container.querySelectorAll('.tile-btn')];
+  let activeIndex = 0;
 
   function setActive(value) {
-    buttons.forEach((btn) => {
-      btn.classList.toggle('active', btn.dataset.value === String(value));
+    const idx = buttons.findIndex((btn) => btn.dataset.value === String(value));
+    if (idx !== -1) activeIndex = idx;
+    buttons.forEach((btn, i) => {
+      btn.classList.toggle('active', i === activeIndex);
     });
+    positionSlidingThumb(container, buttons[activeIndex]);
   }
 
   buttons.forEach((btn) => {
@@ -383,7 +419,23 @@ function setupTilePicker(container, onSelect) {
     });
   });
 
-  return { setActive };
+  return { setActive, refresh: () => positionSlidingThumb(container, buttons[activeIndex]) };
+}
+
+function setupSwitchToggle(container) {
+  if (!container) return { refresh: () => {} };
+  const inputs = [...container.querySelectorAll('input[type="radio"]')];
+
+  function updateThumb() {
+    const checked = inputs.find((i) => i.checked);
+    if (!checked) return;
+    const label = container.querySelector(`label[for="${checked.id}"]`);
+    positionSlidingThumb(container, label);
+  }
+
+  inputs.forEach((input) => input.addEventListener('change', updateThumb));
+
+  return { refresh: updateThumb };
 }
 
 function bounceClass(el, cls) {
@@ -461,15 +513,16 @@ function showLegWinModal(name, standings) {
   openModal(legwinModal);
 }
 
-const LIVE_BANNER_DURATION_MS = 15000;
+const LIVE_BANNER_DURATION_MS = 25000;
 let lastBannerShownAt = 0;
 
 function showLiveBanner(message) {
-  if (!liveBannerEl) return;
+  if (!liveBannerEl || !message) return;
 
   const now = Date.now();
   if (now - lastBannerShownAt < LIVE_BANNER_DURATION_MS) return;
   lastBannerShownAt = now;
+  rememberJokeText(message);
 
   liveBannerEl.textContent = message;
   liveBannerEl.classList.add('show');
@@ -479,22 +532,21 @@ function showLiveBanner(message) {
 
 function maybeRoastBust(playerName) {
   const pool = bustJokes[state.lang] ?? bustJokes.pl;
-  const template = pool[Math.floor(Math.random() * pool.length)];
-  showLiveBanner(template({ player: playerName }));
+  const candidates = pool.map((t) => t({ player: playerName }));
+  showLiveBanner(pickJokeText(candidates));
 }
 
 function maybeRoastLowScore(playerName, amount) {
   const pool = lowScoreJokes[state.lang] ?? lowScoreJokes.pl;
   const eligible = pool.filter((j) => amount >= j.min && amount <= j.max);
-  const chosen = eligible[Math.floor(Math.random() * eligible.length)];
-  showLiveBanner(chosen.text({ player: playerName, amount }));
+  const candidates = eligible.map((j) => j.text({ player: playerName, amount }));
+  showLiveBanner(pickJokeText(candidates));
 }
 
 function maybeCelebrateHighScore(current, amount) {
   const tiers = highScoreJokes[state.lang] ?? highScoreJokes.pl;
   const tier = amount > 170 ? 'pro' : amount > 120 ? 'great' : 'tourney';
   const pool = tiers[tier];
-  const template = pool[Math.floor(Math.random() * pool.length)];
 
   let weakest = current.name;
   const others = state.players.filter((p) => p.id !== current.id);
@@ -502,7 +554,8 @@ function maybeCelebrateHighScore(current, amount) {
     weakest = [...others].sort((a, b) => b.score - a.score)[0].name;
   }
 
-  showLiveBanner(template({ player: current.name, amount, weakest }));
+  const candidates = pool.map((t) => t({ player: current.name, amount, weakest }));
+  showLiveBanner(pickJokeText(candidates));
 }
 
 function reactToTurnResult(current, amount, bust) {
@@ -515,9 +568,9 @@ function reactToTurnResult(current, amount, bust) {
 
   if (!Number.isInteger(amount)) return;
 
-  const sport = getSportJoke(amount);
-  if (sport) {
-    showLiveBanner(sport.text({ player: current.name, amount }));
+  const sportText = getSportJokeText(amount, current.name);
+  if (sportText) {
+    showLiveBanner(sportText);
     return;
   }
 
@@ -525,8 +578,8 @@ function reactToTurnResult(current, amount, bust) {
     maybeRoastLowScore(current.name, amount);
   } else if (amount <= 54 && Math.random() < 0.3) {
     const pool = tableNumberJokes[state.lang] ?? tableNumberJokes.pl;
-    const template = pool[Math.floor(Math.random() * pool.length)];
-    showLiveBanner(template({ player: current.name, amount }));
+    const candidates = pool.map((t) => t({ player: current.name, amount }));
+    showLiveBanner(pickJokeText(candidates));
   } else if (amount > 90) {
     maybeCelebrateHighScore(current, amount);
   }
@@ -545,8 +598,8 @@ function maybeTriggerLiveBanner(current, checkoutAvailable) {
 
   const worst = [...others].sort((a, b) => b.score - a.score)[0];
   const pool = liveBannerJokes[state.lang] ?? liveBannerJokes.pl;
-  const template = pool[Math.floor(Math.random() * pool.length)];
-  showLiveBanner(template({ target: worst.name, player: current.name }));
+  const candidates = pool.map((t) => t({ target: worst.name, player: current.name }));
+  showLiveBanner(pickJokeText(candidates));
 }
 
 function applyTranslations() {
@@ -621,6 +674,18 @@ const startScoreControl = setupTilePicker(startScorePicker, (value) => {
   selectedStartScore = Number(value);
 });
 startScoreControl.setActive(String(selectedStartScore));
+
+const outModeSwitchEl = document.getElementById('out-mode-switch');
+const jokesSwitchEl = document.getElementById('jokes-switch');
+const outModeControl = setupSwitchToggle(outModeSwitchEl);
+const jokesControl = setupSwitchToggle(jokesSwitchEl);
+
+function refreshSetupSwitches() {
+  playerCountControl.refresh();
+  startScoreControl.refresh();
+  outModeControl.refresh();
+  jokesControl.refresh();
+}
 
 function renderPlayerInputs() {
   const count = selectedPlayerCount;
@@ -957,11 +1022,9 @@ function handleDartKey(key) {
   renderGame();
 
   if (state.jokesEnabled) {
-    const sport = getSportJoke(dartValue);
-    if (sport) {
-      const playerName = state.players[state.currentPlayer].name;
-      showLiveBanner(sport.text({ player: playerName, amount: dartValue }));
-    }
+    const playerName = state.players[state.currentPlayer].name;
+    const sportText = getSportJokeText(dartValue, playerName);
+    if (sportText) showLiveBanner(sportText);
   }
 }
 
@@ -1219,6 +1282,7 @@ langEnBtn?.addEventListener('click', () => {
 goScoreboardBtn.addEventListener('click', () => {
   bounceClass(goScoreboardBtn, 'pressed');
   showScreen('setup');
+  refreshSetupSwitches();
 });
 
 startGameBtn.addEventListener('click', () => {
@@ -1249,6 +1313,7 @@ backToSetupBtn.addEventListener('click', () => {
   const jokesRadio = document.querySelector(`input[name="jokes-mode"][value="${state.jokesEnabled ? 'on' : 'off'}"]`);
   if (jokesRadio) jokesRadio.checked = true;
   showScreen('setup');
+  refreshSetupSwitches();
 });
 
 newGameBtn.addEventListener('click', () => {
