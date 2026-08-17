@@ -105,6 +105,17 @@
           </div>
 
           <div class="field-row">
+            <span id="label-starter-mode">Kto zaczyna kolejną partię</span>
+            <div class="switch-toggle" id="starter-mode-switch">
+              <input type="radio" id="starter-mode-alternate" name="starter-mode" value="alternate" checked />
+              <label for="starter-mode-alternate">Na zmianę</label>
+              <input type="radio" id="starter-mode-loser" name="starter-mode" value="loser" />
+              <label for="starter-mode-loser">Przegrany</label>
+              <span class="switch-thumb" aria-hidden="true"></span>
+            </div>
+          </div>
+
+          <div class="field-row">
             <span id="label-start-score">Start punktów</span>
             <div class="tile-picker" id="start-score-picker" role="group" aria-label="Start punktów">
               <button type="button" class="tile-btn" data-value="301">301</button>

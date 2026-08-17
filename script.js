@@ -433,6 +433,9 @@ const t = {
     setupTitle: 'Ustawienia meczu',
     playerCount: 'Liczba zawodników',
     outMode: 'Zakończenie lega',
+    starterMode: 'Kto zaczyna kolejną partię',
+    starterAlternate: 'Na zmianę',
+    starterLoser: 'Przegrany',
     startScore: 'Start punktów',
     next: 'Dalej',
     outDouble: 'Double out',
@@ -480,6 +483,9 @@ const t = {
     setupTitle: 'Match settings',
     playerCount: 'Players count',
     outMode: 'Leg finish mode',
+    starterMode: 'Who starts the next leg',
+    starterAlternate: 'Alternating',
+    starterLoser: 'Loser',
     startScore: 'Starting score',
     next: 'Next',
     outDouble: 'Double out',
@@ -809,6 +815,13 @@ function applyTranslations() {
   if (outDoubleLabel) outDoubleLabel.textContent = tr('outDouble');
   if (outSingleLabel) outSingleLabel.textContent = tr('outSingle');
 
+  const labelStarterMode = document.getElementById('label-starter-mode');
+  const starterAlternateLabel = document.querySelector('label[for="starter-mode-alternate"]');
+  const starterLoserLabel = document.querySelector('label[for="starter-mode-loser"]');
+  if (labelStarterMode) labelStarterMode.textContent = tr('starterMode');
+  if (starterAlternateLabel) starterAlternateLabel.textContent = tr('starterAlternate');
+  if (starterLoserLabel) starterLoserLabel.textContent = tr('starterLoser');
+
   const labelJokes = document.getElementById('label-jokes');
   const jokesOnLabel = document.querySelector('label[for="jokes-on"]');
   const jokesOffLabel = document.querySelector('label[for="jokes-off"]');
@@ -875,14 +888,17 @@ startScoreControl.setActive(String(selectedStartScore));
 
 const outModeSwitchEl = document.getElementById('out-mode-switch');
 const jokesSwitchEl = document.getElementById('jokes-switch');
+const starterModeSwitchEl = document.getElementById('starter-mode-switch');
 const outModeControl = setupSwitchToggle(outModeSwitchEl);
 const jokesControl = setupSwitchToggle(jokesSwitchEl);
+const starterModeControl = setupSwitchToggle(starterModeSwitchEl);
 
 function refreshSetupSwitches() {
   playerCountControl.refresh();
   startScoreControl.refresh();
   outModeControl.refresh();
   jokesControl.refresh();
+  starterModeControl.refresh();
 }
 
 function renderPlayerInputs() {
@@ -915,8 +931,10 @@ function collectPlayers() {
   }));
 
   state.currentPlayer = 0;
+  state.legStarterIndex = 0;
   state.startScore = start;
   state.outMode = document.querySelector('input[name="out-mode"]:checked').value;
+  state.starterMode = document.querySelector('input[name="starter-mode"]:checked').value;
   state.jokesEnabled = document.querySelector('input[name="jokes-mode"]:checked').value === 'on';
   state.turnInput = '';
   state.turnDarts = [];
@@ -1081,6 +1099,18 @@ function rotatePlayer() {
   state.currentPlayer = (state.currentPlayer + 1) % state.players.length;
 }
 
+function advanceLegStarter(legStandings) {
+  let nextIndex;
+  if (state.starterMode === 'loser') {
+    const loser = legStandings.reduce((worst, p) => (p.score > worst.score ? p : worst), legStandings[0]);
+    nextIndex = state.players.findIndex((p) => p.id === loser.id);
+  } else {
+    nextIndex = (state.legStarterIndex + 1) % state.players.length;
+  }
+  state.currentPlayer = nextIndex;
+  state.legStarterIndex = nextIndex;
+}
+
 function pushHistory() {
   state.history.push({
     players: state.players.map((p) => ({ ...p })),
@@ -1150,7 +1180,11 @@ function submitTurn() {
   }
 
   state.turnInput = '';
-  rotatePlayer();
+  if (legWon) {
+    advanceLegStarter(legStandings);
+  } else {
+    rotatePlayer();
+  }
   renderGame();
 
   if (legWon) {
@@ -1274,7 +1308,11 @@ function submitDartsTurn() {
 
   state.turnDarts = [];
   state.activeMultiplier = 1;
-  rotatePlayer();
+  if (legWon) {
+    advanceLegStarter(legStandings);
+  } else {
+    rotatePlayer();
+  }
   renderGame();
 
   if (legWon) {
