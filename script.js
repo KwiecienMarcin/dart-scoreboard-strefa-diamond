@@ -1324,8 +1324,15 @@ submitDartsBtn?.addEventListener('click', () => {
   submitDartsTurn();
 });
 
+function loadLazyImage(img) {
+  if (img && !img.src && img.dataset.src) {
+    img.src = img.dataset.src;
+  }
+}
+
 rulesLink?.addEventListener('click', () => {
   bounceClass(rulesLink, 'pressed');
+  loadLazyImage(document.querySelector('.rules-image'));
   openModal(rulesModal);
 });
 rulesClose?.addEventListener('click', () => closeModal(rulesModal));
