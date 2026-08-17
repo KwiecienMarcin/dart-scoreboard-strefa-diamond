@@ -285,6 +285,9 @@ function pickJokeText(candidates) {
 // Picks a random entry from `pool` whose specific id hasn't fired in the
 // last JOKE_REPEAT_COOLDOWN_MS, so a *specific* joke doesn't repeat too
 // often, without blocking unrelated jokes in the same pool from firing.
+// Does NOT mark the id as shown - callers must call markJokeShown(id)
+// themselves, and only once the banner actually gets displayed (showLiveBanner
+// can reject it to avoid overlapping/too-frequent banners).
 function pickFreshFromPool(prefix, pool, isEligible, ctx) {
   const candidates = pool
     .map((entry, i) => ({ id: `${prefix}-${i}`, entry }))
@@ -292,12 +295,11 @@ function pickFreshFromPool(prefix, pool, isEligible, ctx) {
     .filter(({ id }) => !jokeOnCooldown(id));
   if (!candidates.length) return null;
   const picked = candidates[Math.floor(Math.random() * candidates.length)];
-  markJokeShown(picked.id);
   const render = picked.entry.text ?? picked.entry;
-  return render(ctx);
+  return { id: picked.id, text: render(ctx) };
 }
 
-function getSportJokeText(amount, playerName) {
+function getSportJoke(amount, playerName) {
   const pool = sportJokes[state.lang] ?? sportJokes.pl;
   return pickFreshFromPool('sport', pool, (j) => amount >= j.min && amount <= j.max, { player: playerName, amount });
 }
@@ -642,16 +644,49 @@ function showLegWinModal(name, standings) {
 }
 
 const LIVE_BANNER_DISPLAY_MS = 5000;
+const LIVE_BANNER_GAP_MS = 15000;
+const LIVE_BANNER_BASE_FONT_REM = 2.3;
+const LIVE_BANNER_MIN_FONT_REM = 1.3;
+let bannerHiddenAt = 0;
 
+// Shrinks the banner's font size just enough for `message` to fit on a
+// single line, instead of letting it wrap and grow the banner taller.
+function fitBannerFontSize(el) {
+  let fontSize = LIVE_BANNER_BASE_FONT_REM;
+  el.style.fontSize = `${fontSize}rem`;
+  let singleLineHeight = parseFloat(getComputedStyle(el).lineHeight);
+  while (el.scrollHeight > singleLineHeight * 1.4 && fontSize > LIVE_BANNER_MIN_FONT_REM) {
+    fontSize = Math.round((fontSize - 0.1) * 10) / 10;
+    el.style.fontSize = `${fontSize}rem`;
+    singleLineHeight = parseFloat(getComputedStyle(el).lineHeight);
+  }
+}
+
+// Shows a joke banner, unless one is currently visible or fewer than
+// LIVE_BANNER_GAP_MS have passed since the last one disappeared - so
+// banners never overlap/interrupt each other and always leave a gap.
+// Returns whether the banner actually got shown.
 function showLiveBanner(message) {
-  if (!liveBannerEl || !message) return;
+  if (!liveBannerEl || !message) return false;
+  if (liveBannerEl.classList.contains('show')) return false;
+  if (Date.now() - bannerHiddenAt < LIVE_BANNER_GAP_MS) return false;
 
   rememberJokeText(message);
 
   liveBannerEl.textContent = message;
+  fitBannerFontSize(liveBannerEl);
   liveBannerEl.classList.add('show');
   clearTimeout(liveBannerTimer);
-  liveBannerTimer = setTimeout(() => liveBannerEl.classList.remove('show'), LIVE_BANNER_DISPLAY_MS);
+  liveBannerTimer = setTimeout(() => {
+    liveBannerEl.classList.remove('show');
+    bannerHiddenAt = Date.now();
+  }, LIVE_BANNER_DISPLAY_MS);
+  return true;
+}
+
+function showPickedBanner(picked) {
+  if (!picked) return;
+  if (showLiveBanner(picked.text)) markJokeShown(picked.id);
 }
 
 function maybeRoastBust(current) {
@@ -659,9 +694,7 @@ function maybeRoastBust(current) {
   const basePool = bustJokes[state.lang] ?? bustJokes.pl;
   const rivalPool = leader ? (rivalJokes[state.lang] ?? rivalJokes.pl).bust : [];
   const pool = [...basePool, ...rivalPool];
-  const text = pickFreshFromPool('bust', pool, () => true, { player: current.name, leader });
-  if (!text) return;
-  showLiveBanner(text);
+  showPickedBanner(pickFreshFromPool('bust', pool, () => true, { player: current.name, leader }));
 }
 
 function maybeRoastLowScore(current, amount) {
@@ -669,9 +702,7 @@ function maybeRoastLowScore(current, amount) {
   const basePool = lowScoreJokes[state.lang] ?? lowScoreJokes.pl;
   const rivalPool = (leader ? (rivalJokes[state.lang] ?? rivalJokes.pl).lowTurn : []).map((text) => ({ min: 0, max: 10, text }));
   const pool = [...basePool, ...rivalPool];
-  const text = pickFreshFromPool('lowscore', pool, (j) => amount >= j.min && amount <= j.max, { player: current.name, amount, leader });
-  if (!text) return;
-  showLiveBanner(text);
+  showPickedBanner(pickFreshFromPool('lowscore', pool, (j) => amount >= j.min && amount <= j.max, { player: current.name, amount, leader }));
 }
 
 function maybeCelebrateHighScore(current, amount) {
@@ -689,30 +720,24 @@ function maybeCelebrateHighScore(current, amount) {
   const rivalPool = leader ? (rivalJokes[state.lang] ?? rivalJokes.pl).highTurn : [];
   const pool = [...basePool, ...rivalPool];
 
-  const text = pickFreshFromPool(`highscore-${tier}`, pool, () => true, { player: current.name, amount, weakest, leader });
-  if (!text) return;
-  showLiveBanner(text);
+  showPickedBanner(pickFreshFromPool(`highscore-${tier}`, pool, () => true, { player: current.name, amount, weakest, leader }));
 }
 
 function maybeShowSportJoke(current, amount) {
-  const text = getSportJokeText(amount, current.name);
-  if (!text) return false;
-  showLiveBanner(text);
+  const picked = getSportJoke(amount, current.name);
+  if (!picked) return false;
+  showPickedBanner(picked);
   return true;
 }
 
 function maybeShowTableNumberJoke(playerName, amount) {
   const pool = tableNumberJokes[state.lang] ?? tableNumberJokes.pl;
-  const text = pickFreshFromPool('tablenum', pool, () => true, { player: playerName, amount });
-  if (!text) return;
-  showLiveBanner(text);
+  showPickedBanner(pickFreshFromPool('tablenum', pool, () => true, { player: playerName, amount }));
 }
 
 function maybeShowMidScoreJoke(playerName, amount) {
   const pool = midScoreJokes[state.lang] ?? midScoreJokes.pl;
-  const text = pickFreshFromPool('midscore', pool, () => true, { player: playerName, amount });
-  if (!text) return;
-  showLiveBanner(text);
+  showPickedBanner(pickFreshFromPool('midscore', pool, () => true, { player: playerName, amount }));
 }
 
 function reactToTurnResult(current, amount, bust) {
@@ -751,9 +776,7 @@ function maybeTriggerLiveBanner(current, checkoutAvailable) {
 
   const worst = [...others].sort((a, b) => b.score - a.score)[0];
   const pool = liveBannerJokes[state.lang] ?? liveBannerJokes.pl;
-  const text = pickFreshFromPool('checkout', pool, () => true, { target: worst.name, player: current.name });
-  if (!text) return;
-  showLiveBanner(text);
+  showPickedBanner(pickFreshFromPool('checkout', pool, () => true, { target: worst.name, player: current.name }));
 }
 
 function applyTranslations() {
