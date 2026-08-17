@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wieża — Strefa Diamond</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg: #06080f; --accent: #f2ba2a; --accent-2: #ffd449; --text: #ffffff; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Rajdhani", "Inter", sans-serif; font-weight: 500; color: var(--text);
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(to right, #000000 0, rgba(0,0,0,0) 90px),
+      linear-gradient(to left, #000000 0, rgba(0,0,0,0) 90px),
+      radial-gradient(circle at 30% 20%, #191f31, var(--bg));
+    background-repeat: no-repeat; background-attachment: fixed, fixed, scroll;
+    background-size: 100% 100%, 100% 100%, auto; min-height: 100vh;
+  }
+  #app { width: min(100vw, 1280px); max-width: 1280px; margin: 0 auto; padding: 14px 20px 18px; }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .brand { font-family: "Bebas Neue"; font-size: 1.8rem; letter-spacing: 1px; color: var(--accent-2); }
+  .topbar-actions { display: flex; gap: 10px; }
+  .ghost-btn { background: rgba(255,255,255,0.08); border: none; border-radius: 12px; padding: 10px 16px; color: var(--text); font-weight: 700; cursor: pointer; font-family: "Rajdhani"; font-size: 0.95rem; transition: transform 0.15s ease; }
+  .ghost-btn:active { transform: scale(0.93); }
+
+  .primary-btn {
+    background: linear-gradient(120deg, var(--accent-2), var(--accent)); color: #151515; border: none;
+    border-radius: 14px; padding: 13px 28px; font-family: "Rajdhani"; font-size: 1.05rem; font-weight: 700;
+    cursor: pointer; transition: transform 0.15s ease;
+  }
+  .primary-btn:active { transform: scale(0.95); }
+  .primary-btn.pressed { animation: press-pulse 0.4s ease; }
+  .primary-btn.compact { padding: 10px 20px; font-size: 0.95rem; white-space: nowrap; }
+  .secondary-btn {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: var(--text);
+    border-radius: 14px; padding: 13px 28px; font-family: "Rajdhani"; font-size: 1.05rem; font-weight: 700; cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .secondary-btn:active { transform: scale(0.95); }
+
+  .tile-picker { position: relative; display: inline-flex; gap: 6px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; padding: 4px; }
+  .tile-thumb {
+    position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 10px;
+    background: linear-gradient(120deg, var(--accent-2), var(--accent)); box-shadow: 0 0 16px rgba(242,186,42,0.4);
+    transition: left 0.35s cubic-bezier(0.34,1.56,0.64,1), width 0.35s cubic-bezier(0.34,1.56,0.64,1); z-index: 0;
+  }
+  .tile-btn {
+    position: relative; z-index: 1; border: none; background: transparent; color: rgba(255,255,255,0.6);
+    font-size: 1.05rem; font-weight: 700; min-width: 52px; min-height: 44px; padding: 0 14px; border-radius: 10px;
+    cursor: pointer; transition: color 0.2s ease, transform 0.15s ease;
+  }
+  .tile-btn:active { transform: scale(0.88); }
+  .tile-btn.active { color: #151515; }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(3,4,8,0.75); backdrop-filter: blur(6px); align-items: center; justify-content: center; z-index: 500; padding: 20px; animation: overlay-fade 0.3s ease; }
+  .modal-overlay.open { display: flex; }
+  .modal-card { max-width: 540px; background: linear-gradient(160deg, #141a29, #0b0e17); border: 1px solid rgba(242,186,42,0.35); border-radius: 18px; padding: 30px 34px; animation: modal-pop 0.35s cubic-bezier(0.22,1,0.36,1); }
+  .modal-card h2 { font-family: "Bebas Neue"; font-size: 2rem; color: var(--accent-2); margin: 0 0 14px; }
+  .modal-card p { color: rgba(255,255,255,0.75); line-height: 1.55; margin: 0 0 10px; font-size: 1rem; }
+  .modal-card ul { color: rgba(255,255,255,0.75); line-height: 1.6; padding-left: 20px; margin: 0 0 18px; }
+  .modal-card b { color: var(--accent-2); }
+
+  #setup-screen {
+    max-width: 480px; margin: 30px auto; text-align: center;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px; padding: 32px 30px; animation: screen-in 0.45s cubic-bezier(0.22,1,0.36,1);
+  }
+  #setup-screen h1 { font-family: "Bebas Neue"; font-size: 2.2rem; color: var(--accent-2); margin: 0 0 20px; }
+  #setup-screen label { display: block; margin-bottom: 12px; color: rgba(255,255,255,0.7); font-weight: 700; }
+  #setup-screen .field { margin-bottom: 24px; }
+  .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .name-inputs { display: flex; flex-direction: column; gap: 8px; }
+  .name-inputs input {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px;
+    padding: 10px 14px; color: var(--text); font-family: "Rajdhani"; font-size: 1rem; font-weight: 600; text-align: center;
+  }
+  .name-inputs input:focus { outline: none; border-color: var(--accent); }
+
+  #game-screen { display: none; animation: screen-in 0.45s cubic-bezier(0.22,1,0.36,1); }
+  .game-layout { display: grid; grid-template-columns: 1fr 1.25fr; gap: 24px; align-items: start; }
+
+  .board-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+  svg#board { width: min(430px, 100%); height: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5)); transition: width 0.35s ease; }
+  .board-col.kb-open svg#board { width: min(230px, 100%); }
+  .board-backing { fill: #0a0a0a; }
+  .band { stroke: #06080f; stroke-width: 1.5; cursor: pointer; transition: filter 0.1s ease; }
+  .band:hover { filter: brightness(1.3); }
+  .band.black { fill: #121212; }
+  .band.cream { fill: #ece3cd; }
+  .band.red { fill: #c22a34; }
+  .band.green { fill: #157a41; }
+  .bull-outer { fill: #157a41; stroke: #06080f; stroke-width: 1.5; }
+  .bull-inner { fill: #c22a34; stroke: #06080f; stroke-width: 1.5; }
+  .board-label { fill: rgba(255,255,255,0.9); font-family: "Rajdhani"; font-size: 21px; font-weight: 800; pointer-events: none; user-select: none; }
+  .board-label.live { filter: drop-shadow(0 0 8px currentColor); animation: label-pulse 1s ease-in-out infinite; }
+
+  .wedge-glow { fill: rgba(242,186,42,0); pointer-events: none; stroke: rgba(255,255,255,0); stroke-width: 3; }
+  .wedge-glow.live { animation: target-pulse 1s ease-in-out infinite; }
+  .wedge-glow.selected { fill: rgba(255,255,255,0.75) !important; stroke: rgba(255,255,255,1) !important; animation: none !important; }
+  .owner-0-color { fill: rgba(242,186,42,0.55); stroke: rgba(255,224,130,0.9); }
+  .owner-1-color { fill: rgba(111,199,255,0.55); stroke: rgba(180,230,255,0.9); }
+  .owner-2-color { fill: rgba(143,224,143,0.55); stroke: rgba(200,245,200,0.9); }
+  .owner-3-color { fill: rgba(255,154,193,0.55); stroke: rgba(255,205,225,0.9); }
+  @keyframes target-pulse { 0%, 100% { fill-opacity: 0.7; } 50% { fill-opacity: 1; } }
+  @keyframes label-pulse { 0%, 100% { filter: drop-shadow(0 0 4px currentColor); } 50% { filter: drop-shadow(0 0 13px currentColor); } }
+
+  .kb-toggle-row { width: min(430px, 100%); display: flex; justify-content: center; }
+  .keypad { width: min(430px, 100%); max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+  .keypad.open { max-height: 240px; }
+  .keypad-inner { padding-top: 6px; }
+  .keypad-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; }
+  .key-num {
+    padding: 13px 0; border-radius: 9px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04); color: var(--text); font-weight: 700; cursor: pointer; font-family: "Rajdhani"; font-size: 1.05rem;
+    transition: transform 0.1s ease;
+  }
+  .key-num:active { transform: scale(0.9); }
+  .key-num.selected { background: rgba(255,255,255,0.85); border-color: #fff; color: #151515; }
+
+  #confirm-panel {
+    width: min(240px, 100%); display: flex; align-items: center; gap: 14px; overflow: hidden;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(242,186,42,0.35);
+    border-radius: 14px; padding: 14px 20px; min-height: 56px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  #confirm-panel.expanded { width: min(430px, 100%); }
+  .turn-label { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; max-width: 150px; }
+  .turn-label-top { font-size: 0.82rem; color: rgba(255,255,255,0.55); }
+  .turn-label-name {
+    display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-family: "Bebas Neue"; font-size: 1.5rem; line-height: 1.15; color: var(--accent-2); letter-spacing: 0.3px;
+  }
+  #confirm-content {
+    flex: 1; min-width: 0; display: flex; align-items: center; min-height: 28px;
+    opacity: 0; transition: opacity 0.2s ease;
+  }
+  #confirm-panel.expanded #confirm-content { opacity: 1; transition-delay: 0.18s; }
+  #confirm-content .hit-info-wrap { display: flex; align-items: center; gap: 10px; min-width: 0; overflow: hidden; }
+  #confirm-content .hit-label { color: rgba(255,255,255,0.55); font-size: 0.88rem; flex-shrink: 0; }
+  #confirm-content .hit-value {
+    font-family: "Bebas Neue"; font-size: 2.1rem; line-height: 1; color: var(--accent-2); animation: pop-in 0.35s ease;
+    background: rgba(242,186,42,0.1); border: 1px solid rgba(242,186,42,0.4); border-radius: 8px; padding: 5px 15px;
+    flex-shrink: 0;
+  }
+  #confirm-content .confirm-btn-slot { margin-left: auto; flex-shrink: 0; padding-left: 12px; }
+
+  .tower-col { display: flex; flex-direction: column; align-items: flex-start; }
+  .tower-wrap { display: grid; grid-template-columns: 150px auto 1fr; row-gap: 0; align-items: stretch; width: 100%; }
+  .floor-label {
+    display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;
+    font-size: 1.4rem; font-weight: 800; color: rgba(255,255,255,0.55); text-align: right;
+    border-right: 1px dashed rgba(255,255,255,0.1); font-family: "Bebas Neue"; letter-spacing: 0.4px;
+  }
+  .floor-label.is-current { color: var(--accent-2); }
+  .floor-label.neutral { color: rgba(255,255,255,0.25); font-size: 0.85rem; font-family: "Rajdhani"; }
+  .floor-label.fallen, .floor-numbers-list.fallen { opacity: 0; transition: opacity 0.5s ease; }
+  .floor-blocks { display: flex; gap: 16px; align-items: flex-end; padding: 7px 14px; }
+  .floor-numbers-list {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding-left: 14px;
+  }
+  .floor-num-pill {
+    padding: 4px 10px; border-radius: 8px; font-family: "Bebas Neue"; font-size: 1.2rem; letter-spacing: 0.5px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.55);
+    transition: all 0.25s ease;
+  }
+  .floor-numbers-list.is-current .floor-num-pill { color: var(--accent-2); border-color: rgba(242,186,42,0.4); background: rgba(242,186,42,0.1); }
+  .floor-num-pill.destroyed { opacity: 0.3; text-decoration: line-through; }
+  .block {
+    width: 36px; height: 88px;
+    clip-path: polygon(50% 0%, 100% 14%, 100% 100%, 0% 100%, 0% 14%);
+    background: linear-gradient(160deg, #caa24a, #8a6a22);
+    border-bottom: 1px solid rgba(0,0,0,0.35);
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px;
+    font-family: "Bebas Neue"; font-size: 1.15rem; color: #241a05;
+    box-shadow: inset 0 -3px 5px rgba(0,0,0,0.25);
+    transform-origin: bottom center;
+  }
+  .block.owner-0 { background: linear-gradient(160deg, #f2ba2a, #b5850f); }
+  .block.owner-1 { background: linear-gradient(160deg, #6fc7ff, #2a7cb5); color: #071620; }
+  .block.owner-2 { background: linear-gradient(160deg, #8fe08f, #379157); color: #0a2210; }
+  .block.owner-3 { background: linear-gradient(160deg, #ff9ac1, #c14d80); color: #2a0715; }
+  .block.neutral { background: linear-gradient(160deg, #5a5a5a, #333); color: rgba(255,255,255,0.3); }
+  .block.destroyed { visibility: hidden; }
+  .block.mass-tilt-right { animation: mass-tilt-right 0.32s ease-in forwards; }
+  .block.mass-tilt-left { animation: mass-tilt-left 0.32s ease-in forwards; }
+  .block.toppling-right { animation: block-topple-right 0.7s cubic-bezier(0.6,0,0.85,0.35) forwards; }
+  .block.toppling-left { animation: block-topple-left 0.7s cubic-bezier(0.6,0,0.85,0.35) forwards; }
+  @keyframes mass-tilt-right { from { transform: rotate(0deg); } to { transform: rotate(12deg); } }
+  @keyframes mass-tilt-left { from { transform: rotate(0deg); } to { transform: rotate(-12deg); } }
+  @keyframes block-topple-right { 0% { transform: rotate(12deg) translateY(0); opacity: 1; } 70% { opacity: 1; } 100% { transform: rotate(82deg) translateY(10px); opacity: 0; } }
+  @keyframes block-topple-left { 0% { transform: rotate(-12deg) translateY(0); opacity: 1; } 70% { opacity: 1; } 100% { transform: rotate(-82deg) translateY(10px); opacity: 0; } }
+
+  .beam-spacer { border-right: 1px dashed rgba(255,255,255,0.1); }
+  .beam { height: 18px; margin: 0 14px; border-radius: 3px; background: linear-gradient(180deg, #7a5a2a, #4a3616); box-shadow: 0 2px 4px rgba(0,0,0,0.4); transform-origin: center left; }
+  .beam.mass-tilt-right { animation: mass-tilt-right 0.32s ease-in forwards; }
+  .beam.mass-tilt-left { animation: mass-tilt-left 0.32s ease-in forwards; }
+  .beam.toppling-right { animation: beam-topple-right 0.7s cubic-bezier(0.6,0,0.85,0.35) forwards; }
+  .beam.toppling-left { animation: beam-topple-left 0.7s cubic-bezier(0.6,0,0.85,0.35) forwards; }
+  @keyframes beam-topple-right { 0% { transform: rotate(12deg); opacity: 1; } 100% { transform: rotate(38deg) translateY(16px); opacity: 0; } }
+  @keyframes beam-topple-left { 0% { transform: rotate(-12deg); opacity: 1; } 100% { transform: rotate(-38deg) translateY(16px); opacity: 0; } }
+
+  .winner-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(3,4,8,0.6); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; z-index: 600; padding: 20px; animation: overlay-fade 0.3s ease;
+  }
+  .winner-overlay.open { display: flex; }
+  .winner-card {
+    max-width: 520px; width: 100%; text-align: center;
+    background: linear-gradient(160deg, #141a29, #0b0e17); border: 1px solid rgba(242,186,42,0.4);
+    border-radius: 20px; padding: 34px 36px; animation: modal-pop 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+  #winner-banner {
+    background: linear-gradient(120deg, var(--accent-2), var(--accent)); color: #151515; padding: 18px 26px;
+    border-radius: 16px; font-family: "Bebas Neue"; font-size: 1.6rem; margin-bottom: 20px;
+  }
+  .post-game-actions { display: flex; gap: 10px; width: 100%; justify-content: center; }
+
+  @keyframes screen-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes pop-in { 0% { transform: scale(1); } 30% { transform: scale(1.18); } 100% { transform: scale(1); } }
+  @keyframes press-pulse { 0% { transform: scale(1); } 35% { transform: scale(0.9); box-shadow: 0 0 24px rgba(242,186,42,0.6); } 100% { transform: scale(1); } }
+  @keyframes modal-pop { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  @keyframes overlay-fade { from { opacity: 0; } to { opacity: 1; } }
+
+  @media (max-width: 900px) { .game-layout { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="brand">WIEŻA</div>
+    <div class="topbar-actions">
+      <button class="ghost-btn" id="rules-reopen-btn">Zasady</button>
+      <button class="ghost-btn" id="home-top-btn">Strona główna</button>
+    </div>
+  </div>
+
+  <div id="rules-modal" class="modal-overlay open">
+    <div class="modal-card">
+      <h2>Wieża, zasady</h2>
+      <p>Wieża zawsze ma <b>5 pięter</b>. Gracze zajmują piętra od dołu, reszta na górze to neutralna konstrukcja.</p>
+      <ul>
+        <li>Każde Twoje piętro ma ponumerowane klocki. Trafienie w numer (czyjkolwiek by nie był) niszczy odpowiadający klocek.</li>
+        <li>Gdy piętro straci wszystkie klocki oprócz jednego, traci nośność, wieża się wali <b>razem ze wszystkimi piętrami nad nim</b>.</li>
+        <li><b>Celem jest przewrócenie WŁASNEGO piętra</b>, wygrywa właściciel piętra, które runie, nie ten kto trafiał!</li>
+        <li>Kierunek zawalenia zależy od tego, gdzie zostało więcej klocków.</li>
+        <li>Jeden rzut na zmianę, tura przechodzi dalej niezależnie od trafienia.</li>
+      </ul>
+      <button class="primary-btn" id="rules-ok-btn">Gramy!</button>
+    </div>
+  </div>
+
+  <div id="setup-screen">
+    <h1>Ustawienia gry</h1>
+    <div class="field">
+      <label>Liczba graczy</label>
+      <div class="tile-picker" id="count-btns"></div>
+    </div>
+    <div class="field">
+      <label>Poziom trudności</label>
+      <div class="tile-picker" id="diff-btns"></div>
+    </div>
+    <div class="field">
+      <label>Imiona graczy</label>
+      <div class="name-inputs" id="name-inputs"></div>
+    </div>
+    <button class="primary-btn" id="start-btn">Start</button>
+  </div>
+
+  <div id="game-screen">
+    <div class="game-layout">
+      <div class="board-col" id="board-col">
+        <svg id="board" viewBox="-256 -256 512 512"></svg>
+
+        <div class="kb-toggle-row">
+          <button class="ghost-btn" id="kb-toggle-btn">Klawiatura</button>
+        </div>
+
+        <div class="keypad" id="keypad">
+          <div class="keypad-inner"><div class="keypad-grid" id="keypad-numbers"></div></div>
+        </div>
+
+        <div id="confirm-panel">
+          <span class="turn-label" id="turn-label"></span>
+          <div id="confirm-content"></div>
+        </div>
+      </div>
+
+      <div class="tower-col">
+        <div class="tower-wrap" id="tower-wrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="winner-overlay" id="winner-overlay">
+    <div class="winner-card">
+      <div id="winner-banner"></div>
+      <div class="post-game-actions" id="post-game-actions">
+        <button class="primary-btn" id="play-again-btn">Zagraj jeszcze raz</button>
+        <button class="secondary-btn" id="home-btn">Strona główna</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CIRCLE_ORDER = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+const R = { backing: 236, doubleOut: 200, doubleIn: 182, outerSingleOut: 182, outerSingleIn: 116, tripleOut: 116, tripleIn: 100, innerSingleOut: 100, innerSingleIn: 26, bullOuter: 26, bullInner: 12 };
+function polar(r, angleDeg) { const rad = (angleDeg * Math.PI) / 180; return { x: r * Math.sin(rad), y: -r * Math.cos(rad) }; }
+function annularPath(rIn, rOut, a0, a1) {
+  const p1 = polar(rIn, a0), p2 = polar(rOut, a0), p3 = polar(rOut, a1), p4 = polar(rIn, a1);
+  return `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y} A ${rOut} ${rOut} 0 0 1 ${p3.x} ${p3.y} L ${p4.x} ${p4.y} A ${rIn} ${rIn} 0 0 0 ${p1.x} ${p1.y} Z`;
+}
+const svgNS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('board');
+const glowEls = {};
+const labelEls = {};
+
+const backing = document.createElementNS(svgNS, 'circle');
+backing.setAttribute('r', R.backing);
+backing.setAttribute('class', 'board-backing');
+svg.appendChild(backing);
+
+CIRCLE_ORDER.forEach((num, i) => {
+  const a0 = i * 18 - 9, a1 = i * 18 + 9;
+  const isEven = i % 2 === 0;
+  const singleClass = isEven ? 'black' : 'cream';
+  const ringClass = isEven ? 'red' : 'green';
+  [
+    { r0: R.innerSingleIn, r1: R.innerSingleOut, cls: singleClass },
+    { r0: R.tripleIn, r1: R.tripleOut, cls: ringClass },
+    { r0: R.outerSingleIn, r1: R.outerSingleOut, cls: singleClass },
+    { r0: R.doubleIn, r1: R.doubleOut, cls: ringClass },
+  ].forEach((band) => {
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', annularPath(band.r0, band.r1, a0, a1));
+    path.setAttribute('class', `band ${band.cls}`);
+    path.addEventListener('click', () => onBoardClick(num));
+    svg.appendChild(path);
+  });
+  const glow = document.createElementNS(svgNS, 'path');
+  glow.setAttribute('d', annularPath(R.innerSingleIn, R.doubleOut, a0, a1));
+  glow.setAttribute('class', 'wedge-glow');
+  svg.appendChild(glow);
+  glowEls[num] = glow;
+
+  const labelPos = polar((R.doubleOut + R.backing) / 2 + 2, i * 18);
+  const label = document.createElementNS(svgNS, 'text');
+  label.setAttribute('x', labelPos.x);
+  label.setAttribute('y', labelPos.y);
+  label.setAttribute('text-anchor', 'middle');
+  label.setAttribute('dominant-baseline', 'middle');
+  label.setAttribute('class', 'board-label');
+  label.textContent = num;
+  svg.appendChild(label);
+  labelEls[num] = label;
+});
+const bullOuter = document.createElementNS(svgNS, 'circle');
+bullOuter.setAttribute('r', R.bullOuter); bullOuter.setAttribute('class', 'bull-outer');
+svg.appendChild(bullOuter);
+const bullInner = document.createElementNS(svgNS, 'circle');
+bullInner.setAttribute('r', R.bullInner); bullInner.setAttribute('class', 'bull-inner');
+svg.appendChild(bullInner);
+
+// ---- Keypad ----
+const keypadNumbers = document.getElementById('keypad-numbers');
+CIRCLE_ORDER.slice().sort((a, b) => a - b).forEach((num) => {
+  const btn = document.createElement('button');
+  btn.className = 'key-num';
+  btn.textContent = num;
+  btn.dataset.value = num;
+  btn.addEventListener('click', () => onBoardClick(num));
+  keypadNumbers.appendChild(btn);
+});
+document.getElementById('kb-toggle-btn').addEventListener('click', () => {
+  const kb = document.getElementById('keypad');
+  const boardCol = document.getElementById('board-col');
+  const opening = !kb.classList.contains('open');
+  kb.classList.toggle('open', opening);
+  boardCol.classList.toggle('kb-open', opening);
+  document.getElementById('kb-toggle-btn').textContent = opening ? 'Ukryj klawiaturę' : 'Klawiatura';
+});
+
+// ---- Game logic ----
+const TOTAL_FLOORS = 5;
+let state = null;
+let selectedKey = null;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function startGame(playerCount, blocksPerFloor, names) {
+  const pool = shuffle(CIRCLE_ORDER);
+  const players = Array.from({ length: playerCount }, (_, i) => ({ name: names[i] || `Zawodnik ${i + 1}` }));
+
+  const floors = [];
+  for (let i = 0; i < TOTAL_FLOORS; i++) {
+    if (i < playerCount) {
+      floors.push({
+        ownerIndex: i,
+        name: players[i].name,
+        numbers: pool.slice(i * blocksPerFloor, i * blocksPerFloor + blocksPerFloor),
+        destroyed: Array(blocksPerFloor).fill(false),
+        fallen: false,
+      });
+    } else {
+      floors.push({ ownerIndex: null, name: null, numbers: Array(blocksPerFloor).fill(null), destroyed: Array(blocksPerFloor).fill(false), fallen: false });
+    }
+  }
+
+  state = { blocksPerFloor, players, floors, currentIndex: 0, lastHit: null, gameOver: false };
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  document.getElementById('winner-overlay').classList.remove('open');
+  render();
+}
+
+function currentPlayer() { return state.players[state.currentIndex]; }
+
+function liveNumbersForCurrentPlayer() {
+  const map = {};
+  const ownerIdx = state.currentIndex;
+  const floor = state.floors.find((f) => f.ownerIndex === ownerIdx && !f.fallen);
+  if (floor) {
+    floor.numbers.forEach((n, idx) => { if (!floor.destroyed[idx]) map[n] = ownerIdx; });
+  }
+  return map;
+}
+
+function findBlock(value) {
+  for (const f of state.floors) {
+    if (f.ownerIndex === null || f.fallen) continue;
+    const idx = f.numbers.indexOf(value);
+    if (idx !== -1 && !f.destroyed[idx]) return { floor: f, idx };
+  }
+  return null;
+}
+
+function clearSelection() {
+  if (!selectedKey) return;
+  glowEls[selectedKey]?.classList.remove('selected');
+  keypadNumbers.querySelector(`.key-num[data-value="${selectedKey}"]`)?.classList.remove('selected');
+  selectedKey = null;
+}
+
+function onBoardClick(value) {
+  if (!state || state.gameOver) return;
+  clearSelection();
+  state.lastHit = value;
+  glowEls[value].classList.add('selected');
+  keypadNumbers.querySelector(`.key-num[data-value="${value}"]`)?.classList.add('selected');
+  selectedKey = value;
+  renderConfirm();
+}
+
+function nextTurn() { state.currentIndex = (state.currentIndex + 1) % state.players.length; }
+
+function confirmHit() {
+  if (!state || state.lastHit === null) return;
+  const value = state.lastHit;
+  state.lastHit = null;
+  clearSelection();
+  const block = findBlock(value);
+
+  if (block) {
+    block.floor.destroyed[block.idx] = true;
+    render();
+    const blockEl = document.querySelector(`.block[data-floor="${block.floor.ownerIndex}"][data-slot="${block.idx}"]`);
+    if (blockEl) {
+      const dir = Math.random() < 0.5 ? 'left' : 'right';
+      blockEl.classList.add(`toppling-${dir}`);
+    }
+
+    const remaining = block.floor.destroyed.filter((d) => !d).length;
+    if (remaining <= 1) {
+      state.gameOver = true;
+      renderConfirm();
+      setTimeout(() => collapseFrom(block.floor), 450);
+      return;
+    }
+  }
+
+  nextTurn();
+  render();
+}
+
+function collapseFrom(triggerFloor) {
+  const n = state.blocksPerFloor;
+  const remainingIdx = triggerFloor.destroyed.map((d, i) => (d ? null : i)).filter((v) => v !== null);
+  const center = (n - 1) / 2;
+  const avg = remainingIdx.reduce((a, b) => a + b, 0) / (remainingIdx.length || 1);
+  const direction = avg < center ? 'left' : avg > center ? 'right' : (Math.random() < 0.5 ? 'left' : 'right');
+
+  const triggerIdx = state.floors.indexOf(triggerFloor);
+  const affected = state.floors.slice(triggerIdx + 1);
+  const MASS_TILT_MS = 320;
+
+  affected.forEach((floor) => {
+    floor.fallen = true;
+    const pos = state.floors.indexOf(floor);
+    document.querySelectorAll(`.block[data-floor-pos="${pos}"]`).forEach((el) => {
+      el.classList.add(`mass-tilt-${direction}`);
+    });
+    const beam = document.querySelector(`.beam[data-floor-pos="${pos}"]`);
+    if (beam) beam.classList.add(`mass-tilt-${direction}`);
+  });
+
+  setTimeout(() => {
+    affected.forEach((floor) => {
+      const pos = state.floors.indexOf(floor);
+      const blocks = document.querySelectorAll(`.block[data-floor-pos="${pos}"]`);
+      blocks.forEach((el, blockOrder) => {
+        el.classList.remove(`mass-tilt-${direction}`);
+        el.style.animationDelay = `${blockOrder * 0.05 + Math.random() * 0.05}s`;
+        el.classList.add(`toppling-${direction}`);
+      });
+      const beam = document.querySelector(`.beam[data-floor-pos="${pos}"]`);
+      if (beam) { beam.classList.remove(`mass-tilt-${direction}`); beam.classList.add(`toppling-${direction}`); }
+      const label = document.querySelector(`.floor-label[data-floor-pos="${pos}"]`);
+      const numsList = document.querySelector(`.floor-numbers-list[data-floor-pos="${pos}"]`);
+      [label, numsList].forEach((elx) => { if (elx) elx.classList.add('fallen'); });
+    });
+
+    setTimeout(() => {
+      Object.entries(glowEls).forEach(([numStr, el]) => {
+        const num = Number(numStr);
+        el.classList.remove('live', 'owner-0-color', 'owner-1-color', 'owner-2-color', 'owner-3-color');
+        labelEls[num].classList.remove('live');
+        labelEls[num].style.fill = '';
+      });
+      const el = document.getElementById('winner-banner');
+      el.textContent = `${triggerFloor.name} wygrywa! Dzięki niemu wieża się zawaliła.`;
+      document.getElementById('winner-overlay').classList.add('open');
+    }, 750);
+  }, MASS_TILT_MS);
+}
+
+function render() {
+  const p = currentPlayer();
+  document.getElementById('turn-label').innerHTML = state.gameOver
+    ? 'Wieża się wali...'
+    : `<span class="turn-label-top">Rzuca</span><span class="turn-label-name">${p.name}</span>`;
+
+  const liveMap = liveNumbersForCurrentPlayer();
+  Object.entries(glowEls).forEach(([numStr, el]) => {
+    const num = Number(numStr);
+    el.classList.remove('live', 'owner-0-color', 'owner-1-color', 'owner-2-color', 'owner-3-color');
+    labelEls[num].classList.remove('live');
+    labelEls[num].style.fill = '';
+    if (num in liveMap) {
+      el.classList.add('live', `owner-${liveMap[num]}-color`);
+      labelEls[num].classList.add('live');
+      const ownerColors = ['#f2ba2a', '#6fc7ff', '#8fe08f', '#ff9ac1'];
+      labelEls[num].style.fill = ownerColors[liveMap[num]];
+    }
+  });
+
+  const tower = document.getElementById('tower-wrap');
+  tower.innerHTML = '';
+  for (let i = TOTAL_FLOORS - 1; i >= 0; i--) {
+    const f = state.floors[i];
+    const isNeutral = f.ownerIndex === null;
+    const isCurrentFloor = !isNeutral && f.ownerIndex === state.currentIndex && !state.gameOver;
+
+    const label = document.createElement('div');
+    label.className = 'floor-label' + (isCurrentFloor ? ' is-current' : '') + (isNeutral ? ' neutral' : '');
+    label.dataset.floorPos = i;
+    label.textContent = isNeutral ? '—' : f.name;
+    tower.appendChild(label);
+
+    const blocksWrap = document.createElement('div');
+    blocksWrap.className = 'floor-blocks';
+    f.numbers.forEach((n, idx) => {
+      const block = document.createElement('div');
+      block.className = isNeutral ? 'block neutral' : `block owner-${f.ownerIndex}` + (f.destroyed[idx] ? ' destroyed' : '');
+      block.dataset.floor = f.ownerIndex;
+      block.dataset.floorPos = i;
+      block.dataset.slot = idx;
+      block.textContent = isNeutral ? '' : n;
+      blocksWrap.appendChild(block);
+    });
+    tower.appendChild(blocksWrap);
+
+    const numsList = document.createElement('div');
+    numsList.className = 'floor-numbers-list' + (isCurrentFloor ? ' is-current' : '');
+    numsList.dataset.floorPos = i;
+    if (!isNeutral) {
+      f.numbers.forEach((n, idx) => {
+        const pill = document.createElement('span');
+        pill.className = 'floor-num-pill' + (f.destroyed[idx] ? ' destroyed' : '');
+        pill.textContent = n;
+        numsList.appendChild(pill);
+      });
+    }
+    tower.appendChild(numsList);
+
+    if (i > 0) {
+      const spacer = document.createElement('div');
+      spacer.className = 'beam-spacer';
+      tower.appendChild(spacer);
+      const beam = document.createElement('div');
+      beam.className = 'beam';
+      beam.dataset.floorPos = i;
+      tower.appendChild(beam);
+      const spacer2 = document.createElement('div');
+      tower.appendChild(spacer2);
+    }
+  }
+
+  renderConfirm();
+}
+
+function renderConfirm() {
+  const panel = document.getElementById('confirm-panel');
+  const content = document.getElementById('confirm-content');
+  if (state.gameOver || state.lastHit === null) {
+    panel.classList.remove('expanded');
+    content.innerHTML = '';
+    return;
+  }
+  panel.classList.add('expanded');
+  const value = state.lastHit;
+  content.innerHTML = `<span class="hit-info-wrap"><span class="hit-label">Trafiono:</span><span class="hit-value">${value}</span></span><span class="confirm-btn-slot"></span>`;
+  const btn = document.createElement('button');
+  btn.className = 'primary-btn compact';
+  btn.textContent = 'Zatwierdź';
+  btn.addEventListener('click', () => { btn.classList.add('pressed'); confirmHit(); });
+  content.querySelector('.confirm-btn-slot').appendChild(btn);
+}
+
+// ---- Setup wiring ----
+function positionSlidingThumb(container, activeEl) {
+  const thumb = container?.querySelector('.tile-thumb');
+  if (!thumb || !activeEl) return;
+  thumb.style.left = `${activeEl.offsetLeft}px`;
+  thumb.style.width = `${activeEl.offsetWidth}px`;
+}
+
+let selectedCount = 2;
+let selectedBlocks = 3;
+const countBtnsWrap = document.getElementById('count-btns');
+const nameInputsWrap = document.getElementById('name-inputs');
+
+function renderNameInputs() {
+  const existing = [...nameInputsWrap.querySelectorAll('input')].map((i) => i.value);
+  nameInputsWrap.innerHTML = '';
+  for (let i = 0; i < selectedCount; i++) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = `Zawodnik ${i + 1}`;
+    input.value = existing[i] || '';
+    input.maxLength = 20;
+    nameInputsWrap.appendChild(input);
+  }
+}
+
+[2, 3, 4].forEach((n) => {
+  const btn = document.createElement('button');
+  btn.className = 'tile-btn' + (n === selectedCount ? ' active' : '');
+  btn.textContent = n;
+  btn.addEventListener('click', () => {
+    selectedCount = n;
+    [...countBtnsWrap.querySelectorAll('.tile-btn')].forEach((b) => b.classList.toggle('active', Number(b.textContent) === n));
+    positionSlidingThumb(countBtnsWrap, btn);
+    renderNameInputs();
+  });
+  countBtnsWrap.appendChild(btn);
+});
+const countThumb = document.createElement('span');
+countThumb.className = 'tile-thumb';
+countThumb.setAttribute('aria-hidden', 'true');
+countBtnsWrap.appendChild(countThumb);
+positionSlidingThumb(countBtnsWrap, countBtnsWrap.querySelector('.tile-btn.active'));
+renderNameInputs();
+
+const diffBtnsWrap = document.getElementById('diff-btns');
+[{ id: 3, label: 'Łatwy' }, { id: 4, label: 'Trudny' }].forEach((d) => {
+  const btn = document.createElement('button');
+  btn.className = 'tile-btn' + (d.id === selectedBlocks ? ' active' : '');
+  btn.textContent = d.label;
+  btn.addEventListener('click', () => {
+    selectedBlocks = d.id;
+    [...diffBtnsWrap.querySelectorAll('.tile-btn')].forEach((b) => b.classList.toggle('active', b === btn));
+    positionSlidingThumb(diffBtnsWrap, btn);
+  });
+  diffBtnsWrap.appendChild(btn);
+});
+const diffThumb = document.createElement('span');
+diffThumb.className = 'tile-thumb';
+diffThumb.setAttribute('aria-hidden', 'true');
+diffBtnsWrap.appendChild(diffThumb);
+positionSlidingThumb(diffBtnsWrap, diffBtnsWrap.querySelector('.tile-btn.active'));
+
+function readNames() { return [...nameInputsWrap.querySelectorAll('input')].map((i) => i.value.trim()); }
+
+document.getElementById('start-btn').addEventListener('click', (e) => {
+  e.target.classList.add('pressed');
+  startGame(selectedCount, selectedBlocks, readNames());
+});
+document.getElementById('play-again-btn').addEventListener('click', () => {
+  startGame(state.players.length, state.blocksPerFloor, shuffle(state.players.map((p) => p.name)));
+});
+function goHome() {
+  window.location.href = 'index.html';
+}
+document.getElementById('home-btn').addEventListener('click', goHome);
+document.getElementById('home-top-btn').addEventListener('click', goHome);
+document.getElementById('rules-ok-btn').addEventListener('click', () => document.getElementById('rules-modal').classList.remove('open'));
+document.getElementById('rules-reopen-btn').addEventListener('click', () => document.getElementById('rules-modal').classList.add('open'));
+</script>
+</body>
+</html>

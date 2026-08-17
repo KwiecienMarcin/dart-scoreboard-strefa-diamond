@@ -22,6 +22,7 @@
         <img src="/assets/logo_full_small.png" alt="Strefa Diamond" class="topbar-logo brand-logo" />
         <div class="topbar-actions">
           <button id="menu-link" class="ghost-btn" type="button">Menu</button>
+          <button id="games-link" class="ghost-btn" type="button">Gry</button>
           <button id="rules-link" class="ghost-btn" type="button">Zasady darta</button>
           <button id="home-link" class="ghost-btn" type="button">Strona główna</button>
         </div>
@@ -242,6 +243,25 @@
         <input type="text" inputmode="numeric" id="nakka-pin-input" class="nakka-pin-input" placeholder="PIN" maxlength="4" />
         <p class="nakka-error" id="nakka-error" hidden>Nieprawidłowy PIN. Spróbuj ponownie.</p>
         <button type="button" id="nakka-confirm" class="primary-btn submit-btn">Wejdź</button>
+      </div>
+    </div>
+
+    <div id="games-modal" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card games-card">
+        <button id="games-close" class="modal-close" type="button" aria-label="Zamknij">×</button>
+        <h2>Dodatkowe gry</h2>
+        <div class="games-grid">
+          <a href="snajper.html" class="game-option">
+            <img src="/assets/snajper_preview.jpg" alt="Snajper" class="game-option-thumb" />
+            <span class="game-option-name">SNAJPER</span>
+            <p class="game-option-desc">System zawęża cel na tarczy, aż zostanie jedno konkretne pole. Kto pierwszy dojdzie do końca, wygrywa.</p>
+          </a>
+          <a href="wieza.html" class="game-option">
+            <img src="/assets/wieza_preview.jpg" alt="Wieża" class="game-option-thumb" />
+            <span class="game-option-name">WIEŻA</span>
+            <p class="game-option-desc">Każdy gracz ma swoje piętro z ponumerowanymi klockami. Celem jest przewrócenie WŁASNEGO piętra jako pierwszego.</p>
+          </a>
+        </div>
       </div>
     </div>
 

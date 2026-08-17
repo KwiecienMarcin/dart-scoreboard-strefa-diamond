@@ -41,6 +41,9 @@ const menuTabs = document.querySelectorAll('.menu-tab');
 const menuPanels = document.querySelectorAll('.menu-panel');
 const menuSubtabs = document.querySelectorAll('.menu-subtab');
 const rulesModal = document.getElementById('rules-modal');
+const gamesLink = document.getElementById('games-link');
+const gamesModal = document.getElementById('games-modal');
+const gamesClose = document.getElementById('games-close');
 const rulesClose = document.getElementById('rules-close');
 const rulesTitleEl = document.getElementById('rules-title');
 const rulesBodyEl = document.getElementById('rules-body');
@@ -196,7 +199,7 @@ const sportJokes = {
     { min: 1, max: 3, text: (c) => `${c.player}, tarcza ma 20 pól, a ty trafiasz w ${c.amount}. Ambitnie.` },
     { min: 1, max: 3, text: (c) => `${c.player}, ${c.amount}? Pomoże ci już chyba tylko podejście bliżej tarczy.` },
     { min: 1, max: 3, text: (c) => `${c.player}, ${c.amount}? Rzut monetą dałby chyba lepszy wynik.` },
-    { min: 4, max: 8, text: (c) => `Gol! A właściwie ${c.amount} punktów, ${c.player}. San Marino by się ucieszyło.` },
+    { min: 4, max: 8, text: (c) => `Gol! A właściwie ${c.amount} punktów, ${c.player}. Reprezentacja San Marino nie strzeliła tylu bramek przez całe eliminacje.` },
     { min: 15, max: 15, text: (c) => `${c.player}, 15? To tenis, nie darts.` },
     { min: 15, max: 15, text: (c) => `${c.player}, 15 - no ok, ale to darts, nie kort.` },
     { min: 15, max: 15, text: (c) => `${c.player}, 15? Sędzia w tenisie by się ucieszył. My nie bardzo.` },
@@ -224,7 +227,7 @@ const sportJokes = {
     { min: 1, max: 3, text: (c) => `${c.player}, the board has 20 segments and you hit ${c.amount}. Ambitious.` },
     { min: 1, max: 3, text: (c) => `${c.player}, ${c.amount}? At this point only standing closer to the board would help.` },
     { min: 1, max: 3, text: (c) => `${c.player}, ${c.amount}? A coin flip would've probably scored better.` },
-    { min: 4, max: 8, text: (c) => `Goal! Well, ${c.amount} points, ${c.player}. San Marino would be thrilled.` },
+    { min: 4, max: 8, text: (c) => `Goal! Well, ${c.amount} points, ${c.player}. San Marino's national team hasn't scored that many goals in an entire qualifying campaign.` },
     { min: 15, max: 15, text: (c) => `${c.player}, 15? That's tennis, not darts.` },
     { min: 15, max: 15, text: (c) => `${c.player}, 15 - fine, but this is darts, not a tennis court.` },
     { min: 15, max: 15, text: (c) => `${c.player}, 15? A tennis umpire would love that score. We don't.` },
@@ -440,6 +443,9 @@ const t = {
     backToSetup: 'Edytuj zawodników',
     newGame: 'Nowa gra',
     homeLink: 'Strona główna',
+    menuLink: 'Menu baru',
+    gamesLink: 'Gry',
+    playerDefaultName: (i) => `Zawodnik ${i}`,
     enterScore: 'Wpisz sumę rzutów',
     submit: 'Zatwierdź',
     nowThrowing: 'Rzuca teraz',
@@ -484,6 +490,9 @@ const t = {
     backToSetup: 'Edit players',
     newGame: 'New game',
     homeLink: 'Home',
+    menuLink: 'Bar Menu',
+    gamesLink: 'Games',
+    playerDefaultName: (i) => `Player ${i}`,
     enterScore: 'Enter throws sum',
     submit: 'Submit',
     nowThrowing: 'Now throwing',
@@ -646,7 +655,7 @@ function showLegWinModal(name, standings) {
 const LIVE_BANNER_DISPLAY_MS = 5000;
 const LIVE_BANNER_GAP_MS = 15000;
 const LIVE_BANNER_BASE_FONT_REM = 2.3;
-const LIVE_BANNER_MIN_FONT_REM = 1.3;
+const LIVE_BANNER_MIN_FONT_REM = 1.1;
 let bannerHiddenAt = 0;
 
 // Shrinks the banner's font size just enough for `message` to fit on a
@@ -809,6 +818,9 @@ function applyTranslations() {
 
   if (backToSetupLabel) backToSetupLabel.textContent = tr('backToSetup');
   if (newGameLabel) newGameLabel.textContent = tr('newGame');
+  if (homeLink) homeLink.textContent = tr('homeLink');
+  if (menuLink) menuLink.textContent = tr('menuLink');
+  if (gamesLink) gamesLink.textContent = tr('gamesLink');
   if (rulesLink) rulesLink.textContent = tr('rulesButton');
   if (rulesTitleEl) rulesTitleEl.textContent = tr('rulesTitle');
   if (scoreInputEl) scoreInputEl.placeholder = tr('enterScore');
@@ -830,6 +842,10 @@ function applyTranslations() {
     btn.textContent = tr('undoEntry');
   });
 
+  document.querySelectorAll('#players-inputs input.player-name').forEach((input, i) => {
+    input.placeholder = defaultPlayerName(i);
+  });
+
   renderRulesContent();
 
   langPlBtn?.classList.toggle('active', state.lang === 'pl');
@@ -843,7 +859,7 @@ function showScreen(name) {
 }
 
 function defaultPlayerName(i) {
-  return `Zawodnik ${i + 1}`;
+  return tr('playerDefaultName')(i + 1);
 }
 
 const playerCountControl = setupTilePicker(playerCountPicker, (value) => {
@@ -1368,6 +1384,15 @@ rulesModal?.addEventListener('click', (e) => {
   if (e.target === rulesModal) closeModal(rulesModal);
 });
 
+gamesLink?.addEventListener('click', () => {
+  bounceClass(gamesLink, 'pressed');
+  openModal(gamesModal);
+});
+gamesClose?.addEventListener('click', () => closeModal(gamesModal));
+gamesModal?.addEventListener('click', (e) => {
+  if (e.target === gamesModal) closeModal(gamesModal);
+});
+
 function preloadAllMenuImages() {
   document.querySelectorAll('.menu-image').forEach((img) => {
     if (!img.src && img.dataset.src) {
@@ -1457,6 +1482,7 @@ document.addEventListener('keydown', (e) => {
     closeModal(rulesModal);
     closeModal(legwinModal);
     closeModal(nakkaModal);
+    closeModal(gamesModal);
     closeMenuModal();
   }
 });

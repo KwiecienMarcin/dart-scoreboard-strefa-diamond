@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Snajper — Strefa Diamond</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg: #06080f; --accent: #f2ba2a; --accent-2: #ffd449; --text: #ffffff; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Rajdhani", "Inter", sans-serif; font-weight: 500; color: var(--text);
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(to right, #000000 0, rgba(0,0,0,0) 90px),
+      linear-gradient(to left, #000000 0, rgba(0,0,0,0) 90px),
+      radial-gradient(circle at 30% 20%, #191f31, var(--bg));
+    background-repeat: no-repeat; background-attachment: fixed, fixed, scroll;
+    background-size: 100% 100%, 100% 100%, auto; min-height: 100vh;
+  }
+  #app { width: min(100vw, 1280px); max-width: 1280px; margin: 0 auto; padding: 14px 20px 18px; }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .brand { font-family: "Bebas Neue"; font-size: 1.8rem; letter-spacing: 1px; color: var(--accent-2); }
+  .topbar-actions { display: flex; gap: 10px; }
+  .ghost-btn { background: rgba(255,255,255,0.08); border: none; border-radius: 12px; padding: 10px 16px; color: var(--text); font-weight: 700; cursor: pointer; font-family: "Rajdhani"; font-size: 0.95rem; transition: transform 0.15s ease; }
+  .ghost-btn:active { transform: scale(0.93); }
+
+  .primary-btn {
+    background: linear-gradient(120deg, var(--accent-2), var(--accent)); color: #151515; border: none;
+    border-radius: 14px; padding: 13px 28px; font-family: "Rajdhani"; font-size: 1.05rem; font-weight: 700;
+    cursor: pointer; transition: transform 0.15s ease;
+  }
+  .primary-btn:active { transform: scale(0.95); }
+  .primary-btn.pressed { animation: press-pulse 0.4s ease; }
+  .primary-btn.compact { padding: 10px 20px; font-size: 0.95rem; white-space: nowrap; }
+  .secondary-btn {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: var(--text);
+    border-radius: 14px; padding: 13px 28px; font-family: "Rajdhani"; font-size: 1.05rem; font-weight: 700; cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .secondary-btn:active { transform: scale(0.95); }
+
+  .tile-picker { position: relative; display: inline-flex; gap: 6px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; padding: 4px; }
+  .tile-thumb {
+    position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 10px;
+    background: linear-gradient(120deg, var(--accent-2), var(--accent)); box-shadow: 0 0 16px rgba(242,186,42,0.4);
+    transition: left 0.35s cubic-bezier(0.34,1.56,0.64,1), width 0.35s cubic-bezier(0.34,1.56,0.64,1); z-index: 0;
+  }
+  .tile-btn {
+    position: relative; z-index: 1; border: none; background: transparent; color: rgba(255,255,255,0.6);
+    font-size: 1.05rem; font-weight: 700; min-width: 52px; min-height: 44px; padding: 0 14px; border-radius: 10px;
+    cursor: pointer; transition: color 0.2s ease, transform 0.15s ease;
+  }
+  .tile-btn:active { transform: scale(0.88); }
+  .tile-btn.active { color: #151515; }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(3,4,8,0.75); backdrop-filter: blur(6px); align-items: center; justify-content: center; z-index: 500; padding: 20px; animation: overlay-fade 0.3s ease; }
+  .modal-overlay.open { display: flex; }
+  .modal-card { max-width: 520px; background: linear-gradient(160deg, #141a29, #0b0e17); border: 1px solid rgba(242,186,42,0.35); border-radius: 18px; padding: 30px 34px; animation: modal-pop 0.35s cubic-bezier(0.22,1,0.36,1); }
+  .modal-card h2 { font-family: "Bebas Neue"; font-size: 2rem; color: var(--accent-2); margin: 0 0 14px; }
+  .modal-card p { color: rgba(255,255,255,0.75); line-height: 1.55; margin: 0 0 10px; font-size: 1rem; }
+  .modal-card ul { color: rgba(255,255,255,0.75); line-height: 1.6; padding-left: 20px; margin: 0 0 18px; }
+  .modal-card b { color: var(--accent-2); }
+
+  #setup-screen {
+    max-width: 480px; margin: 30px auto; text-align: center;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px; padding: 32px 30px; animation: screen-in 0.45s cubic-bezier(0.22,1,0.36,1);
+  }
+  #setup-screen h1 { font-family: "Bebas Neue"; font-size: 2.2rem; color: var(--accent-2); margin: 0 0 20px; }
+  #setup-screen label { display: block; margin-bottom: 12px; color: rgba(255,255,255,0.7); font-weight: 700; }
+  #setup-screen .field { margin-bottom: 24px; }
+  .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .name-inputs { display: flex; flex-direction: column; gap: 8px; }
+  .name-inputs input {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px;
+    padding: 10px 14px; color: var(--text); font-family: "Rajdhani"; font-size: 1rem; font-weight: 600; text-align: center;
+  }
+  .name-inputs input:focus { outline: none; border-color: var(--accent); }
+
+  #game-screen { display: none; animation: screen-in 0.45s cubic-bezier(0.22,1,0.36,1); }
+  .game-layout { display: grid; grid-template-columns: 1fr 1.25fr; gap: 24px; align-items: stretch; }
+
+  .players-panel { display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+  .player-card {
+    position: relative; padding: 18px 22px; border-radius: 16px; text-align: center;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    animation: card-pop 0.35s ease;
+  }
+  .player-card.is-current { background: rgba(242,186,42,0.1); border-color: rgba(242,186,42,0.5); box-shadow: 0 0 26px rgba(242,186,42,0.25); }
+  .player-card.is-winner { background: rgba(242,186,42,0.18); border-color: var(--accent-2); box-shadow: 0 0 34px rgba(242,186,42,0.45); }
+  .player-card .p-name { font-size: 1.9rem; font-weight: 700; color: rgba(255,255,255,0.85); display: block; margin-bottom: 12px; font-family: "Bebas Neue"; letter-spacing: 0.5px; }
+  .player-card.is-current .p-name { color: var(--accent-2); }
+
+  .level-track { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .level-pill {
+    padding: 8px 15px; border-radius: 10px; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.3px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.35);
+    transition: all 0.25s ease;
+  }
+  .level-pill.done { color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.02); text-decoration: line-through; }
+  .level-pill.current {
+    color: var(--accent-2); background: rgba(242,186,42,0.16); border-color: rgba(242,186,42,0.5);
+    box-shadow: 0 0 16px rgba(242,186,42,0.35); animation: pill-pulse 1.3s ease-in-out infinite; font-size: 1.05rem;
+  }
+  .level-pill.bump { animation: pop-in 0.4s ease; }
+  @keyframes pill-pulse { 0%, 100% { box-shadow: 0 0 10px rgba(242,186,42,0.2); } 50% { box-shadow: 0 0 24px rgba(242,186,42,0.55); } }
+
+  .board-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .target-caption {
+    text-align: right; font-size: 1.05rem; color: rgba(255,255,255,0.8);
+    padding: 0 4px; min-height: 18px; width: 100%;
+  }
+  .target-caption b { color: var(--accent-2); }
+
+  svg#board { width: min(430px, 100%); height: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5)); transition: width 0.35s ease; }
+  .board-col.kb-open svg#board { width: min(230px, 100%); }
+  .board-backing { fill: #0a0a0a; }
+  .band { stroke: #06080f; stroke-width: 1.5; cursor: pointer; transition: filter 0.1s ease; }
+  .band:hover { filter: brightness(1.3); }
+  .band.black { fill: #121212; }
+  .band.cream { fill: #ece3cd; }
+  .band.red { fill: #c22a34; }
+  .band.green { fill: #157a41; }
+  .bull-outer { fill: #157a41; stroke: #06080f; stroke-width: 1.5; cursor: pointer; }
+  .bull-inner { fill: #c22a34; stroke: #06080f; stroke-width: 1.5; cursor: pointer; }
+
+  .wedge-glow, .ring-glow { fill: rgba(242,186,42,0); pointer-events: none; stroke: rgba(255,255,255,0); stroke-width: 3; }
+  .wedge-glow.lit { fill: rgba(242,186,42,0.55); stroke: rgba(255,236,170,0.9); animation: target-pulse 1s ease-in-out infinite; }
+  .ring-glow.lit { fill: rgba(255,212,73,0.9); stroke: rgba(255,255,255,0.9); animation: target-pulse 0.8s ease-in-out infinite; }
+  .wedge-glow.selected, .ring-glow.selected { fill: rgba(255,255,255,0.75) !important; stroke: rgba(255,255,255,1) !important; animation: none !important; }
+  @keyframes target-pulse { 0%, 100% { fill-opacity: 0.7; } 50% { fill-opacity: 1; } }
+
+  .board-label { fill: rgba(255,255,255,0.9); font-family: "Rajdhani"; font-size: 21px; font-weight: 800; pointer-events: none; user-select: none; }
+  .board-label.lit { fill: var(--accent-2); filter: drop-shadow(0 0 9px rgba(242,186,42,1)); animation: label-pulse 1s ease-in-out infinite; }
+  @keyframes label-pulse { 0%, 100% { filter: drop-shadow(0 0 5px rgba(242,186,42,0.7)); } 50% { filter: drop-shadow(0 0 16px rgba(242,186,42,1)); } }
+
+  .kb-toggle-row { width: min(430px, 100%); display: flex; justify-content: center; }
+
+  .keypad { width: min(430px, 100%); max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+  .keypad.open { max-height: 240px; }
+  .keypad-inner { padding-top: 6px; }
+  .keypad-mods { display: flex; gap: 8px; margin-bottom: 8px; }
+  .key-mod {
+    flex: 1; padding: 11px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); font-weight: 700; cursor: pointer; font-family: "Rajdhani"; font-size: 1rem;
+  }
+  .key-mod.active { background: linear-gradient(120deg, var(--accent-2), var(--accent)); color: #151515; border-color: transparent; }
+  .keypad-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; }
+  .key-num {
+    padding: 13px 0; border-radius: 9px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04); color: var(--text); font-weight: 700; cursor: pointer; font-family: "Rajdhani"; font-size: 1.05rem;
+    transition: transform 0.1s ease;
+  }
+  .key-num:active { transform: scale(0.9); }
+  .key-num.lit { background: rgba(242,186,42,0.22); border-color: var(--accent); color: var(--accent-2); box-shadow: 0 0 12px rgba(242,186,42,0.4); }
+  .key-num.selected { background: rgba(255,255,255,0.85); border-color: #fff; color: #151515; }
+
+  #confirm-panel {
+    width: min(430px, 100%); background: rgba(255,255,255,0.04); border: 1px solid rgba(242,186,42,0.35);
+    border-radius: 14px; padding: 14px 20px; min-height: 56px;
+  }
+  #confirm-content { position: relative; display: flex; align-items: center; min-height: 28px; }
+  #confirm-content.placeholder { color: rgba(255,255,255,0.35); font-size: 0.95rem; justify-content: center; }
+  #confirm-content .hit-info-wrap {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    display: flex; align-items: center; gap: 12px;
+  }
+  #confirm-content .hit-label { color: rgba(255,255,255,0.55); font-size: 0.88rem; }
+  #confirm-content .hit-value {
+    font-family: "Bebas Neue"; font-size: 2.2rem; line-height: 1; color: var(--accent-2); animation: pop-in 0.35s ease;
+    background: rgba(242,186,42,0.1); border: 1px solid rgba(242,186,42,0.4); border-radius: 8px; padding: 5px 16px;
+  }
+  #confirm-content .confirm-btn-slot { margin-left: auto; }
+
+  .winner-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(3,4,8,0.6); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; z-index: 600; padding: 20px; animation: overlay-fade 0.3s ease;
+  }
+  .winner-overlay.open { display: flex; }
+  .winner-card {
+    max-width: 520px; width: 100%; text-align: center;
+    background: linear-gradient(160deg, #141a29, #0b0e17); border: 1px solid rgba(242,186,42,0.4);
+    border-radius: 20px; padding: 34px 36px; animation: modal-pop 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+  #winner-banner {
+    background: linear-gradient(120deg, var(--accent-2), var(--accent)); color: #151515; padding: 18px 26px;
+    border-radius: 16px; font-family: "Bebas Neue"; font-size: 1.6rem; margin-bottom: 20px;
+  }
+  .post-game-actions { display: flex; gap: 10px; width: 100%; justify-content: center; }
+  #status-banner {
+    display: none; margin-top: 6px; width: min(430px, 100%); text-align: center;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.85);
+    padding: 12px 18px; border-radius: 14px; font-size: 0.95rem; animation: modal-pop 0.3s ease;
+  }
+
+  @keyframes screen-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes card-pop { 0% { transform: scale(0.96) translateY(6px); opacity: 0.7; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+  @keyframes pop-in { 0% { transform: scale(1); } 30% { transform: scale(1.2); } 100% { transform: scale(1); } }
+  @keyframes press-pulse { 0% { transform: scale(1); } 35% { transform: scale(0.9); box-shadow: 0 0 24px rgba(242,186,42,0.6); } 100% { transform: scale(1); } }
+  @keyframes modal-pop { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  @keyframes overlay-fade { from { opacity: 0; } to { opacity: 1; } }
+
+  @media (max-width: 900px) { .game-layout { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="brand">SNAJPER</div>
+    <div class="topbar-actions">
+      <button class="ghost-btn" id="rules-reopen-btn">Zasady</button>
+      <button class="ghost-btn" id="home-top-btn">Strona główna</button>
+    </div>
+  </div>
+
+  <div id="rules-modal" class="modal-overlay open">
+    <div class="modal-card">
+      <h2>Snajper, zasady</h2>
+      <p>System pokazuje coraz mniejszy fragment tarczy. Trafiaj w podświetlony cel i idź krok po kroku dalej, aż zostanie jedno konkretne pole.</p>
+      <ul>
+        <li><b>Połowa</b> tarczy, potem <b>ćwiartka</b>, potem <b>konkretne pole</b>.</li>
+        <li>W trybie <b>trudnym</b> dochodzi 4. poziom: trzeba trafić w to samo pole, ale konkretnie w obwódkę <b>podwójną albo potrójną</b>.</li>
+        <li>Klikaj na tarczy albo rozwiń klawiaturę pod nią, działają tak samo.</li>
+        <li>Chybienie oznacza, że zostajesz na tym samym poziomie i próbujesz dalej w kolejnej turze.</li>
+        <li>Gdy ktoś dojdzie do końca, reszta graczy dostaje dogrywkę rzutów, żeby wyrównać szanse. Jeśli ktoś też zdąży skończyć, jest prawdziwa dogrywka.</li>
+      </ul>
+      <button class="primary-btn" id="rules-ok-btn">Gramy!</button>
+    </div>
+  </div>
+
+  <div id="setup-screen">
+    <h1>Ustawienia gry</h1>
+    <div class="field">
+      <label>Liczba graczy</label>
+      <div class="tile-picker" id="count-btns"></div>
+    </div>
+    <div class="field">
+      <label>Poziom trudności</label>
+      <div class="tile-picker" id="diff-btns"></div>
+    </div>
+    <div class="field">
+      <label>Imiona graczy</label>
+      <div class="name-inputs" id="name-inputs"></div>
+    </div>
+    <button class="primary-btn" id="start-btn">Start</button>
+  </div>
+
+  <div id="game-screen">
+    <div class="game-layout">
+      <div class="players-panel" id="players-panel"></div>
+
+      <div class="board-col" id="board-col">
+        <div class="target-caption" id="target-caption"></div>
+        <svg id="board" viewBox="-256 -256 512 512"></svg>
+
+        <div class="kb-toggle-row">
+          <button class="ghost-btn" id="kb-toggle-btn">Klawiatura</button>
+        </div>
+
+        <div class="keypad" id="keypad">
+          <div class="keypad-inner">
+            <div class="keypad-mods">
+              <button class="key-mod" id="mod-double" data-mod="double">DOUBLE</button>
+              <button class="key-mod" id="mod-triple" data-mod="triple">TRIPLE</button>
+            </div>
+            <div class="keypad-grid" id="keypad-numbers"></div>
+          </div>
+        </div>
+
+        <div id="confirm-panel">
+          <div id="confirm-content" class="placeholder">Kliknij pole na tarczy albo użyj klawiatury.</div>
+        </div>
+
+        <div id="status-banner"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="winner-overlay" id="winner-overlay">
+    <div class="winner-card">
+      <div id="winner-banner"></div>
+      <div class="post-game-actions" id="post-game-actions">
+        <button class="primary-btn" id="play-again-btn">Zagraj jeszcze raz</button>
+        <button class="secondary-btn" id="home-btn">Strona główna</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CIRCLE_ORDER = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+const R = {
+  backing: 236,
+  doubleOut: 200, doubleIn: 182,
+  outerSingleOut: 182, outerSingleIn: 116,
+  tripleOut: 116, tripleIn: 100,
+  innerSingleOut: 100, innerSingleIn: 26,
+  bullOuter: 26, bullInner: 12,
+};
+function polar(r, angleDeg) { const rad = (angleDeg * Math.PI) / 180; return { x: r * Math.sin(rad), y: -r * Math.cos(rad) }; }
+function annularPath(rIn, rOut, a0, a1) {
+  const p1 = polar(rIn, a0), p2 = polar(rOut, a0), p3 = polar(rOut, a1), p4 = polar(rIn, a1);
+  return `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y} A ${rOut} ${rOut} 0 0 1 ${p3.x} ${p3.y} L ${p4.x} ${p4.y} A ${rIn} ${rIn} 0 0 0 ${p1.x} ${p1.y} Z`;
+}
+const svgNS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('board');
+const overlayFullEls = {};
+const overlayRingEls = {};
+const labelEls = {};
+
+const backing = document.createElementNS(svgNS, 'circle');
+backing.setAttribute('r', R.backing);
+backing.setAttribute('class', 'board-backing');
+svg.appendChild(backing);
+
+CIRCLE_ORDER.forEach((num, i) => {
+  const a0 = i * 18 - 9, a1 = i * 18 + 9;
+  const isEven = i % 2 === 0;
+  const singleClass = isEven ? 'black' : 'cream';
+  const ringClass = isEven ? 'red' : 'green';
+  const specs = [
+    { r0: R.innerSingleIn, r1: R.innerSingleOut, cls: singleClass, ring: 'single' },
+    { r0: R.tripleIn, r1: R.tripleOut, cls: ringClass, ring: 'triple' },
+    { r0: R.outerSingleIn, r1: R.outerSingleOut, cls: singleClass, ring: 'single' },
+    { r0: R.doubleIn, r1: R.doubleOut, cls: ringClass, ring: 'double' },
+  ];
+  specs.forEach((spec) => {
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', annularPath(spec.r0, spec.r1, a0, a1));
+    path.setAttribute('class', `band ${spec.cls}`);
+    path.addEventListener('click', () => onBoardClick(num, spec.ring));
+    svg.appendChild(path);
+  });
+
+  const fullGlow = document.createElementNS(svgNS, 'path');
+  fullGlow.setAttribute('d', annularPath(R.innerSingleIn, R.doubleOut, a0, a1));
+  fullGlow.setAttribute('class', 'wedge-glow');
+  svg.appendChild(fullGlow);
+  overlayFullEls[num] = fullGlow;
+
+  const dGlow = document.createElementNS(svgNS, 'path');
+  dGlow.setAttribute('d', annularPath(R.doubleIn, R.doubleOut, a0, a1));
+  dGlow.setAttribute('class', 'ring-glow');
+  svg.appendChild(dGlow);
+  const tGlow = document.createElementNS(svgNS, 'path');
+  tGlow.setAttribute('d', annularPath(R.tripleIn, R.tripleOut, a0, a1));
+  tGlow.setAttribute('class', 'ring-glow');
+  svg.appendChild(tGlow);
+  overlayRingEls[num] = { double: dGlow, triple: tGlow };
+
+  const labelPos = polar((R.doubleOut + R.backing) / 2 + 2, i * 18);
+  const label = document.createElementNS(svgNS, 'text');
+  label.setAttribute('x', labelPos.x);
+  label.setAttribute('y', labelPos.y);
+  label.setAttribute('text-anchor', 'middle');
+  label.setAttribute('dominant-baseline', 'middle');
+  label.setAttribute('class', 'board-label');
+  label.textContent = num;
+  svg.appendChild(label);
+  labelEls[num] = label;
+});
+
+const bullOuter = document.createElementNS(svgNS, 'circle');
+bullOuter.setAttribute('r', R.bullOuter); bullOuter.setAttribute('class', 'bull-outer');
+bullOuter.addEventListener('click', () => onBoardClick('bull25', 'single'));
+svg.appendChild(bullOuter);
+const bullInner = document.createElementNS(svgNS, 'circle');
+bullInner.setAttribute('r', R.bullInner); bullInner.setAttribute('class', 'bull-inner');
+bullInner.addEventListener('click', () => onBoardClick('bull50', 'single'));
+svg.appendChild(bullInner);
+
+// ---- Keypad ----
+let pendingMod = null;
+const keypadNumbers = document.getElementById('keypad-numbers');
+CIRCLE_ORDER.slice().sort((a, b) => a - b).forEach((num) => {
+  const btn = document.createElement('button');
+  btn.className = 'key-num';
+  btn.textContent = num;
+  btn.dataset.value = num;
+  btn.addEventListener('click', () => {
+    const mod = pendingMod || 'single';
+    onBoardClick(num, mod);
+    setMod(null);
+  });
+  keypadNumbers.appendChild(btn);
+});
+const bullBtn = document.createElement('button');
+bullBtn.className = 'key-num';
+bullBtn.textContent = '25';
+bullBtn.addEventListener('click', () => { onBoardClick('bull25', 'single'); setMod(null); });
+keypadNumbers.appendChild(bullBtn);
+
+function setMod(mod) {
+  pendingMod = mod;
+  document.getElementById('mod-double').classList.toggle('active', mod === 'double');
+  document.getElementById('mod-triple').classList.toggle('active', mod === 'triple');
+}
+document.getElementById('mod-double').addEventListener('click', () => setMod(pendingMod === 'double' ? null : 'double'));
+document.getElementById('mod-triple').addEventListener('click', () => setMod(pendingMod === 'triple' ? null : 'triple'));
+
+document.getElementById('kb-toggle-btn').addEventListener('click', () => {
+  const kb = document.getElementById('keypad');
+  const boardCol = document.getElementById('board-col');
+  const opening = !kb.classList.contains('open');
+  kb.classList.toggle('open', opening);
+  boardCol.classList.toggle('kb-open', opening);
+  document.getElementById('kb-toggle-btn').textContent = opening ? 'Ukryj klawiaturę' : 'Klawiatura';
+});
+
+// ---- Game logic ----
+const HALVES = [CIRCLE_ORDER.slice(0, 10), CIRCLE_ORDER.slice(10, 20)];
+const QUARTERS = [CIRCLE_ORDER.slice(0, 5), CIRCLE_ORDER.slice(5, 10), CIRCLE_ORDER.slice(10, 15), CIRCLE_ORDER.slice(15, 20)];
+
+function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+let state = null;
+let selectedKey = null; // {type: 'board'|'keypad', el, num}
+
+function levelNames() { return state.difficulty === 'hard' ? ['Połowa', 'Ćwiartka', 'Pole', '2x / 3x'] : ['Połowa', 'Ćwiartka', 'Pole']; }
+function maxLevel() { return state.difficulty === 'hard' ? 3 : 2; }
+
+function newPlayer(name) { return { name, level: 0, targetSet: pickRandom(HALVES), finalTarget: null, done: false, throws: 0 }; }
+
+function startGame(playerCount, difficulty, names) {
+  state = {
+    difficulty,
+    players: Array.from({ length: playerCount }, (_, i) => newPlayer(names[i] || `Zawodnik ${i + 1}`)),
+    currentIndex: 0, lastHit: null, winThrowCount: null, winnerCandidates: [],
+    phase: 'playing', suddenDeathGroup: [], suddenDeathHits: [], suddenDeathPos: 0,
+  };
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  document.getElementById('winner-overlay').classList.remove('open');
+  document.getElementById('status-banner').style.display = 'none';
+  render();
+}
+
+function currentPlayer() { return state.players[state.currentIndex]; }
+
+function isHitForPlayer(p, value, ring) {
+  if (typeof value !== 'number') return false;
+  if (p.level < 2) return p.targetSet.includes(value);
+  if (p.level === 2) return value === p.finalTarget;
+  if (p.level === 3) return value === p.finalTarget && (ring === 'double' || ring === 'triple');
+  return false;
+}
+
+function advancePlayer(p) {
+  if (p.level === 0) {
+    const candidates = QUARTERS.filter((q) => q.every((n) => p.targetSet.includes(n)));
+    p.targetSet = pickRandom(candidates);
+    p.level = 1;
+  } else if (p.level === 1) {
+    p.finalTarget = pickRandom(p.targetSet);
+    p.targetSet = [p.finalTarget];
+    p.level = 2;
+  } else if (p.level === 2) {
+    if (maxLevel() === 2) { p.done = true; } else { p.level = 3; }
+  } else if (p.level === 3) {
+    p.done = true;
+  }
+}
+
+function clearSelection() {
+  if (!selectedKey) return;
+  if (selectedKey.type === 'board') {
+    overlayFullEls[selectedKey.num]?.classList.remove('selected');
+    overlayRingEls[selectedKey.num]?.double.classList.remove('selected');
+    overlayRingEls[selectedKey.num]?.triple.classList.remove('selected');
+  } else if (selectedKey.el) {
+    selectedKey.el.classList.remove('selected');
+  }
+  selectedKey = null;
+}
+
+function onBoardClick(value, ring) {
+  if (!state) return;
+  if (state.phase === 'finished') return;
+  clearSelection();
+  state.lastHit = { value, ring };
+  if (typeof value === 'number') {
+    if (ring === 'double') overlayRingEls[value].double.classList.add('selected');
+    else if (ring === 'triple') overlayRingEls[value].triple.classList.add('selected');
+    else overlayFullEls[value].classList.add('selected');
+    selectedKey = { type: 'board', num: value };
+    const keyBtn = keypadNumbers.querySelector(`.key-num[data-value="${value}"]`);
+    if (keyBtn) { keyBtn.classList.add('selected'); }
+  }
+  renderConfirm();
+}
+
+function confirmHit() {
+  if (!state || !state.lastHit) return;
+  const { value, ring } = state.lastHit;
+  state.lastHit = null;
+  clearSelection();
+
+  if (state.phase === 'suddendeath') { confirmSuddenDeathHit(value, ring); return; }
+
+  const p = currentPlayer();
+  p.throws += 1;
+  const hit = isHitForPlayer(p, value, ring);
+  let bumped = false;
+  if (hit) {
+    advancePlayer(p);
+    bumped = true;
+    if (p.done) {
+      if (state.winThrowCount === null) state.winThrowCount = p.throws;
+      if (!state.winnerCandidates.includes(p)) state.winnerCandidates.push(p);
+    }
+  }
+
+  if (state.winThrowCount !== null) {
+    const allCaughtUp = state.players.every((pl) => pl.done || pl.throws >= state.winThrowCount);
+    if (allCaughtUp) { finalizeGame(); return; }
+    document.getElementById('status-banner').style.display = 'block';
+    document.getElementById('status-banner').textContent = `${state.winnerCandidates[0].name} doszedł do końca. Reszta dostaje dogrywkę rzutów, żeby wyrównać szanse.`;
+  }
+
+  advanceToNextEligiblePlayer();
+  render(bumped ? p : null);
+}
+
+function advanceToNextEligiblePlayer() {
+  let guard = 0;
+  do {
+    state.currentIndex = (state.currentIndex + 1) % state.players.length;
+    guard += 1;
+  } while (guard <= state.players.length && (currentPlayer().done || (state.winThrowCount !== null && currentPlayer().throws >= state.winThrowCount)));
+}
+
+function finalizeGame() {
+  if (state.winnerCandidates.length === 1) declareWinner(state.winnerCandidates[0]);
+  else startSuddenDeath(state.winnerCandidates);
+}
+
+function startSuddenDeath(group) {
+  state.phase = 'suddendeath';
+  state.suddenDeathGroup = group; state.suddenDeathHits = []; state.suddenDeathPos = 0;
+  state.currentIndex = state.players.indexOf(group[0]);
+  document.getElementById('status-banner').style.display = 'block';
+  document.getElementById('status-banner').textContent = `Dogrywka między: ${group.map((p) => p.name).join(', ')}.`;
+  render();
+}
+
+function confirmSuddenDeathHit(value, ring) {
+  const p = currentPlayer();
+  const hit = isHitForPlayer(p, value, ring);
+  if (hit) state.suddenDeathHits.push(p);
+  state.suddenDeathPos += 1;
+  if (state.suddenDeathPos < state.suddenDeathGroup.length) {
+    state.currentIndex = state.players.indexOf(state.suddenDeathGroup[state.suddenDeathPos]);
+    render();
+    return;
+  }
+  if (state.suddenDeathHits.length === 1) {
+    declareWinner(state.suddenDeathHits[0]);
+  } else if (state.suddenDeathHits.length === 0) {
+    document.getElementById('status-banner').textContent = `Nikt nie trafił, jeszcze jedna dogrywka między: ${state.suddenDeathGroup.map((p) => p.name).join(', ')}.`;
+    state.suddenDeathHits = []; state.suddenDeathPos = 0;
+    state.currentIndex = state.players.indexOf(state.suddenDeathGroup[0]);
+    render();
+  } else {
+    state.suddenDeathGroup = state.suddenDeathHits; state.suddenDeathHits = []; state.suddenDeathPos = 0;
+    state.currentIndex = state.players.indexOf(state.suddenDeathGroup[0]);
+    document.getElementById('status-banner').textContent = `Kilka trafień naraz. Kolejna dogrywka między: ${state.suddenDeathGroup.map((p) => p.name).join(', ')}.`;
+    render();
+  }
+}
+
+function declareWinner(winner) {
+  state.phase = 'finished';
+  document.getElementById('status-banner').style.display = 'none';
+  const el = document.getElementById('winner-banner');
+  el.textContent = `${winner.name} wygrywa!`;
+  document.getElementById('winner-overlay').classList.add('open');
+  render();
+}
+
+function targetDescriptionFor(p) {
+  if (p.done) return 'Gotowe!';
+  if (p.level === 3) return `Cel: pole <b>${p.finalTarget}</b>, obwódka <b>podwójna lub potrójna</b>`;
+  if (p.level === 2) return `Cel: dokładnie pole <b>${p.finalTarget}</b>`;
+  const nums = [...p.targetSet].sort((a, b) => a - b).join(', ');
+  return `Cel: <b>${levelNames()[p.level]}</b> tarczy (${nums})`;
+}
+
+function render(bumpedPlayer) {
+  const p = currentPlayer();
+  const captionText = state.phase === 'suddendeath'
+    ? `Dogrywka, rzuca: <b>${p.name}</b>. ${targetDescriptionFor(p)}`
+    : state.phase === 'finished' ? 'Gra zakończona.' : `${p.name} rzuca. ${targetDescriptionFor(p)}`;
+  document.getElementById('target-caption').innerHTML = captionText;
+
+  const names = levelNames();
+  const panel = document.getElementById('players-panel');
+  panel.innerHTML = '';
+  state.players.forEach((pp, i) => {
+    const card = document.createElement('div');
+    const isActive = i === state.currentIndex && state.phase !== 'finished';
+    card.className = 'player-card' + (isActive ? ' is-current' : '') + (pp.done ? ' is-winner' : '');
+    const pillsHtml = names.map((n, lvl) => {
+      const cls = pp.done || lvl < pp.level ? 'done' : lvl === pp.level ? 'current' : '';
+      const bump = pp === bumpedPlayer && lvl === pp.level && cls === 'current' ? ' bump' : '';
+      return `<span class="level-pill ${cls}${bump}">${n}</span>`;
+    }).join('');
+    card.innerHTML = `<span class="p-name">${pp.name}</span><div class="level-track">${pillsHtml}</div>`;
+    panel.appendChild(card);
+  });
+  bumpedPlayer = null;
+
+  Object.keys(overlayFullEls).forEach((numStr) => {
+    const num = Number(numStr);
+    overlayFullEls[num].classList.remove('lit');
+    overlayRingEls[num].double.classList.remove('lit');
+    overlayRingEls[num].triple.classList.remove('lit');
+    labelEls[num].classList.remove('lit');
+  });
+  document.querySelectorAll('.key-num.lit').forEach((el) => el.classList.remove('lit'));
+
+  if (state.phase !== 'finished') {
+    if (p.level <= 2) {
+      p.targetSet.forEach((num) => {
+        overlayFullEls[num].classList.add('lit');
+        labelEls[num].classList.add('lit');
+        const keyBtn = keypadNumbers.querySelector(`.key-num[data-value="${num}"]`);
+        if (keyBtn) keyBtn.classList.add('lit');
+      });
+    } else if (p.level === 3) {
+      overlayRingEls[p.finalTarget].double.classList.add('lit');
+      overlayRingEls[p.finalTarget].triple.classList.add('lit');
+      labelEls[p.finalTarget].classList.add('lit');
+      const keyBtn = keypadNumbers.querySelector(`.key-num[data-value="${p.finalTarget}"]`);
+      if (keyBtn) keyBtn.classList.add('lit');
+    }
+  }
+
+  renderConfirm();
+}
+
+function renderConfirm() {
+  const content = document.getElementById('confirm-content');
+  if (state.phase === 'finished' || !state.lastHit) {
+    content.className = 'placeholder';
+    content.innerHTML = state.phase === 'finished' ? '' : 'Kliknij pole na tarczy albo użyj klawiatury.';
+    return;
+  }
+  const { value } = state.lastHit;
+  const label = value === 'bull25' ? '25' : value === 'bull50' ? '50' : value;
+  content.className = '';
+  content.innerHTML = `<span class="hit-info-wrap"><span class="hit-label">Trafiono:</span><span class="hit-value">${label}</span></span><span class="confirm-btn-slot"></span>`;
+  const btn = document.createElement('button');
+  btn.className = 'primary-btn compact';
+  btn.textContent = 'Zatwierdź';
+  btn.addEventListener('click', () => { btn.classList.add('pressed'); confirmHit(); });
+  content.querySelector('.confirm-btn-slot').appendChild(btn);
+}
+
+// ---- Setup wiring ----
+function positionSlidingThumb(container, activeEl) {
+  const thumb = container?.querySelector('.tile-thumb');
+  if (!thumb || !activeEl) return;
+  thumb.style.left = `${activeEl.offsetLeft}px`;
+  thumb.style.width = `${activeEl.offsetWidth}px`;
+}
+
+let selectedCount = 2;
+let selectedDifficulty = 'easy';
+const countBtnsWrap = document.getElementById('count-btns');
+const nameInputsWrap = document.getElementById('name-inputs');
+
+function renderNameInputs() {
+  const existing = [...nameInputsWrap.querySelectorAll('input')].map((i) => i.value);
+  nameInputsWrap.innerHTML = '';
+  for (let i = 0; i < selectedCount; i++) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = `Zawodnik ${i + 1}`;
+    input.value = existing[i] || '';
+    input.maxLength = 20;
+    nameInputsWrap.appendChild(input);
+  }
+}
+
+[2, 3, 4].forEach((n) => {
+  const btn = document.createElement('button');
+  btn.className = 'tile-btn' + (n === selectedCount ? ' active' : '');
+  btn.textContent = n;
+  btn.addEventListener('click', () => {
+    selectedCount = n;
+    [...countBtnsWrap.querySelectorAll('.tile-btn')].forEach((b) => b.classList.toggle('active', Number(b.textContent) === n));
+    positionSlidingThumb(countBtnsWrap, btn);
+    renderNameInputs();
+  });
+  countBtnsWrap.appendChild(btn);
+});
+const countThumb = document.createElement('span');
+countThumb.className = 'tile-thumb';
+countThumb.setAttribute('aria-hidden', 'true');
+countBtnsWrap.appendChild(countThumb);
+positionSlidingThumb(countBtnsWrap, countBtnsWrap.querySelector('.tile-btn.active'));
+renderNameInputs();
+
+const diffBtnsWrap = document.getElementById('diff-btns');
+[{ id: 'easy', label: 'Łatwy' }, { id: 'hard', label: 'Trudny' }].forEach((d) => {
+  const btn = document.createElement('button');
+  btn.className = 'tile-btn' + (d.id === selectedDifficulty ? ' active' : '');
+  btn.textContent = d.label;
+  btn.addEventListener('click', () => {
+    selectedDifficulty = d.id;
+    [...diffBtnsWrap.querySelectorAll('.tile-btn')].forEach((b) => b.classList.toggle('active', b === btn));
+    positionSlidingThumb(diffBtnsWrap, btn);
+  });
+  diffBtnsWrap.appendChild(btn);
+});
+const diffThumb = document.createElement('span');
+diffThumb.className = 'tile-thumb';
+diffThumb.setAttribute('aria-hidden', 'true');
+diffBtnsWrap.appendChild(diffThumb);
+positionSlidingThumb(diffBtnsWrap, diffBtnsWrap.querySelector('.tile-btn.active'));
+
+function readNames() {
+  return [...nameInputsWrap.querySelectorAll('input')].map((i) => i.value.trim());
+}
+
+document.getElementById('start-btn').addEventListener('click', (e) => {
+  e.target.classList.add('pressed');
+  startGame(selectedCount, selectedDifficulty, readNames());
+});
+
+document.getElementById('play-again-btn').addEventListener('click', () => {
+  startGame(state.players.length, state.difficulty, shuffle(state.players.map((p) => p.name)));
+});
+function goHome() {
+  window.location.href = 'index.html';
+}
+document.getElementById('home-btn').addEventListener('click', goHome);
+document.getElementById('home-top-btn').addEventListener('click', goHome);
+
+document.getElementById('rules-ok-btn').addEventListener('click', () => document.getElementById('rules-modal').classList.remove('open'));
+document.getElementById('rules-reopen-btn').addEventListener('click', () => document.getElementById('rules-modal').classList.add('open'));
+</script>
+</body>
+</html>
