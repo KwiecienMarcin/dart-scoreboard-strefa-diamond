@@ -652,10 +652,15 @@ let bannerHiddenAt = 0;
 // Shrinks the banner's font size just enough for `message` to fit on a
 // single line, instead of letting it wrap and grow the banner taller.
 function fitBannerFontSize(el) {
+  function contentHeight() {
+    const cs = getComputedStyle(el);
+    return el.scrollHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  }
+
   let fontSize = LIVE_BANNER_BASE_FONT_REM;
   el.style.fontSize = `${fontSize}rem`;
   let singleLineHeight = parseFloat(getComputedStyle(el).lineHeight);
-  while (el.scrollHeight > singleLineHeight * 1.4 && fontSize > LIVE_BANNER_MIN_FONT_REM) {
+  while (contentHeight() > singleLineHeight * 1.4 && fontSize > LIVE_BANNER_MIN_FONT_REM) {
     fontSize = Math.round((fontSize - 0.1) * 10) / 10;
     el.style.fontSize = `${fontSize}rem`;
     singleLineHeight = parseFloat(getComputedStyle(el).lineHeight);
