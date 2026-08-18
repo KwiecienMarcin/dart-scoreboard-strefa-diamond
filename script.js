@@ -627,8 +627,9 @@ function getISOWeekNumber(date) {
 }
 
 function getNakkaPin() {
-  const week = getISOWeekNumber(new Date());
-  return String(week + 10);
+  const now = new Date();
+  const week = getISOWeekNumber(now);
+  return String(now.getDate() + week);
 }
 
 function openNakkaModal() {
