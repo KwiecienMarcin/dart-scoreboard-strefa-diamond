@@ -375,13 +375,34 @@
   // ---------------------------------------------------------------------
   // Polling
   // ---------------------------------------------------------------------
+  // TYMCZASOWE narzedzie diagnostyczne: male, dyskretne info w rogu ekranu, widoczne
+  // TYLKO gdy poll() sie nie powiedzie - zeby dalo sie odczytac blad prosto z ekranu
+  // tabletu bez USB/DevTools. Usunac po znalezieniu i naprawieniu przyczyny.
+  function showDebugBadge(text) {
+    let el = document.getElementById('rlt-debug-badge');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'rlt-debug-badge';
+      el.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:99999;background:rgba(200,0,0,0.85);color:#fff;font:11px monospace;padding:4px 8px;border-radius:6px;max-width:90vw;word-break:break-all;pointer-events:none;';
+      document.body.appendChild(el);
+    }
+    el.textContent = 'RLT debug: ' + text;
+  }
+  function clearDebugBadge() {
+    document.getElementById('rlt-debug-badge')?.remove();
+  }
+
   async function poll() {
     try {
       const devParam = RLT_DEV_BOARD ? `?devBoard=${encodeURIComponent(RLT_DEV_BOARD)}` : '';
       const res = await fetch(`${RLT_API}/api/roulette/state${devParam}`);
-      if (!res.ok) return;
+      if (!res.ok) {
+        showDebugBadge(`HTTP ${res.status} z ${RLT_API}`);
+        return;
+      }
       const data = await res.json();
       currentState = data;
+      clearDebugBadge();
 
       const overlayOpen = qs('#rlt-overlay')?.classList.contains('rlt-open');
       if (data.active && !data.alreadyUsed && data.eventId !== dismissedEventId && !overlayOpen) {
@@ -390,7 +411,7 @@
         showOverlay();
       }
     } catch (e) {
-      // backend unreachable - fail silently, try again next poll
+      showDebugBadge(`${e.name}: ${e.message} (${RLT_API})`);
     }
   }
 
