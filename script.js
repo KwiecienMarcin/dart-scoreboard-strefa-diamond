@@ -660,10 +660,27 @@ function showLegWinModal(name, standings) {
 }
 
 const LIVE_BANNER_DISPLAY_MS = 5000;
-const LIVE_BANNER_GAP_MS = 15000;
+let LIVE_BANNER_GAP_MS = 15000;
 const LIVE_BANNER_BASE_FONT_REM = 2.3;
 const LIVE_BANNER_MIN_FONT_REM = 1.1;
 let bannerHiddenAt = 0;
+
+// Picks up the joke-gap setting from the settings backend (see ruletka-backend/)
+// live, without a page reload, so it applies to a game already in progress.
+// Fails silently if the backend is unreachable (e.g. not deployed yet).
+const SETTINGS_API = window.RLT_API_OVERRIDE || 'http://192.168.0.245:4001';
+async function pollLiveSettings() {
+  try {
+    const res = await fetch(`${SETTINGS_API}/api/settings`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.jokeGapSeconds) LIVE_BANNER_GAP_MS = data.jokeGapSeconds * 1000;
+  } catch (e) {
+    // backend unreachable - keep current value, try again next poll
+  }
+}
+pollLiveSettings();
+setInterval(pollLiveSettings, 30000);
 
 // Shrinks the banner's font size just enough for `message` to fit on a
 // single line, instead of letting it wrap and grow the banner taller.
