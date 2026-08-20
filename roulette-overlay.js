@@ -5,7 +5,7 @@
   const RLT_POLL_MS = 3000;
   const RLT_DEV_BOARD = new URLSearchParams(location.search).get('devBoard');
   const SKIP_DELAY_MS = 5000;
-  const INTRO_TIMEOUT_MS = 60000;
+  const INTRO_TIMEOUT_MS_DEFAULT = 60000;
   const CIRCLE_ORDER = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
 
   let dismissedEventId = null; // zdarzenie już pominięte/zamknięte w tej sesji przeglądarki
@@ -231,6 +231,11 @@
 
   function renderIntroScreen() {
     screenState = 'intro';
+    fetch(`${RLT_API}/api/roulette/confirm-shown`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventId: currentState.eventId, board: currentState.board }),
+    }).catch(() => {});
     const card = qs('#rlt-card');
     const prizesText = (currentState.prizes || []).join(' • ');
     card.innerHTML = `
@@ -249,12 +254,13 @@
     }, SKIP_DELAY_MS);
 
     clearTimeout(introTimeoutId);
+    const introTimeoutMs = (Number(currentState.introTimeoutSeconds) > 0 ? Number(currentState.introTimeoutSeconds) : INTRO_TIMEOUT_MS_DEFAULT / 1000) * 1000;
     introTimeoutId = setTimeout(() => {
       if (screenState === 'intro') {
         dismissedEventId = currentState.eventId;
         hideOverlay();
       }
-    }, INTRO_TIMEOUT_MS);
+    }, introTimeoutMs);
 
     qs('#rlt-continue-btn').addEventListener('click', () => {
       clearTimeout(introTimeoutId);
