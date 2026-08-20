@@ -668,7 +668,7 @@ let bannerHiddenAt = 0;
 // Picks up the joke-gap setting from the settings backend (see ruletka-backend/)
 // live, without a page reload, so it applies to a game already in progress.
 // Fails silently if the backend is unreachable (e.g. not deployed yet).
-const SETTINGS_API = window.RLT_API_OVERRIDE || 'http://192.168.0.245:4001';
+const SETTINGS_API = window.RLT_API_OVERRIDE || 'https://192.168.0.245:4001';
 async function pollLiveSettings() {
   try {
     const res = await fetch(`${SETTINGS_API}/api/settings`);

@@ -2,7 +2,7 @@
 // Uzycie: <script src="roulette-overlay.js"></script> (i opcjonalnie ?devBoard=N w URL do testow lokalnych).
 // Zmien RLT_API na docelowy adres backendu (Railway) przed wdrozeniem produkcyjnym.
 (function () {
-  const RLT_API = window.RLT_API_OVERRIDE || 'http://192.168.0.245:4001';
+  const RLT_API = window.RLT_API_OVERRIDE || 'https://192.168.0.245:4001';
   const RLT_POLL_MS = 3000;
   const RLT_DEV_BOARD = new URLSearchParams(location.search).get('devBoard');
   const SKIP_DELAY_MS = 5000;
