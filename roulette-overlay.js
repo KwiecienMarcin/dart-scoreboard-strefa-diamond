@@ -373,7 +373,7 @@
     const card = qs('#rlt-card');
     const resultBlock = document.createElement('div');
     resultBlock.innerHTML = won
-      ? `<p class="rlt-result-title rlt-win">Wygrałeś!</p><p class="rlt-msg">Zapraszamy do baru po jedną z nagród: <span class="rlt-prizes">${prize}</span></p>`
+      ? `<p class="rlt-result-title rlt-win">Wygrałeś!</p><p class="rlt-msg">Zapraszamy do baru po jedną z nagród:</p><p class="rlt-msg"><span class="rlt-prizes">${prize}</span></p>`
       : `<p class="rlt-result-title rlt-lose">Nie tym razem</p><p class="rlt-msg">Spróbuj przy następnej okazji!</p>`;
     card.appendChild(resultBlock);
 
@@ -400,36 +400,13 @@
   // ---------------------------------------------------------------------
   // Odpytywanie
   // ---------------------------------------------------------------------
-  // TYMCZASOWY DEBUG (do usunięcia po zdiagnozowaniu problemu z tarczą 1): zapisuje
-  // stan ostatniego pollu w hashu URL, żeby dało się go odczytać zdalnie przez
-  // fully-mdm-updated (kolumna/panel "URL" pokazuje aktualny adres z Fully Kiosk).
-  function rltDebugHash(fields) {
-    try {
-      const str = Object.entries(fields).map(([k, v]) => `${k}=${v}`).join(',');
-      history.replaceState(null, '', location.pathname + location.search + '#dbg:' + str);
-    } catch (e) {}
-  }
-
   async function poll() {
-    const t = new Date().toLocaleTimeString('pl-PL');
     try {
       const devParam = RLT_DEV_BOARD ? `?devBoard=${encodeURIComponent(RLT_DEV_BOARD)}` : '';
       const res = await fetch(`${RLT_API}/api/roulette/state${devParam}`);
-      if (!res.ok) {
-        rltDebugHash({ t, err: `http${res.status}` });
-        return;
-      }
+      if (!res.ok) return;
       const data = await res.json();
       currentState = data;
-      rltDebugHash({
-        t,
-        b: data.board,
-        en: data.enabled ? 1 : 0,
-        a: data.active ? 1 : 0,
-        e: data.eventId || '-',
-        u: data.alreadyUsed ? 1 : 0,
-        w: data.isWinner ? 1 : 0,
-      });
 
       const overlayEl = qs('#rlt-overlay');
       const overlayOpen = !!overlayEl && overlayEl.classList.contains('rlt-open');
@@ -447,7 +424,7 @@
         showOverlay();
       }
     } catch (e) {
-      rltDebugHash({ t, err: String((e && e.message) || e) });
+      // backend niedostępny - spróbuj ponownie przy kolejnym odpytaniu
     }
   }
 
