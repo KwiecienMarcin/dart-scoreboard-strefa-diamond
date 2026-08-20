@@ -852,7 +852,8 @@ function applyTranslations() {
   if (newGameLabel) newGameLabel.textContent = tr('newGame');
   if (homeLink) homeLink.textContent = tr('homeLink');
   if (menuLink) menuLink.textContent = tr('menuLink');
-  if (gamesLink) gamesLink.textContent = tr('gamesLink');
+  const gamesLinkMain = gamesLink?.querySelector('.games-link-main');
+  if (gamesLinkMain) gamesLinkMain.textContent = tr('gamesLink');
   if (rulesLink) rulesLink.textContent = tr('rulesButton');
   if (rulesTitleEl) rulesTitleEl.textContent = tr('rulesTitle');
   if (scoreInputEl) scoreInputEl.placeholder = tr('enterScore');
