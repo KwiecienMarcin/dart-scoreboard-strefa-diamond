@@ -318,7 +318,7 @@ body {
 }
 
 .games-link-main {
-  color: #ff4d4d;
+  color: var(--text);
   font-weight: 700;
 }
 
