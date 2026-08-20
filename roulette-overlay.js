@@ -225,7 +225,7 @@
   function renderIntroScreen() {
     screenState = 'intro';
     const card = qs('#rlt-card');
-    const prizesText = (currentState.prizes || []).join(', ');
+    const prizesText = (currentState.prizes || []).join(' • ');
     card.innerHTML = `
       <h2 class="rlt-title">Koło Fortuny!</h2>
       <p class="rlt-msg">Wykonaj rzut lotką, wpisz numer w który trafiłeś, a potem zakręć kołem.</p>
@@ -360,7 +360,7 @@
     screenState = 'result';
     const won = currentState.isWinner;
     const prizes = currentState.prizes && currentState.prizes.length ? currentState.prizes : ['nagroda'];
-    const prize = prizes.join(', ');
+    const prize = prizes.join(' • ');
 
     qs('#rlt-status').remove();
     qs('.rlt-title').textContent = 'Wynik';
@@ -394,13 +394,36 @@
   // ---------------------------------------------------------------------
   // Odpytywanie
   // ---------------------------------------------------------------------
+  // TYMCZASOWY DEBUG (do usunięcia po zdiagnozowaniu problemu z tarczą 1): zapisuje
+  // stan ostatniego pollu w hashu URL, żeby dało się go odczytać zdalnie przez
+  // fully-mdm-updated (kolumna/panel "URL" pokazuje aktualny adres z Fully Kiosk).
+  function rltDebugHash(fields) {
+    try {
+      const str = Object.entries(fields).map(([k, v]) => `${k}=${v}`).join(',');
+      history.replaceState(null, '', location.pathname + location.search + '#dbg:' + str);
+    } catch (e) {}
+  }
+
   async function poll() {
+    const t = new Date().toLocaleTimeString('pl-PL');
     try {
       const devParam = RLT_DEV_BOARD ? `?devBoard=${encodeURIComponent(RLT_DEV_BOARD)}` : '';
       const res = await fetch(`${RLT_API}/api/roulette/state${devParam}`);
-      if (!res.ok) return;
+      if (!res.ok) {
+        rltDebugHash({ t, err: `http${res.status}` });
+        return;
+      }
       const data = await res.json();
       currentState = data;
+      rltDebugHash({
+        t,
+        b: data.board,
+        en: data.enabled ? 1 : 0,
+        a: data.active ? 1 : 0,
+        e: data.eventId || '-',
+        u: data.alreadyUsed ? 1 : 0,
+        w: data.isWinner ? 1 : 0,
+      });
 
       const overlayOpen = qs('#rlt-overlay')?.classList.contains('rlt-open');
 
@@ -417,7 +440,7 @@
         showOverlay();
       }
     } catch (e) {
-      // backend niedostępny - spróbuj ponownie przy kolejnym odpytaniu
+      rltDebugHash({ t, err: String((e && e.message) || e) });
     }
   }
 

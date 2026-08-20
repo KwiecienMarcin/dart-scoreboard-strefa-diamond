@@ -1416,6 +1416,62 @@ select,
   }
 }
 
+/* Tablety typu Xiaomi Pad 7 (mniejsza wysokość w poziomie niż zakładał pierwotny layout) -
+   dociskamy pionowe odstępy, żeby ekran główny mieścił się w całości bez przewijania. */
+@media (max-height: 1050px) and (orientation: landscape) {
+  #app {
+    padding: 14px 20px 18px;
+  }
+
+  .hero-card {
+    padding: 18px 24px;
+    gap: 10px;
+  }
+
+  .hero-brand {
+    gap: 6px;
+  }
+
+  .logo-wrap {
+    width: min(30vw, 260px);
+  }
+
+  .slogan {
+    padding-bottom: 8px;
+    font-size: clamp(1.3rem, 2.4vw, 1.9rem);
+  }
+
+  .hero-actions-zone {
+    gap: 10px;
+  }
+
+  .hero-main-cta {
+    min-height: 74px;
+    padding: 12px 22px;
+  }
+
+  .nakka-link {
+    padding: 10px 20px;
+  }
+
+  .home-games-promo {
+    padding: 8px 20px;
+    gap: 2px;
+  }
+
+  .games-promo-cta {
+    font-size: 1rem;
+  }
+
+  .games-promo-note {
+    font-size: 0.76rem;
+  }
+}
+
+body:has(#home-screen.screen.active) {
+  overflow: hidden;
+}
+
 @keyframes spin-border {
   to {
     transform: rotate(1turn);
