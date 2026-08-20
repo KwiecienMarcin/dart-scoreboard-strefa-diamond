@@ -15,6 +15,12 @@
   let introTimeoutId = null;
 
   function qs(sel, root) { return (root || document).querySelector(sel); }
+  // bez opcjonalnego chainowania (?.) - starsze WebView na niektorych tabletach
+  // nie parsuja tej skladni i wywalaja caly skrypt bledem parsowania
+  function removeEl(sel) {
+    const el = qs(sel);
+    if (el) el.remove();
+  }
 
   // ---------------------------------------------------------------------
   // Style (odizolowane prefixem rlt-, żeby nigdy nie kolidowały ze stroną)
@@ -306,8 +312,8 @@
 
   function startSpin() {
     screenState = 'spinning';
-    qs('.rlt-keypad-row')?.remove();
-    qs('.rlt-confirm-panel')?.remove();
+    removeEl('.rlt-keypad-row');
+    removeEl('.rlt-confirm-panel');
     const statusEl = document.createElement('div');
     statusEl.className = 'rlt-status-text';
     statusEl.id = 'rlt-status';
@@ -320,7 +326,7 @@
     qs('.rlt-wheel-zone').insertBefore(readout, statusEl);
 
     qs('.rlt-title').textContent = 'Losujemy...';
-    qs('.rlt-msg')?.remove();
+    removeEl('.rlt-msg');
 
     const targetIdx = currentState.isWinner
       ? CIRCLE_ORDER.indexOf(selectedNumber)
@@ -425,7 +431,8 @@
         w: data.isWinner ? 1 : 0,
       });
 
-      const overlayOpen = qs('#rlt-overlay')?.classList.contains('rlt-open');
+      const overlayEl = qs('#rlt-overlay');
+      const overlayOpen = !!overlayEl && overlayEl.classList.contains('rlt-open');
 
       // "Zatrzymaj teraz" z panelu (albo koniec wymuszonego okna) zamyka nakładkę,
       // ale tylko dopóki gracz jeszcze nie zaczął rzutu - nie przerywamy w trakcie gry.
