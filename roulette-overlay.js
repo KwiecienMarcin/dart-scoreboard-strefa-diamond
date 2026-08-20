@@ -387,9 +387,18 @@
       document.body.appendChild(el);
     }
     el.textContent = 'RLT debug: ' + text;
+    // Zapisz blad tez w URL (bez przeladowania) - fully-mdm-updated pokazuje currentUrl
+    // kazdego tabletu na liscie urzadzen, wiec blad bedzie widoczny tam, bez ekranu/USB.
+    try {
+      const short = text.slice(0, 120);
+      history.replaceState(null, '', location.pathname + location.search + '#rlt-err=' + encodeURIComponent(short));
+    } catch (e2) {}
   }
   function clearDebugBadge() {
     document.getElementById('rlt-debug-badge')?.remove();
+    if (location.hash.startsWith('#rlt-err=')) {
+      try { history.replaceState(null, '', location.pathname + location.search); } catch (e2) {}
+    }
   }
 
   async function poll() {
