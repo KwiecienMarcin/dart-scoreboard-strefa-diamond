@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=2.1.108" />
+    <link rel="stylesheet" href="styles.css?v=2.1.109" />
   </head>
   <body>
     <div id="orientation-warning">
@@ -24,7 +24,7 @@
           <button id="menu-link" class="ghost-btn" type="button">Menu</button>
           <button id="games-link" class="ghost-btn games-link-btn" type="button">
             <span class="games-link-main">Gry</span>
-            <span class="games-link-badge">Nowość</span>
+            <span class="games-link-badge" id="games-link-badge">Nowość</span>
           </button>
           <button id="rules-link" class="ghost-btn" type="button">Zasady darta</button>
           <button id="home-link" class="ghost-btn" type="button">Strona główna</button>
@@ -39,7 +39,7 @@
             <div class="logo-wrap">
               <img src="/assets/logo_full_small.png" alt="Strefa Diamond logo" class="hero-logo brand-logo" />
             </div>
-            <p class="slogan">NAJLEPSZY WYMIAR DARTA</p>
+            <p class="slogan" id="home-slogan">NAJLEPSZY WYMIAR DARTA</p>
           </div>
 
           <div class="hero-divider"></div>
@@ -59,28 +59,28 @@
                 </svg>
               </span>
               <span class="hero-cta-text">
-                <span class="home-cta-main">DART SCOREBOARD</span>
-                <span class="home-cta-sub">Liczenie punktów</span>
+                <span class="home-cta-main" id="home-cta-main">DART SCOREBOARD</span>
+                <span class="home-cta-sub" id="home-cta-sub">Liczenie punktów</span>
               </span>
             </button>
 
             <button type="button" id="nakka-btn" class="nakka-link">
               <span class="nakka-name">NAKKA</span>
-              <span class="nakka-link-sub">Dostępne tylko na turnieje darterskie</span>
+              <span class="nakka-link-sub" id="nakka-sub">Dostępne tylko na turnieje darterskie</span>
             </button>
 
             <div class="home-badges">
-              <span>1-4 GRACZY</span>
-              <span>DOUBLE / SINGLE OUT</span>
+              <span id="badge-players">1-4 GRACZY</span>
+              <span id="badge-outmode">DOUBLE / SINGLE OUT</span>
             </div>
 
             <button type="button" id="home-games-promo" class="home-games-promo">
-              <span class="games-promo-cta">Wypróbuj nasze gry!</span>
-              <span class="games-promo-note">W weekendy wieczorem, o pełnych godzinach, grając w darta wygrywasz nagrody na barze!</span>
+              <span class="games-promo-cta" id="games-promo-cta">Wypróbuj nasze gry!</span>
+              <span class="games-promo-note" id="games-promo-note">W weekendy wieczorem, o pełnych godzinach, grając w darta wygrywasz nagrody na barze!</span>
             </button>
           </div>
 
-          <div class="hero-credit">by Marcin Kwiecień<span class="hero-version">v2.1.108</span></div>
+          <div class="hero-credit">by Marcin Kwiecień<span class="hero-version">v2.1.109</span></div>
         </div>
       </section>
 
@@ -294,7 +294,7 @@
       </div>
     </div>
 
-    <script src="script.js?v=2.1.108"></script>
-    <script src="roulette-overlay.js?v=2.1.108"></script>
+    <script src="script.js?v=2.1.109"></script>
+    <script src="roulette-overlay.js?v=2.1.109"></script>
   </body>
 </html>

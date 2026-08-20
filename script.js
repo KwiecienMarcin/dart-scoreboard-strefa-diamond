@@ -449,6 +449,15 @@ const t = {
     homeLink: 'Strona główna',
     menuLink: 'Menu baru',
     gamesLink: 'Gry',
+    gamesBadge: 'Nowość',
+    homeSlogan: 'NAJLEPSZY WYMIAR DARTA',
+    homeCtaMain: 'DART SCOREBOARD',
+    homeCtaSub: 'Liczenie punktów',
+    nakkaSubtitle: 'Dostępne tylko na turnieje darterskie',
+    badgePlayers: '1-4 GRACZY',
+    badgeOutMode: 'DOUBLE / SINGLE OUT',
+    gamesPromoCta: 'Wypróbuj nasze gry!',
+    gamesPromoNote: 'W weekendy wieczorem, o pełnych godzinach, grając w darta wygrywasz nagrody na barze!',
     playerDefaultName: (i) => `Zawodnik ${i}`,
     enterScore: 'Wpisz sumę rzutów',
     submit: 'Zatwierdź',
@@ -499,6 +508,15 @@ const t = {
     homeLink: 'Home',
     menuLink: 'Bar Menu',
     gamesLink: 'Games',
+    gamesBadge: 'New',
+    homeSlogan: 'THE ULTIMATE DART EXPERIENCE',
+    homeCtaMain: 'DART SCOREBOARD',
+    homeCtaSub: 'Score counting',
+    nakkaSubtitle: 'Available for dart tournaments only',
+    badgePlayers: '1-4 PLAYERS',
+    badgeOutMode: 'DOUBLE / SINGLE OUT',
+    gamesPromoCta: 'Try our games!',
+    gamesPromoNote: 'On weekend evenings, on the hour, playing darts wins you prizes at the bar!',
     playerDefaultName: (i) => `Player ${i}`,
     enterScore: 'Enter throws sum',
     submit: 'Submit',
@@ -854,6 +872,25 @@ function applyTranslations() {
   if (menuLink) menuLink.textContent = tr('menuLink');
   const gamesLinkMain = gamesLink?.querySelector('.games-link-main');
   if (gamesLinkMain) gamesLinkMain.textContent = tr('gamesLink');
+  const gamesLinkBadge = document.getElementById('games-link-badge');
+  if (gamesLinkBadge) gamesLinkBadge.textContent = tr('gamesBadge');
+
+  const homeSloganEl = document.getElementById('home-slogan');
+  const homeCtaMainEl = document.getElementById('home-cta-main');
+  const homeCtaSubEl = document.getElementById('home-cta-sub');
+  const nakkaSubEl = document.getElementById('nakka-sub');
+  const badgePlayersEl = document.getElementById('badge-players');
+  const badgeOutModeEl = document.getElementById('badge-outmode');
+  const gamesPromoCtaEl = document.getElementById('games-promo-cta');
+  const gamesPromoNoteEl = document.getElementById('games-promo-note');
+  if (homeSloganEl) homeSloganEl.textContent = tr('homeSlogan');
+  if (homeCtaMainEl) homeCtaMainEl.textContent = tr('homeCtaMain');
+  if (homeCtaSubEl) homeCtaSubEl.textContent = tr('homeCtaSub');
+  if (nakkaSubEl) nakkaSubEl.textContent = tr('nakkaSubtitle');
+  if (badgePlayersEl) badgePlayersEl.textContent = tr('badgePlayers');
+  if (badgeOutModeEl) badgeOutModeEl.textContent = tr('badgeOutMode');
+  if (gamesPromoCtaEl) gamesPromoCtaEl.textContent = tr('gamesPromoCta');
+  if (gamesPromoNoteEl) gamesPromoNoteEl.textContent = tr('gamesPromoNote');
   if (rulesLink) rulesLink.textContent = tr('rulesButton');
   if (rulesTitleEl) rulesTitleEl.textContent = tr('rulesTitle');
   if (scoreInputEl) scoreInputEl.placeholder = tr('enterScore');
