@@ -1,21 +1,23 @@
-// Ruletka (kolo fortuny) - nakladka do wstrzykniecia na dowolna strone.
-// Uzycie: <script src="roulette-overlay.js"></script> (i opcjonalnie ?devBoard=N w URL do testow lokalnych).
-// Zmien RLT_API na docelowy adres backendu (Railway) przed wdrozeniem produkcyjnym.
+// Ruletka (koło fortuny) - nakładka do wstrzyknięcia na dowolną stronę.
+// Użycie: <script src="roulette-overlay.js"></script> (i opcjonalnie ?devBoard=N w URL do testów lokalnych).
 (function () {
   const RLT_API = window.RLT_API_OVERRIDE || 'https://192.168.0.245:4001';
   const RLT_POLL_MS = 3000;
   const RLT_DEV_BOARD = new URLSearchParams(location.search).get('devBoard');
   const SKIP_DELAY_MS = 5000;
+  const INTRO_TIMEOUT_MS = 60000;
   const CIRCLE_ORDER = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
 
-  let dismissedEventId = null; // event already skipped/closed this browser session
+  let dismissedEventId = null; // zdarzenie już pominięte/zamknięte w tej sesji przeglądarki
   let pollTimer = null;
   let uiBuilt = false;
+  let screenState = 'closed'; // 'closed' | 'intro' | 'throwing' | 'spinning' | 'result'
+  let introTimeoutId = null;
 
   function qs(sel, root) { return (root || document).querySelector(sel); }
 
   // ---------------------------------------------------------------------
-  // Styles (scoped with rlt- prefix so this never collides with the host page)
+  // Style (odizolowane prefixem rlt-, żeby nigdy nie kolidowały ze stroną)
   // ---------------------------------------------------------------------
   function injectStyles() {
     if (qs('#rlt-styles')) return;
@@ -48,16 +50,17 @@
       .rlt-msg { font-size: 1.05rem; color: rgba(255,255,255,0.85); line-height: 1.5; margin: 0 0 6px; }
       .rlt-prizes { color: #ffd449; font-weight: 700; }
       .rlt-btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
+      .rlt-btn-stack { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 24px; }
       .rlt-primary {
         background: linear-gradient(120deg, #ffd449, #f2ba2a); color: #151515; border: none; border-radius: 14px;
         padding: 13px 26px; font-family: "Rajdhani"; font-size: 1.05rem; font-weight: 700; cursor: pointer;
-        transition: transform 0.15s ease;
+        transition: transform 0.15s ease; min-width: 200px;
       }
       .rlt-primary:active { transform: scale(0.95); }
       .rlt-secondary {
         background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 14px;
         padding: 12px 24px; font-family: "Rajdhani"; font-size: 0.98rem; font-weight: 700; cursor: pointer;
-        opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        opacity: 0; pointer-events: none; transition: opacity 0.4s ease; min-width: 200px;
       }
       .rlt-secondary.rlt-visible { opacity: 1; pointer-events: auto; }
 
@@ -108,7 +111,7 @@
   }
 
   // ---------------------------------------------------------------------
-  // Wheel SVG helpers (same wedge math as Snajper/Wieza)
+  // Pomoce do rysowania koła (ta sama matematyka co Snajper/Wieża)
   // ---------------------------------------------------------------------
   const R = { backing: 236, doubleOut: 200, doubleIn: 182, outerSingleOut: 182, outerSingleIn: 116, tripleOut: 116, tripleIn: 100, innerSingleOut: 100, innerSingleIn: 26 };
   function polar(r, angleDeg) { const rad = (angleDeg * Math.PI) / 180; return { x: r * Math.sin(rad), y: -r * Math.cos(rad) }; }
@@ -189,7 +192,7 @@
   }
 
   // ---------------------------------------------------------------------
-  // DOM scaffold
+  // Szkielet DOM
   // ---------------------------------------------------------------------
   function buildDOM() {
     if (uiBuilt) return;
@@ -206,27 +209,30 @@
   }
 
   // ---------------------------------------------------------------------
-  // Screens
+  // Ekrany
   // ---------------------------------------------------------------------
-  let currentState = null; // last polled /api/roulette/state response
+  let currentState = null; // ostatnia odpowiedź /api/roulette/state
 
   function showOverlay() {
     qs('#rlt-overlay').classList.add('rlt-open');
   }
   function hideOverlay() {
     qs('#rlt-overlay').classList.remove('rlt-open');
+    screenState = 'closed';
+    clearTimeout(introTimeoutId);
   }
 
   function renderIntroScreen() {
+    screenState = 'intro';
     const card = qs('#rlt-card');
     const prizesText = (currentState.prizes || []).join(', ');
     card.innerHTML = `
-      <h2 class="rlt-title">Kolo Fortuny!</h2>
-      <p class="rlt-msg">Rzuc lotka, zakrec kolem i sprobuj trafic ten sam numer.</p>
-      <p class="rlt-msg">Mozesz wygrac: <span class="rlt-prizes">${prizesText}</span></p>
-      <div class="rlt-btn-row">
+      <h2 class="rlt-title">Koło Fortuny!</h2>
+      <p class="rlt-msg">Wykonaj rzut lotką, wpisz numer w który trafiłeś, a potem zakręć kołem.</p>
+      <p class="rlt-msg">Jeśli koło zatrzyma się na tym samym numerze, wygrywasz jedną z nagród: <span class="rlt-prizes">${prizesText}</span></p>
+      <div class="rlt-btn-stack">
         <button class="rlt-primary" id="rlt-continue-btn">Rzucam!</button>
-        <button class="rlt-secondary" id="rlt-skip-btn">Pomin</button>
+        <button class="rlt-secondary" id="rlt-skip-btn">Pomiń</button>
       </div>
     `;
     setTimeout(() => {
@@ -234,7 +240,18 @@
       if (skipBtn) skipBtn.classList.add('rlt-visible');
     }, SKIP_DELAY_MS);
 
-    qs('#rlt-continue-btn').addEventListener('click', renderThrowScreen);
+    clearTimeout(introTimeoutId);
+    introTimeoutId = setTimeout(() => {
+      if (screenState === 'intro') {
+        dismissedEventId = currentState.eventId;
+        hideOverlay();
+      }
+    }, INTRO_TIMEOUT_MS);
+
+    qs('#rlt-continue-btn').addEventListener('click', () => {
+      clearTimeout(introTimeoutId);
+      renderThrowScreen();
+    });
     qs('#rlt-skip-btn').addEventListener('click', () => {
       dismissedEventId = currentState.eventId;
       hideOverlay();
@@ -244,10 +261,11 @@
   let selectedNumber = null;
 
   function renderThrowScreen() {
+    screenState = 'throwing';
     selectedNumber = null;
     const card = qs('#rlt-card');
     card.innerHTML = `
-      <h2 class="rlt-title">W co trafiles?</h2>
+      <h2 class="rlt-title">Rzuć lotką i kliknij na kole bądź klawiaturze numer, który trafiłeś</h2>
       <div class="rlt-wheel-zone">
         <div class="rlt-wheel-wrap">
           <div class="rlt-pointer"></div>
@@ -255,7 +273,7 @@
         </div>
         <div class="rlt-keypad-row" id="rlt-keypad"></div>
         <div class="rlt-confirm-panel">
-          <span id="rlt-confirm-label" style="color:rgba(255,255,255,0.4);font-size:0.92rem;">Kliknij pole na tarczy albo uzyj klawiatury.</span>
+          <span id="rlt-confirm-label" style="color:rgba(255,255,255,0.4);font-size:0.92rem;">Kliknij pole na tarczy albo użyj klawiatury.</span>
         </div>
       </div>
     `;
@@ -281,19 +299,19 @@
     const panel = qs('.rlt-confirm-panel');
     panel.innerHTML = `
       <span class="rlt-hit-value">${num}</span>
-      <button class="rlt-primary" id="rlt-confirm-throw-btn" style="padding:9px 20px;font-size:0.92rem;">Zatwierdz</button>
+      <button class="rlt-primary" id="rlt-confirm-throw-btn" style="padding:9px 20px;font-size:0.92rem;">Zatwierdź</button>
     `;
     qs('#rlt-confirm-throw-btn').addEventListener('click', startSpin);
   }
 
   function startSpin() {
-    const card = qs('#rlt-card');
+    screenState = 'spinning';
     qs('.rlt-keypad-row')?.remove();
     qs('.rlt-confirm-panel')?.remove();
     const statusEl = document.createElement('div');
     statusEl.className = 'rlt-status-text';
     statusEl.id = 'rlt-status';
-    statusEl.textContent = 'Kolo sie kreci...';
+    statusEl.textContent = 'Losujemy...';
     qs('.rlt-wheel-zone').appendChild(statusEl);
 
     const readout = document.createElement('div');
@@ -301,7 +319,7 @@
     readout.id = 'rlt-readout';
     qs('.rlt-wheel-zone').insertBefore(readout, statusEl);
 
-    qs('.rlt-title').textContent = 'Kreci sie...';
+    qs('.rlt-title').textContent = 'Losujemy...';
     qs('.rlt-msg')?.remove();
 
     const targetIdx = currentState.isWinner
@@ -339,6 +357,7 @@
   }
 
   function finishSpin() {
+    screenState = 'result';
     const won = currentState.isWinner;
     const prizes = currentState.prizes && currentState.prizes.length ? currentState.prizes : ['nagroda'];
     const prize = prizes.join(', ');
@@ -348,8 +367,8 @@
     const card = qs('#rlt-card');
     const resultBlock = document.createElement('div');
     resultBlock.innerHTML = won
-      ? `<p class="rlt-result-title rlt-win">Wygrales!</p><p class="rlt-msg">Zapraszamy do baru po jedna z nagrod: <span class="rlt-prizes">${prize}</span></p>`
-      : `<p class="rlt-result-title rlt-lose">Nie tym razem</p><p class="rlt-msg">Sprobuj przy nastepnej okazji!</p>`;
+      ? `<p class="rlt-result-title rlt-win">Wygrałeś!</p><p class="rlt-msg">Zapraszamy do baru po jedną z nagród: <span class="rlt-prizes">${prize}</span></p>`
+      : `<p class="rlt-result-title rlt-lose">Nie tym razem</p><p class="rlt-msg">Spróbuj przy następnej okazji!</p>`;
     card.appendChild(resultBlock);
 
     const btnRow = document.createElement('div');
@@ -373,54 +392,32 @@
   }
 
   // ---------------------------------------------------------------------
-  // Polling
+  // Odpytywanie
   // ---------------------------------------------------------------------
-  // TYMCZASOWE narzedzie diagnostyczne: male, dyskretne info w rogu ekranu, widoczne
-  // TYLKO gdy poll() sie nie powiedzie - zeby dalo sie odczytac blad prosto z ekranu
-  // tabletu bez USB/DevTools. Usunac po znalezieniu i naprawieniu przyczyny.
-  function showDebugBadge(text) {
-    let el = document.getElementById('rlt-debug-badge');
-    if (!el) {
-      el = document.createElement('div');
-      el.id = 'rlt-debug-badge';
-      el.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:99999;background:rgba(200,0,0,0.85);color:#fff;font:11px monospace;padding:4px 8px;border-radius:6px;max-width:90vw;word-break:break-all;pointer-events:none;';
-      document.body.appendChild(el);
-    }
-    el.textContent = 'RLT debug: ' + text;
-    // Zapisz blad tez w URL (bez przeladowania) - fully-mdm-updated pokazuje currentUrl
-    // kazdego tabletu na liscie urzadzen, wiec blad bedzie widoczny tam, bez ekranu/USB.
-    try {
-      const short = text.slice(0, 120);
-      history.replaceState(null, '', location.pathname + location.search + '#rlt-err=' + encodeURIComponent(short));
-    } catch (e2) {}
-  }
-  function clearDebugBadge() {
-    document.getElementById('rlt-debug-badge')?.remove();
-    if (location.hash.startsWith('#rlt-err=')) {
-      try { history.replaceState(null, '', location.pathname + location.search); } catch (e2) {}
-    }
-  }
-
   async function poll() {
     try {
       const devParam = RLT_DEV_BOARD ? `?devBoard=${encodeURIComponent(RLT_DEV_BOARD)}` : '';
       const res = await fetch(`${RLT_API}/api/roulette/state${devParam}`);
-      if (!res.ok) {
-        showDebugBadge(`HTTP ${res.status} z ${RLT_API}`);
-        return;
-      }
+      if (!res.ok) return;
       const data = await res.json();
       currentState = data;
-      clearDebugBadge();
 
       const overlayOpen = qs('#rlt-overlay')?.classList.contains('rlt-open');
+
+      // "Zatrzymaj teraz" z panelu (albo koniec wymuszonego okna) zamyka nakładkę,
+      // ale tylko dopóki gracz jeszcze nie zaczął rzutu - nie przerywamy w trakcie gry.
+      if (overlayOpen && !data.active && screenState === 'intro') {
+        hideOverlay();
+        return;
+      }
+
       if (data.active && !data.alreadyUsed && data.eventId !== dismissedEventId && !overlayOpen) {
         buildDOM();
         renderIntroScreen();
         showOverlay();
       }
     } catch (e) {
-      showDebugBadge(`${e.name}: ${e.message} (${RLT_API})`);
+      // backend niedostępny - spróbuj ponownie przy kolejnym odpytaniu
     }
   }
 

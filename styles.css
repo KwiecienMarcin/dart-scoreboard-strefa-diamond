@@ -294,9 +294,79 @@ body {
   position: absolute;
   right: 18px;
   bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
   color: rgba(255, 255, 255, 0.72);
   font-size: clamp(0.95rem, 1.2vw, 1.1rem);
   letter-spacing: 1px;
+}
+
+.hero-version {
+  font-size: 0.65rem;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.games-link-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  line-height: 1.1;
+}
+
+.games-link-main {
+  color: #ff4d4d;
+  font-weight: 700;
+}
+
+.games-link-badge {
+  color: #f2ba2a;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.home-games-promo {
+  z-index: 2;
+  width: 100%;
+  border: 1px solid rgba(242, 186, 42, 0.35);
+  background: rgba(242, 186, 42, 0.08);
+  border-radius: 16px;
+  padding: 12px 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.home-games-promo:hover {
+  background: rgba(242, 186, 42, 0.14);
+  border-color: rgba(242, 186, 42, 0.55);
+}
+
+.home-games-promo:active {
+  transform: scale(0.97);
+}
+
+.games-promo-cta {
+  font-family: "Bebas Neue", "Rajdhani", sans-serif;
+  color: var(--accent-2);
+  letter-spacing: 1.5px;
+  font-size: 1.15rem;
+}
+
+.games-promo-note {
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 500;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.65);
+  text-align: center;
 }
 
 h1,
@@ -1333,6 +1403,7 @@ select,
   .hero-credit {
     position: static;
     margin-top: 4px;
+    align-items: center;
     text-align: center;
   }
 

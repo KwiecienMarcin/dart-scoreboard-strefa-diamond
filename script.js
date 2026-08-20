@@ -42,6 +42,7 @@ const menuPanels = document.querySelectorAll('.menu-panel');
 const menuSubtabs = document.querySelectorAll('.menu-subtab');
 const rulesModal = document.getElementById('rules-modal');
 const gamesLink = document.getElementById('games-link');
+const homeGamesPromo = document.getElementById('home-games-promo');
 const gamesModal = document.getElementById('games-modal');
 const gamesClose = document.getElementById('games-close');
 const rulesClose = document.getElementById('rules-close');
@@ -1442,6 +1443,10 @@ rulesModal?.addEventListener('click', (e) => {
 
 gamesLink?.addEventListener('click', () => {
   bounceClass(gamesLink, 'pressed');
+  openModal(gamesModal);
+});
+homeGamesPromo?.addEventListener('click', () => {
+  bounceClass(homeGamesPromo, 'pressed');
   openModal(gamesModal);
 });
 gamesClose?.addEventListener('click', () => closeModal(gamesModal));
