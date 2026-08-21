@@ -56,6 +56,7 @@
       .rlt-msg { font-size: 1.05rem; color: rgba(255,255,255,0.85); line-height: 1.5; margin: 0 0 6px; }
       .rlt-prizes { color: #ffd449; font-weight: 700; }
       .rlt-note { font-size: 0.85rem; color: rgba(255,255,255,0.55); margin: 10px 0 0; line-height: 1.4; }
+      .rlt-note-red { font-size: 0.95rem; color: #ff5555; font-weight: 700; margin: 10px 0 0; line-height: 1.4; }
       .rlt-btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
       .rlt-btn-stack { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 24px; }
       .rlt-primary {
@@ -239,7 +240,7 @@
     const card = qs('#rlt-card');
     const prizesText = (currentState.prizes || []).join(' • ');
     card.innerHTML = `
-      <h2 class="rlt-title">Koło Fortuny!</h2>
+      <h2 class="rlt-title">Wygraj nagrodę z baru!</h2>
       <p class="rlt-msg">Wykonaj rzut lotką, wpisz numer w który trafiłeś, a potem zakręć kołem.</p>
       <p class="rlt-msg">Jeśli koło zatrzyma się na tym samym numerze, wygrywasz jedną z nagród: <span class="rlt-prizes">${prizesText}</span></p>
       <p class="rlt-note">Wygrać można tylko na tarczy, którą sam(a) wynająłeś/wynajęłaś - gra na innej tarczy się nie liczy.</p>
@@ -325,7 +326,7 @@
     const statusEl = document.createElement('div');
     statusEl.className = 'rlt-status-text';
     statusEl.id = 'rlt-status';
-    statusEl.textContent = 'Losujemy...';
+    statusEl.textContent = 'Konkurs trwa...';
     qs('.rlt-wheel-zone').appendChild(statusEl);
 
     const readout = document.createElement('div');
@@ -333,7 +334,7 @@
     readout.id = 'rlt-readout';
     qs('.rlt-wheel-zone').insertBefore(readout, statusEl);
 
-    qs('.rlt-title').textContent = 'Losujemy...';
+    qs('.rlt-title').textContent = 'Konkurs trwa...';
     removeEl('.rlt-msg');
 
     const targetIdx = currentState.isWinner
@@ -381,7 +382,7 @@
     const card = qs('#rlt-card');
     const resultBlock = document.createElement('div');
     resultBlock.innerHTML = won
-      ? `<p class="rlt-result-title rlt-win">Wygrałeś!</p><p class="rlt-msg">Zapraszamy do baru po jedną z nagród:</p><p class="rlt-msg"><span class="rlt-prizes">${prize}</span></p><p class="rlt-note">Wygrana obowiązuje tylko na tarczy nr ${currentState.board}, którą wynająłeś/wynajęłaś. Obsługa może to zweryfikować przy odbiorze nagrody.</p>`
+      ? `<p class="rlt-result-title rlt-win">Wygrałeś!</p><p class="rlt-msg">Zapraszamy do baru po jedną z nagród:</p><p class="rlt-msg"><span class="rlt-prizes">${prize}</span></p><p class="rlt-note-red">Podejdź do baru z pudełkiem od tarczy nr ${currentState.board}, na której grasz.</p><p class="rlt-note">Wygrana obowiązuje tylko na tej tarczy - obsługa może to zweryfikować przy odbiorze nagrody.</p>`
       : `<p class="rlt-result-title rlt-lose">Nie tym razem</p><p class="rlt-msg">Spróbuj przy następnej okazji!</p>`;
     card.appendChild(resultBlock);
 
